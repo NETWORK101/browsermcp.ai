@@ -1,0 +1,29 @@
+{
+  "name": "headlessdev",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Browser capabilities for AI coding agents via MCP protocol",
+  "bin": {
+    "headlessdev": "./bin/headlessdev.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@mozilla/readability": "^0.5.0",
+    "better-sqlite3": "^9.0.0",
+    "playwright": "^1.48.0",
+    "turndown": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/node": "^22.0.0",
+    "@types/turndown": "^5.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^2.0.0"
+  }
+}
