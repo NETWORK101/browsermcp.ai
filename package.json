@@ -1,15 +1,39 @@
 {
   "name": "headlessdev",
   "version": "0.1.0",
+  "description": "Give your AI agent a browser. MCP server for headless browser automation with 10-50x token reduction.",
   "type": "module",
-  "description": "Browser capabilities for AI coding agents via MCP protocol",
+  "main": "dist/src/index.js",
   "bin": {
-    "headlessdev": "./bin/headlessdev.ts"
+    "headlessdev": "dist/bin/headlessdev.js"
   },
+  "files": [
+    "dist/"
+  ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/bin/headlessdev.js",
     "test": "vitest run",
-    "dev": "tsx src/index.ts"
+    "dev": "tsx src/index.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "browser",
+    "headless",
+    "ai",
+    "agent",
+    "playwright",
+    "claude",
+    "cursor",
+    "automation"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/headlessdev/headlessdev"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",

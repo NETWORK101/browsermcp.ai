@@ -1,5 +1,4 @@
 import TurndownService from 'turndown';
-// turndown-plugin-gfm has no bundled types — use dynamic import with any cast
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { gfm } from 'turndown-plugin-gfm';
 
@@ -14,7 +13,8 @@ function buildTurndown(): TurndownService {
   td.use(gfm);
 
   // Strip remaining noise tags outright
-  td.remove(['script', 'style', 'svg', 'noscript']);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  td.remove(['script', 'style', 'svg', 'noscript'] as any);
 
   // Truncate data: URIs on images to keep markdown readable
   td.addRule('images-no-data-uri', {
