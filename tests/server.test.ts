@@ -95,11 +95,11 @@ describe("MCP server", () => {
     expect(items.required).not.toContain("value");
   });
 
-  it("calling any tool returns placeholder response", async () => {
+  it("calling unknown tool returns error response", async () => {
     const { client } = await startServer();
-    const result = await client.callTool({ name: "browse", arguments: { url: "https://example.com" } });
+    const result = await client.callTool({ name: "unknown_tool", arguments: {} });
     expect(result.content).toHaveLength(1);
     expect((result.content[0] as { type: string; text: string }).type).toBe("text");
-    expect((result.content[0] as { type: string; text: string }).text).toBe("not implemented yet");
+    expect((result.content[0] as { type: string; text: string }).text).toContain("Unknown tool");
   });
 });

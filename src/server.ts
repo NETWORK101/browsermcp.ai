@@ -3,6 +3,11 @@ import {
   ListToolsRequestSchema,
   CallToolRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
+import { BrowserManager } from './browser/manager.js';
+import { handleBrowse } from './tools/browse.js';
+import { handleExtract } from './tools/extract.js';
+import { handleScreenshot } from './tools/screenshot.js';
+import { handleInteract } from './tools/interact.js';
 
 const TOOLS = [
   {
@@ -90,21 +95,34 @@ const TOOLS = [
   },
 ];
 
-const PLACEHOLDER_RESPONSE = {
-  content: [{ type: "text" as const, text: "not implemented yet" }],
-};
-
 export function createServer(): Server {
   const server = new Server(
     { name: "headlessdev", version: "0.1.0" },
     { capabilities: { tools: {} } }
   );
 
+  const browserManager = new BrowserManager();
+
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: TOOLS,
   }));
 
-  server.setRequestHandler(CallToolRequestSchema, async () => PLACEHOLDER_RESPONSE);
+  server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    const { name, arguments: args } = request.params;
+
+    switch (name) {
+      case 'browse':
+        return handleBrowse(args as any, browserManager);
+      case 'extract':
+        return handleExtract(args as any, browserManager);
+      case 'screenshot':
+        return handleScreenshot(args as any, browserManager);
+      case 'interact':
+        return handleInteract(args as any, browserManager);
+      default:
+        return { content: [{ type: 'text', text: `Unknown tool: ${name}` }] };
+    }
+  });
 
   return server;
 }
