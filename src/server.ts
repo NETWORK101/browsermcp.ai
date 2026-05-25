@@ -8,6 +8,8 @@ import { handleBrowse } from './tools/browse.js';
 import { handleExtract } from './tools/extract.js';
 import { handleScreenshot } from './tools/screenshot.js';
 import { handleInteract } from './tools/interact.js';
+import { UsageTracker } from './cost/tracker.js';
+import { CircuitBreaker } from './cost/circuit-breaker.js';
 
 const TOOLS = [
   {
@@ -95,6 +97,16 @@ const TOOLS = [
   },
 ];
 
+function estimateTokensFromResult(result: { content: Array<{ type: string; text?: string }> }): number {
+  let chars = 0;
+  for (const item of result.content) {
+    if (item.type === 'text' && item.text) {
+      chars += item.text.length;
+    }
+  }
+  return Math.ceil(chars / 4);
+}
+
 export function createServer(): Server {
   const server = new Server(
     { name: "headlessdev", version: "0.1.0" },
@@ -102,6 +114,8 @@ export function createServer(): Server {
   );
 
   const browserManager = new BrowserManager();
+  const tracker = new UsageTracker();
+  const circuitBreaker = new CircuitBreaker(tracker);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: TOOLS,
@@ -110,18 +124,36 @@ export function createServer(): Server {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params;
 
+    const check = circuitBreaker.check();
+    if (!check.allowed) {
+      return { content: [{ type: 'text', text: check.message! }] };
+    }
+
+    const startTime = Date.now();
+    let result: { content: Array<{ type: string; text?: string }> };
+
     switch (name) {
       case 'browse':
-        return handleBrowse(args as any, browserManager);
+        result = await handleBrowse(args as any, browserManager);
+        break;
       case 'extract':
-        return handleExtract(args as any, browserManager);
+        result = await handleExtract(args as any, browserManager);
+        break;
       case 'screenshot':
-        return handleScreenshot(args as any, browserManager);
+        result = await handleScreenshot(args as any, browserManager);
+        break;
       case 'interact':
-        return handleInteract(args as any, browserManager);
+        result = await handleInteract(args as any, browserManager);
+        break;
       default:
         return { content: [{ type: 'text', text: `Unknown tool: ${name}` }] };
     }
+
+    const durationMs = Date.now() - startTime;
+    const url = (args as any)?.url;
+    tracker.record(name, estimateTokensFromResult(result), durationMs, url);
+
+    return result;
   });
 
   return server;
