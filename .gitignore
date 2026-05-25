@@ -2,3 +2,4 @@ node_modules
 dist
 *.db
 .headlessdev
+LAUNCH.md
