@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>headlessdev — Use Case Marketplace</title>
+<meta name="description" content="Browse common use cases for headlessdev across industries. Pre-built workflows for competitor monitoring, QA testing, research, and more.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --cream: #F7F3EE; --ink: #1A1A18; --ink-light: #3D3D38; --ink-muted: #8A8A82;
+  --accent: #C84B31; --accent-glow: #E8623D;
+  --green: #4ADE80; --blue: #60A5FA; --amber: #FBBF24; --purple: #A78BFA; --pink: #F472B6; --teal: #2DD4BF;
+  --terminal-bg: #0D0F11; --terminal-text: #D4D4D8; --terminal-dim: #52525B;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+  --max-w: 1200px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--sans); background: var(--cream); color: var(--ink); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+body::before { content: ''; position: fixed; inset: 0; opacity: 0.03; pointer-events: none; z-index: 9999; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); background-size: 128px; }
+
+/* NAV */
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center; background: rgba(247, 243, 238, 0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(26, 26, 24, 0.06); }
+.nav-logo { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: -0.03em; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; align-items: center; list-style: none; }
+.nav-links a { font-size: 0.875rem; color: var(--ink-muted); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: var(--ink); }
+.nav-links a.active { color: var(--accent); }
+.nav-cta { font-family: var(--mono) !important; font-size: 0.8rem !important; background: var(--ink); color: var(--cream) !important; padding: 0.5rem 1.25rem; border-radius: 6px; }
+
+/* HERO */
+.hero { padding: 10rem 2rem 4rem; text-align: center; position: relative; }
+.hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, rgba(200, 75, 49, 0.04) 0%, transparent 50%); pointer-events: none; }
+.hero-label { font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 1.5rem; }
+.hero h1 { font-family: var(--serif); font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 400; line-height: 1.1; letter-spacing: -0.03em; max-width: 800px; margin: 0 auto 1.5rem; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero p { font-size: 1.15rem; color: var(--ink-muted); max-width: 600px; margin: 0 auto 2.5rem; line-height: 1.7; }
+.hero-stats { display: flex; justify-content: center; gap: 3rem; }
+.hero-stat { text-align: center; }
+.hero-stat-num { font-family: var(--serif); font-size: 2.5rem; font-weight: 700; color: var(--ink); line-height: 1; }
+.hero-stat-label { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-muted); margin-top: 0.4rem; }
+
+/* FILTER BAR */
+.filter-bar { max-width: var(--max-w); margin: 3rem auto 0; padding: 0 2rem; display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.filter-chip { font-family: var(--mono); font-size: 0.75rem; padding: 0.5rem 1rem; border-radius: 20px; border: 1px solid rgba(26,26,24,0.1); background: white; color: var(--ink-muted); cursor: pointer; transition: all 0.2s; }
+.filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+.filter-chip.active { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+/* GRID */
+.marketplace { max-width: var(--max-w); margin: 0 auto; padding: 3rem 2rem 4rem; }
+.marketplace-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+
+/* CARDS */
+.uc-card { background: white; border: 1px solid rgba(26,26,24,0.06); border-radius: 14px; padding: 2rem; transition: all 0.3s; cursor: default; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+.uc-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.uc-card:hover { border-color: rgba(26,26,24,0.12); box-shadow: 0 8px 30px rgba(0,0,0,0.05); transform: translateY(-2px); }
+.uc-card:hover::before { transform: scaleX(1); }
+.uc-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+.uc-card-icon { font-size: 0.75rem; font-family: var(--mono); font-weight: 700; width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.uc-card-tags { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.uc-tag { font-family: var(--mono); font-size: 0.55rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0.25rem 0.5rem; border-radius: 4px; }
+.uc-tag-cat { background: rgba(200,75,49,0.08); color: var(--accent); }
+.uc-tag-audience { border: 1px solid rgba(26,26,24,0.08); color: var(--ink-muted); }
+.uc-card-title { font-family: var(--sans); font-size: 1.05rem; font-weight: 600; color: var(--ink); margin-bottom: 0.5rem; }
+.uc-card-desc { font-size: 0.88rem; color: var(--ink-muted); line-height: 1.6; margin-bottom: 1rem; flex: 1; }
+.uc-card-gap { font-family: var(--mono); font-size: 0.72rem; color: var(--accent); margin-bottom: 1rem; line-height: 1.5; }
+.uc-card-prompt { background: var(--cream); border-radius: 8px; padding: 0.75rem 1rem; font-size: 0.8rem; color: var(--ink-light); line-height: 1.5; border: 1px solid rgba(26,26,24,0.04); }
+.uc-card-prompt-label { font-family: var(--mono); font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--ink-muted); margin-bottom: 0.3rem; }
+.uc-card-tools { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.uc-tool-badge { font-family: var(--mono); font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 4px; background: rgba(74, 222, 128, 0.1); color: var(--green); border: 1px solid rgba(74, 222, 128, 0.15); }
+
+/* CATEGORY COLORS */
+.cat-monitoring::before { background: var(--amber); }
+.cat-research::before { background: var(--blue); }
+.cat-testing::before { background: var(--green); }
+.cat-data::before { background: var(--purple); }
+.cat-marketing::before { background: var(--pink); }
+.cat-ops::before { background: var(--teal); }
+
+/* GAP SECTION */
+.gap-section { max-width: var(--max-w); margin: 0 auto; padding: 4rem 2rem 6rem; }
+.gap-banner { background: var(--ink); border-radius: 16px; padding: 3.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; color: var(--cream); }
+.gap-banner h2 { font-family: var(--serif); font-size: 2.5rem; font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+.gap-banner p { color: rgba(247,243,238,0.55); font-size: 1rem; line-height: 1.7; }
+.gap-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+.gap-item { display: flex; align-items: flex-start; gap: 1rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.25rem 1.5rem; }
+.gap-item-icon { font-size: 1.3rem; flex-shrink: 0; margin-top: 0.1rem; }
+.gap-item-text { font-size: 0.9rem; color: rgba(247,243,238,0.7); line-height: 1.5; }
+.gap-item-text strong { color: var(--cream); }
+
+/* CTA */
+.mkt-cta { padding: 5rem 2rem; background: #F2EDE7; text-align: center; }
+.mkt-cta h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; letter-spacing: -0.02em; margin-bottom: 1rem; }
+.mkt-cta p { color: var(--ink-muted); font-size: 1.05rem; margin-bottom: 2rem; }
+.mkt-cta-cmd { display: inline-block; background: var(--ink); color: var(--green); font-family: var(--mono); font-size: 1rem; padding: 1rem 2rem; border-radius: 10px; text-decoration: none; transition: all 0.2s; border: none; cursor: pointer; }
+.mkt-cta-cmd:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
+.mkt-cta-links { display: flex; justify-content: center; gap: 2rem; margin-top: 1.5rem; }
+.mkt-cta-links a { color: var(--ink-muted); text-decoration: none; font-size: 0.85rem; }
+.mkt-cta-links a:hover { color: var(--accent); }
+
+footer { padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--ink-muted); }
+footer a { color: var(--accent); text-decoration: none; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .marketplace-grid { grid-template-columns: 1fr; }
+  .gap-banner { grid-template-columns: 1fr; }
+  .hero-stats { gap: 1.5rem; }
+  .nav-links { display: none; }
+}
+
+/* ANIMATION */
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">&lt;<span>headless</span>dev /&gt;</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="marketplace.html" class="active">Use Cases</a></li>
+    <li><a href="index.html#tools">Tools</a></li>
+    <li><a href="https://github.com/NETWORK101/headlessdev" class="nav-cta">GitHub</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-label">Use Case Marketplace</div>
+  <h1>The browser gap,<br><em>solved by industry.</em></h1>
+  <p>AI agents can't browse the web. headlessdev fixes that. Browse ready-made workflows for your industry, or build your own in minutes.</p>
+  <div class="hero-stats">
+    <div class="hero-stat">
+      <div class="hero-stat-num">6</div>
+      <div class="hero-stat-label">Categories</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">18</div>
+      <div class="hero-stat-label">Use Cases</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-num">4</div>
+      <div class="hero-stat-label">Tools</div>
+    </div>
+  </div>
+</section>
+
+<div class="filter-bar" id="filterBar"></div>
+
+<section class="marketplace">
+  <div class="marketplace-grid" id="marketplaceGrid"></div>
+</section>
+
+<section class="gap-section">
+  <div class="gap-banner reveal">
+    <div>
+      <h2>Why this matters now.</h2>
+      <p>Every AI tool today hits the same wall: it can reason, generate, and analyze, but it can't see the web. This creates a critical gap in every workflow that depends on live web data. headlessdev bridges that gap with one install, zero cost, and universal agent compatibility.</p>
+    </div>
+    <ul class="gap-list">
+      <li class="gap-item">
+        <div class="gap-item-icon">\uD83D\uDEAB</div>
+        <div class="gap-item-text"><strong>The gap:</strong> AI agents cannot access, read, or interact with websites. Every workflow requiring live web data breaks.</div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-item-icon">\uD83D\uDCB8</div>
+        <div class="gap-item-text"><strong>Current workarounds cost $20-99/mo</strong> per seat for cloud browser services, and waste 50x more tokens on raw HTML dumps.</div>
+      </li>
+      <li class="gap-item">
+        <div class="gap-item-icon">\u2705</div>
+        <div class="gap-item-text"><strong>headlessdev closes it for free.</strong> One command. Local execution. 10-50x token reduction. Works with Claude, Codex, and Cursor.</div>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<section class="mkt-cta">
+  <h2>Start using these workflows today.</h2>
+  <p>One install. Every use case above works immediately with Claude Code, Codex CLI, or Cursor.</p>
+  <button class="mkt-cta-cmd" id="mktCopyBtn">$ npx headlessdev init</button>
+  <div class="mkt-cta-links">
+    <a href="https://github.com/NETWORK101/headlessdev">GitHub</a>
+    <a href="index.html">Back to home</a>
+  </div>
+</section>
+
+<footer>
+  <a href="https://github.com/NETWORK101/headlessdev">headlessdev</a> &mdash; MIT License. Give your AI agent a browser.
+</footer>
+
+<script>
+// ═══ USE CASE DATA ═══
+var useCases = [
+  // MONITORING & INTELLIGENCE
+  { cat: 'monitoring', catLabel: 'Monitoring', catClass: 'cat-monitoring', iconLetter: 'M', iconBg: 'rgba(251,191,36,0.12)', iconColor: '#FBBF24', title: 'Competitor Price Tracking', audience: 'Business',
+    desc: 'Automatically monitor competitor pricing pages daily. Get alerts when plans change, features are added, or pricing shifts.',
+    gap: 'Gap: AI can\'t check competitor websites without browser access.',
+    prompt: '"Browse acme.com/pricing weekly and flag any changes to their plan structure, pricing, or feature list compared to last check."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'monitoring', catLabel: 'Monitoring', catClass: 'cat-monitoring', iconLetter: 'R', iconBg: 'rgba(251,191,36,0.12)', iconColor: '#FBBF24', title: 'Review & Mention Monitoring', audience: 'Marketing',
+    desc: 'Track G2, Capterra, Trustpilot, and social platforms for new reviews and brand mentions. Summarize sentiment automatically.',
+    gap: 'Gap: Review sites require browser rendering to access content.',
+    prompt: '"Check G2 and Capterra for new reviews of our product this week. Summarize themes and flag any negative reviews scoring below 3 stars."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'monitoring', catLabel: 'Monitoring', catClass: 'cat-monitoring', iconLetter: 'N', iconBg: 'rgba(251,191,36,0.12)', iconColor: '#FBBF24', title: 'Industry News Aggregation', audience: 'Business',
+    desc: 'Crawl industry news sites, blogs, and press release pages. Build a weekly digest without manual browsing.',
+    gap: 'Gap: News sites require JavaScript rendering and cookie consent handling.',
+    prompt: '"Collect the top AI news stories from TechCrunch, The Verge, and Hacker News from this week. Create a formatted digest with links."',
+    tools: ['browse', 'extract'] },
+
+  // MARKET RESEARCH
+  { cat: 'research', catLabel: 'Research', catClass: 'cat-research', iconLetter: 'L', iconBg: 'rgba(96,165,250,0.12)', iconColor: '#60A5FA', title: 'Market Landscape Mapping', audience: 'Business',
+    desc: 'Research competitor websites, extract feature comparisons, pricing models, and positioning. Build competitive intelligence reports.',
+    gap: 'Gap: Comparing 10+ competitor websites requires browser access to each.',
+    prompt: '"Visit these 8 competitor websites and build a comparison table of: pricing tiers, key features, target audience, and any free trial offers."',
+    tools: ['browse', 'extract', 'screenshot'] },
+
+  { cat: 'research', catLabel: 'Research', catClass: 'cat-research', iconLetter: 'E', iconBg: 'rgba(96,165,250,0.12)', iconColor: '#60A5FA', title: 'Lead Enrichment', audience: 'Sales',
+    desc: 'Visit prospect company websites and extract team size, tech stack, recent news, funding status, and key contacts from about pages.',
+    gap: 'Gap: Company websites have dynamic content that needs browser rendering.',
+    prompt: '"Browse these 20 company websites and create a spreadsheet with: company name, team size estimate, industry, key products, and any recent news or blog posts."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'research', catLabel: 'Research', catClass: 'cat-research', iconLetter: 'D', iconBg: 'rgba(96,165,250,0.12)', iconColor: '#60A5FA', title: 'Documentation Ingestion', audience: 'Developer',
+    desc: 'Crawl API documentation, SDK guides, and reference pages. Feed structured content directly into your agent\'s context for coding tasks.',
+    gap: 'Gap: Docs sites use JS rendering, tabs, and code toggles that raw fetch misses.',
+    prompt: '"Browse the Stripe API docs for the Payments section. Extract all endpoint URLs, required parameters, and example request/response pairs."',
+    tools: ['browse', 'extract'] },
+
+  // QA & TESTING
+  { cat: 'testing', catLabel: 'QA & Testing', catClass: 'cat-testing', iconLetter: 'S', iconBg: 'rgba(74,222,128,0.12)', iconColor: '#4ADE80', title: 'Signup Flow Testing', audience: 'Developer',
+    desc: 'Navigate through your signup, onboarding, or checkout flows. Report broken elements, slow pages, or UX issues before customers find them.',
+    gap: 'Gap: Testing flows requires browser interaction, not just HTTP requests.',
+    prompt: '"Navigate our signup flow at app.example.com/signup. Fill the form with test data, submit, and report any errors, slow loads, or confusing steps."',
+    tools: ['browse', 'interact', 'screenshot'] },
+
+  { cat: 'testing', catLabel: 'QA & Testing', catClass: 'cat-testing', iconLetter: 'V', iconBg: 'rgba(74,222,128,0.12)', iconColor: '#4ADE80', title: 'Visual Regression Testing', audience: 'Developer',
+    desc: 'Screenshot key pages before and after deploys. Compare visual differences to catch CSS regressions, layout shifts, and broken components.',
+    gap: 'Gap: Visual testing requires rendering pages in a real browser engine.',
+    prompt: '"Screenshot our homepage, pricing page, and dashboard at these URLs. Save them as baseline images for comparison after the next deploy."',
+    tools: ['screenshot'] },
+
+  { cat: 'testing', catLabel: 'QA & Testing', catClass: 'cat-testing', iconLetter: 'B', iconBg: 'rgba(74,222,128,0.12)', iconColor: '#4ADE80', title: 'Broken Link Detection', audience: 'Developer',
+    desc: 'Crawl your website and check every internal and external link. Report 404s, redirects, and unreachable pages.',
+    gap: 'Gap: SPAs generate links dynamically &mdash; can\'t be found without browser rendering.',
+    prompt: '"Browse every page on docs.example.com and check all links. Report any that return 404, redirect unexpectedly, or fail to load."',
+    tools: ['browse', 'interact'] },
+
+  // DATA COLLECTION
+  { cat: 'data', catLabel: 'Data Collection', catClass: 'cat-data', iconLetter: 'J', iconBg: 'rgba(167,139,250,0.12)', iconColor: '#A78BFA', title: 'Job Market Analysis', audience: 'Business',
+    desc: 'Monitor job posting sites for competitor hiring patterns, salary ranges, and emerging role types in your industry.',
+    gap: 'Gap: Job sites use heavy JavaScript and anti-bot measures.',
+    prompt: '"Browse the careers pages of these 5 competitors and extract: open positions, departments hiring, location requirements, and any salary information listed."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'data', catLabel: 'Data Collection', catClass: 'cat-data', iconLetter: 'P', iconBg: 'rgba(167,139,250,0.12)', iconColor: '#A78BFA', title: 'Real Estate Monitoring', audience: 'Business',
+    desc: 'Track property listings, price changes, and new inventory across real estate platforms. Build market intelligence dashboards.',
+    gap: 'Gap: Real estate sites use complex JS rendering for listing cards.',
+    prompt: '"Browse Zillow listings in [zipcode] and extract: address, price, bedrooms, square footage, and days on market for all listings under $500K."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'data', catLabel: 'Data Collection', catClass: 'cat-data', iconLetter: '$', iconBg: 'rgba(167,139,250,0.12)', iconColor: '#A78BFA', title: 'E-commerce Price Intelligence', audience: 'Business',
+    desc: 'Monitor product prices across retailers. Track stock availability, promotional pricing, and bundle offers.',
+    gap: 'Gap: E-commerce sites have dynamic pricing that requires browser execution.',
+    prompt: '"Check the price of [product] across Amazon, Best Buy, and Walmart. Report current price, availability, and any active coupon codes or promotions."',
+    tools: ['browse', 'extract'] },
+
+  // MARKETING & CONTENT
+  { cat: 'marketing', catLabel: 'Marketing', catClass: 'cat-marketing', iconLetter: 'SE', iconBg: 'rgba(244,114,182,0.12)', iconColor: '#F472B6', title: 'SEO Audit & Monitoring', audience: 'Marketing',
+    desc: 'Browse your pages and check meta tags, heading structure, image alt text, page speed indicators, and content quality signals.',
+    gap: 'Gap: SEO audits need rendered DOM to check dynamic meta tags and structured data.',
+    prompt: '"Browse our top 10 landing pages and audit each for: title tag, meta description, H1 usage, image alt text, and any missing Open Graph tags."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'marketing', catLabel: 'Marketing', catClass: 'cat-marketing', iconLetter: 'UX', iconBg: 'rgba(244,114,182,0.12)', iconColor: '#F472B6', title: 'Content & Design Inspiration', audience: 'Marketing',
+    desc: 'Browse award-winning websites, collect design patterns, copy styles, and layout ideas. Build visual mood boards automatically.',
+    gap: 'Gap: Design inspiration requires visual rendering — raw HTML is meaningless.',
+    prompt: '"Screenshot the hero sections of these 10 SaaS landing pages. For each, extract the headline, subheadline, CTA text, and primary color."',
+    tools: ['browse', 'screenshot', 'extract'] },
+
+  { cat: 'marketing', catLabel: 'Marketing', catClass: 'cat-marketing', iconLetter: 'SP', iconBg: 'rgba(244,114,182,0.12)', iconColor: '#F472B6', title: 'Social Proof Collection', audience: 'Marketing',
+    desc: 'Gather testimonials, case studies, and social proof from partner websites, review platforms, and social media profiles.',
+    gap: 'Gap: Social platforms and review sites require authenticated browser sessions.',
+    prompt: '"Browse our G2 profile and extract the 10 most recent reviews with: reviewer name, rating, title, and key quote. Format as a table."',
+    tools: ['browse', 'extract'] },
+
+  // OPERATIONS
+  { cat: 'ops', catLabel: 'Operations', catClass: 'cat-ops', iconLetter: 'SL', iconBg: 'rgba(45,212,191,0.12)', iconColor: '#2DD4BF', title: 'Vendor & SLA Monitoring', audience: 'Operations',
+    desc: 'Check vendor status pages, SLA dashboards, and service health indicators. Get proactive alerts before outages affect your team.',
+    gap: 'Gap: Status pages are JS-rendered widgets that raw HTTP can\'t read.',
+    prompt: '"Check the status pages of AWS, Stripe, and Twilio. Report the current status of each service and any ongoing or recent incidents."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'ops', catLabel: 'Operations', catClass: 'cat-ops', iconLetter: 'RC', iconBg: 'rgba(45,212,191,0.12)', iconColor: '#2DD4BF', title: 'Regulatory & Compliance Checks', audience: 'Operations',
+    desc: 'Monitor regulatory websites for policy updates, new requirements, or deadline changes that affect your business.',
+    gap: 'Gap: Government and regulatory sites often require JS rendering.',
+    prompt: '"Browse the FDA.gov announcements page and extract any new guidance documents or regulatory changes published this month related to [industry]."',
+    tools: ['browse', 'extract'] },
+
+  { cat: 'ops', catLabel: 'Operations', catClass: 'cat-ops', iconLetter: 'UP', iconBg: 'rgba(45,212,191,0.12)', iconColor: '#2DD4BF', title: 'Uptime & Performance Checks', audience: 'Developer',
+    desc: 'Load your application pages and measure render time, check for errors, and verify critical elements are present and functional.',
+    gap: 'Gap: Real user experience testing requires a browser, not just ping.',
+    prompt: '"Browse our app at 5 key URLs. For each, report: load time, any console errors, whether the main content renders, and screenshot the result."',
+    tools: ['browse', 'screenshot', 'interact'] }
+];
+
+var categories = [
+  { id: 'all', label: 'All Use Cases' },
+  { id: 'monitoring', label: 'Monitoring & Intelligence' },
+  { id: 'research', label: 'Market Research' },
+  { id: 'testing', label: 'QA & Testing' },
+  { id: 'data', label: 'Data Collection' },
+  { id: 'marketing', label: 'Marketing & Content' },
+  { id: 'ops', label: 'Operations' }
+];
+
+// ═══ BUILD FILTER BAR ═══
+var filterBar = document.getElementById('filterBar');
+var activeFilter = 'all';
+
+categories.forEach(function(cat) {
+  var chip = document.createElement('button');
+  chip.className = 'filter-chip' + (cat.id === 'all' ? ' active' : '');
+  chip.textContent = cat.label;
+  chip.dataset.cat = cat.id;
+  chip.addEventListener('click', function() {
+    activeFilter = cat.id;
+    document.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+    chip.classList.add('active');
+    renderGrid();
+  });
+  filterBar.appendChild(chip);
+});
+
+// ═══ RENDER GRID ═══
+function renderGrid() {
+  var grid = document.getElementById('marketplaceGrid');
+  grid.textContent = '';
+
+  var filtered = activeFilter === 'all' ? useCases : useCases.filter(function(uc) { return uc.cat === activeFilter; });
+
+  filtered.forEach(function(uc) {
+    var card = document.createElement('div');
+    card.className = 'uc-card ' + uc.catClass + ' reveal';
+
+    // Top row: icon + tags
+    var top = document.createElement('div');
+    top.className = 'uc-card-top';
+    var icon = document.createElement('div');
+    icon.className = 'uc-card-icon';
+    icon.textContent = uc.iconLetter;
+    icon.style.background = uc.iconBg;
+    icon.style.color = uc.iconColor;
+    top.appendChild(icon);
+    var tags = document.createElement('div');
+    tags.className = 'uc-card-tags';
+    var catTag = document.createElement('span');
+    catTag.className = 'uc-tag uc-tag-cat';
+    catTag.textContent = uc.catLabel;
+    tags.appendChild(catTag);
+    var audTag = document.createElement('span');
+    audTag.className = 'uc-tag uc-tag-audience';
+    audTag.textContent = uc.audience;
+    tags.appendChild(audTag);
+    top.appendChild(tags);
+    card.appendChild(top);
+
+    // Title
+    var title = document.createElement('div');
+    title.className = 'uc-card-title';
+    title.textContent = uc.title;
+    card.appendChild(title);
+
+    // Description
+    var desc = document.createElement('div');
+    desc.className = 'uc-card-desc';
+    desc.textContent = uc.desc;
+    card.appendChild(desc);
+
+    // Gap callout
+    var gap = document.createElement('div');
+    gap.className = 'uc-card-gap';
+    gap.textContent = uc.gap;
+    card.appendChild(gap);
+
+    // Prompt example
+    var promptWrap = document.createElement('div');
+    promptWrap.className = 'uc-card-prompt';
+    var promptLabel = document.createElement('div');
+    promptLabel.className = 'uc-card-prompt-label';
+    promptLabel.textContent = 'Example prompt';
+    promptWrap.appendChild(promptLabel);
+    promptWrap.appendChild(document.createTextNode(uc.prompt));
+    card.appendChild(promptWrap);
+
+    // Tools used
+    var toolsWrap = document.createElement('div');
+    toolsWrap.className = 'uc-card-tools';
+    uc.tools.forEach(function(t) {
+      var badge = document.createElement('span');
+      badge.className = 'uc-tool-badge';
+      badge.textContent = t;
+      toolsWrap.appendChild(badge);
+    });
+    card.appendChild(toolsWrap);
+
+    grid.appendChild(card);
+  });
+
+  // Re-observe for reveal animations
+  document.querySelectorAll('.uc-card.reveal').forEach(function(el) {
+    revealObserver.observe(el);
+  });
+}
+
+// ═══ SCROLL REVEALS ═══
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+// ═══ COPY ═══
+document.getElementById('mktCopyBtn').addEventListener('click', function() {
+  navigator.clipboard.writeText('npx headlessdev init');
+  this.textContent = 'Copied!';
+  var btn = this;
+  setTimeout(function() { btn.textContent = '$ npx headlessdev init'; }, 2000);
+});
+
+// Initial render
+renderGrid();
+</script>
+</body>
+</html>

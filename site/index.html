@@ -198,6 +198,75 @@ footer a { color: var(--accent); text-decoration: none; }
 .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
+/* MULTI-AGENT (Better Together) */
+.multi-agent { padding: 8rem 2rem; background: var(--ink); color: var(--cream); position: relative; overflow: hidden; }
+.multi-agent::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 30% 40%, rgba(96, 165, 250, 0.06) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(200, 75, 49, 0.06) 0%, transparent 50%); pointer-events: none; }
+.multi-agent-inner { max-width: var(--max-w); margin: 0 auto; }
+.multi-agent h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; line-height: 1.15; margin-bottom: 1rem; letter-spacing: -0.02em; }
+.multi-agent > .ma-sub { color: rgba(247, 243, 238, 0.55); font-size: 1.05rem; margin-bottom: 3.5rem; max-width: 600px; line-height: 1.7; }
+.agent-duo { display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: stretch; margin-bottom: 3rem; }
+.agent-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 2.5rem; }
+.agent-card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+.agent-card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; font-family: var(--mono); }
+.agent-card-icon.claude { background: rgba(200, 75, 49, 0.15); color: var(--accent-glow); }
+.agent-card-icon.codex { background: rgba(96, 165, 250, 0.15); color: var(--terminal-blue); }
+.agent-card-name { font-family: var(--mono); font-size: 1.1rem; font-weight: 600; color: var(--cream); }
+.agent-card-role { font-size: 0.85rem; color: var(--ink-muted); }
+.agent-card-strengths { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+.agent-card-strengths li { font-size: 0.9rem; color: rgba(247, 243, 238, 0.7); display: flex; align-items: flex-start; gap: 0.6rem; line-height: 1.5; }
+.agent-card-strengths li::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-top: 0.5rem; flex-shrink: 0; }
+.agent-card.claude-card .agent-card-strengths li::before { background: var(--accent); }
+.agent-card.codex-card .agent-card-strengths li::before { background: var(--terminal-blue); }
+.agent-plus { display: flex; align-items: center; justify-content: center; font-family: var(--serif); font-size: 3rem; color: rgba(255,255,255,0.15); }
+.workflow-strip { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 2rem 2.5rem; }
+.workflow-strip-label { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--terminal-green); margin-bottom: 1.25rem; }
+.workflow-steps { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.workflow-step { display: flex; align-items: center; gap: 0.75rem; }
+.workflow-step-badge { font-family: var(--mono); font-size: 0.7rem; padding: 0.3rem 0.6rem; border-radius: 4px; font-weight: 600; flex-shrink: 0; }
+.workflow-step-badge.c { background: rgba(200, 75, 49, 0.15); color: var(--accent-glow); }
+.workflow-step-badge.x { background: rgba(96, 165, 250, 0.15); color: var(--terminal-blue); }
+.workflow-step-badge.h { background: rgba(74, 222, 128, 0.15); color: var(--terminal-green); }
+.workflow-step-text { font-size: 0.85rem; color: rgba(247, 243, 238, 0.6); }
+.workflow-arrow { color: rgba(255,255,255,0.15); font-size: 1.2rem; }
+
+/* BUSINESS SECTION */
+.business { padding: 8rem 2rem; background: var(--cream); }
+.business-inner { max-width: var(--max-w); margin: 0 auto; }
+.business-header { text-align: center; margin-bottom: 4rem; }
+.business-header .section-label { color: var(--accent); }
+.business h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+.business-header p { color: var(--ink-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; line-height: 1.7; }
+.business-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 4rem; }
+.biz-card { background: #fff; border: 1px solid rgba(26,26,24,0.06); border-radius: 14px; padding: 2rem; transition: all 0.3s; }
+.biz-card:hover { border-color: rgba(200, 75, 49, 0.15); box-shadow: 0 8px 30px rgba(0,0,0,0.04); transform: translateY(-2px); }
+.biz-card-icon { font-size: 2rem; margin-bottom: 1rem; }
+.biz-card-title { font-family: var(--sans); font-size: 1.05rem; font-weight: 600; color: var(--ink); margin-bottom: 0.5rem; }
+.biz-card-desc { font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6; margin-bottom: 1rem; }
+.biz-card-example { font-family: var(--mono); font-size: 0.72rem; color: var(--ink-muted); background: var(--cream); border-radius: 6px; padding: 0.75rem; line-height: 1.6; border: 1px solid rgba(26,26,24,0.06); }
+.biz-card-example em { color: var(--accent); font-style: normal; }
+.biz-onramp { background: #fff; border: 1px solid rgba(26,26,24,0.06); border-radius: 16px; padding: 3rem; display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+.biz-onramp-text h3 { font-family: var(--serif); font-size: 2rem; font-weight: 400; line-height: 1.2; margin-bottom: 1rem; letter-spacing: -0.02em; }
+.biz-onramp-text p { color: var(--ink-muted); font-size: 1rem; line-height: 1.7; margin-bottom: 1.5rem; }
+.biz-steps { list-style: none; display: flex; flex-direction: column; gap: 1rem; }
+.biz-step { display: flex; align-items: flex-start; gap: 1rem; }
+.biz-step-num { font-family: var(--mono); font-size: 0.75rem; font-weight: 700; color: var(--accent); background: rgba(200, 75, 49, 0.08); width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.15rem; }
+.biz-step-text { font-size: 0.95rem; color: var(--ink-light); line-height: 1.5; }
+.biz-step-text strong { color: var(--ink); }
+.biz-onramp-visual { background: var(--terminal-bg); border-radius: 12px; padding: 2rem; font-family: var(--mono); font-size: 0.8rem; line-height: 1.8; color: var(--terminal-text); }
+.bov-comment { color: var(--terminal-dim); }
+.bov-prompt { color: var(--terminal-green); }
+.bov-cmd { color: #F1F5F9; }
+.bov-success { color: var(--terminal-green); }
+.bov-output { color: var(--terminal-dim); }
+.bov-highlight { color: var(--accent-glow); }
+
+@media (max-width: 768px) {
+  .agent-duo { grid-template-columns: 1fr; }
+  .agent-plus { transform: rotate(90deg); padding: 1rem 0; }
+  .business-grid { grid-template-columns: 1fr; }
+  .biz-onramp { grid-template-columns: 1fr; }
+}
+
 /* INTRO VIDEO */
 .intro-video { padding: 4rem 2rem 6rem; background: #F2EDE7; }
 .intro-video-inner { max-width: 960px; margin: 0 auto; text-align: center; }
@@ -228,9 +297,12 @@ footer a { color: var(--accent); text-decoration: none; }
 <nav>
   <a href="#" class="nav-logo">&lt;<span>headless</span>dev /&gt;</a>
   <ul class="nav-links">
+    <li><a href="marketplace.html">Use Cases</a></li>
     <li><a href="#intro">Intro</a></li>
     <li><a href="#walkthrough">Walkthrough</a></li>
     <li><a href="#tools">Tools</a></li>
+    <li><a href="#agents">Agents</a></li>
+    <li><a href="#business">Business</a></li>
     <li><a href="#comparison">Compare</a></li>
     <li><a href="https://github.com/NETWORK101/headlessdev" class="nav-cta">GitHub</a></li>
   </ul>
@@ -317,6 +389,128 @@ footer a { color: var(--accent); text-decoration: none; }
     <p>Each tool returns token-efficient output designed for LLM consumption, not human reading.</p>
   </div>
   <div class="tools-grid" id="toolsGrid"></div>
+</section>
+
+<!-- ═══ MULTI-AGENT: BETTER TOGETHER ═══ -->
+<section class="multi-agent" id="agents">
+  <div class="multi-agent-inner">
+    <div class="reveal">
+      <div class="section-label">Better together</div>
+      <h2>Claude + Codex.<br>One browser. Zero friction.</h2>
+      <p class="ma-sub">headlessdev works with both Claude Code and OpenAI Codex CLI through the MCP protocol. Use whichever agent fits your task, or let them collaborate.</p>
+    </div>
+
+    <div class="agent-duo reveal">
+      <div class="agent-card claude-card">
+        <div class="agent-card-header">
+          <div class="agent-card-icon claude">C</div>
+          <div>
+            <div class="agent-card-name">Claude Code</div>
+            <div class="agent-card-role">Deep reasoning, long context</div>
+          </div>
+        </div>
+        <ul class="agent-card-strengths">
+          <li>Understands complex codebases end-to-end</li>
+          <li>Excels at multi-file refactors and architecture</li>
+          <li>Strong at interpreting nuanced web content</li>
+          <li>Plans multi-step browser workflows intelligently</li>
+        </ul>
+      </div>
+
+      <div class="agent-plus">+</div>
+
+      <div class="agent-card codex-card">
+        <div class="agent-card-header">
+          <div class="agent-card-icon codex">X</div>
+          <div>
+            <div class="agent-card-name">Codex CLI</div>
+            <div class="agent-card-role">Fast execution, broad tooling</div>
+          </div>
+        </div>
+        <ul class="agent-card-strengths">
+          <li>Rapid prototyping and quick iterations</li>
+          <li>Strong at code generation from examples</li>
+          <li>Efficient batch operations across files</li>
+          <li>Integrates with the OpenAI ecosystem</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="workflow-strip reveal">
+      <div class="workflow-strip-label">Example workflow: competitive research agent</div>
+      <div class="workflow-steps">
+        <div class="workflow-step">
+          <span class="workflow-step-badge c">Claude</span>
+          <span class="workflow-step-text">Plans which competitor pages to analyze</span>
+        </div>
+        <span class="workflow-arrow">\u2192</span>
+        <div class="workflow-step">
+          <span class="workflow-step-badge h">headlessdev</span>
+          <span class="workflow-step-text">Browses and distills each page</span>
+        </div>
+        <span class="workflow-arrow">\u2192</span>
+        <div class="workflow-step">
+          <span class="workflow-step-badge x">Codex</span>
+          <span class="workflow-step-text">Generates comparison report code</span>
+        </div>
+        <span class="workflow-arrow">\u2192</span>
+        <div class="workflow-step">
+          <span class="workflow-step-badge h">headlessdev</span>
+          <span class="workflow-step-text">Screenshots the final dashboard</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ BUSINESS USERS ═══ -->
+<section class="business" id="business">
+  <div class="business-inner">
+    <div class="business-header reveal">
+      <div class="section-label">Not a developer? No problem.</div>
+      <h2>What headlessdev does<br>for your business.</h2>
+      <p>You don't need to write code. Your AI agent handles the technical details. Here's what becomes possible when your agent can browse the web.</p>
+    </div>
+
+    <div class="business-grid" id="bizGrid"></div>
+
+    <div class="biz-onramp reveal">
+      <div class="biz-onramp-text">
+        <h3>Getting started takes two minutes.</h3>
+        <p>Ask your developer (or your AI agent) to run one command. That's the entire setup. After that, you can ask your agent to do any of the use cases above in plain English.</p>
+        <ul class="biz-steps">
+          <li class="biz-step">
+            <span class="biz-step-num">1</span>
+            <span class="biz-step-text"><strong>Install headlessdev</strong> \u2014 your developer runs <code>npx headlessdev init</code> once</span>
+          </li>
+          <li class="biz-step">
+            <span class="biz-step-num">2</span>
+            <span class="biz-step-text"><strong>Ask in plain English</strong> \u2014 tell your AI agent what you need: "Check our competitor's pricing page and summarize the changes"</span>
+          </li>
+          <li class="biz-step">
+            <span class="biz-step-num">3</span>
+            <span class="biz-step-text"><strong>Get results</strong> \u2014 your agent browses the page, extracts the data, and gives you a structured answer</span>
+          </li>
+        </ul>
+      </div>
+      <div class="biz-onramp-visual">
+        <div class="bov-comment"># You just type this in plain English:</div>
+        <br>
+        <div><span class="bov-prompt">You:</span> <span class="bov-cmd">Check if Acme Corp changed</span></div>
+        <div><span class="bov-cmd">     their pricing this week</span></div>
+        <br>
+        <div><span class="bov-output">\u2500\u2500\u2500 agent browsing acme.com/pricing \u2500\u2500\u2500</span></div>
+        <div><span class="bov-output">Distilled: </span><span class="bov-success">1,340 tokens</span></div>
+        <br>
+        <div><span class="bov-success">Agent:</span> <span class="bov-cmd">Yes, Acme updated pricing</span></div>
+        <div><span class="bov-cmd">on May 14th. Key changes:</span></div>
+        <br>
+        <div><span class="bov-highlight">1.</span> <span class="bov-cmd">Pro plan: $29 \u2192 $39/mo</span></div>
+        <div><span class="bov-highlight">2.</span> <span class="bov-cmd">New "Starter" tier at $9/mo</span></div>
+        <div><span class="bov-highlight">3.</span> <span class="bov-cmd">Enterprise now includes SSO</span></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <section class="comparison" id="comparison">
@@ -522,6 +716,54 @@ toolsData.forEach(function(tool) {
   });
 
   toolsGrid.appendChild(card);
+  revealObserver.observe(card);
+});
+
+// ═══ BUSINESS USE CASES (built safely via DOM) ═══
+var bizData = [
+  { icon: '\uD83D\uDD0D', title: 'Competitor Monitoring', desc: 'Track competitor pricing, features, and messaging changes automatically. Get alerts when something shifts.',
+    example: '"Browse competitor.com/pricing weekly and flag any changes to their plan structure or pricing"' },
+  { icon: '\uD83D\uDCCA', title: 'Market Research', desc: 'Gather data from industry reports, review sites, and forums. Summarize trends without manual browsing.',
+    example: '"Extract all G2 reviews for [product] from the last 3 months and summarize sentiment themes"' },
+  { icon: '\uD83E\uDDFE', title: 'Lead Enrichment', desc: 'Visit prospect websites and extract company info, tech stack indicators, team size, and recent news.',
+    example: '"Browse these 20 company websites and build a spreadsheet of their team size, industry, and key products"' },
+  { icon: '\u2705', title: 'QA & Site Testing', desc: 'Check your own website for broken links, form issues, or content problems. Catch issues before customers do.',
+    example: '"Navigate through our signup flow and report any errors, slow pages, or confusing UI elements"' },
+  { icon: '\uD83D\uDCC4', title: 'Content Aggregation', desc: 'Pull content from multiple sources into structured formats. Build reports, newsletters, or databases from web data.',
+    example: '"Collect the top 10 AI news stories from these 5 sites and create a formatted weekly digest"' },
+  { icon: '\uD83D\uDD17', title: 'API & Integration Testing', desc: 'Verify third-party integrations, check API documentation pages, and validate webhook endpoints are responding.',
+    example: '"Browse our API documentation and verify every endpoint example actually matches our current API response format"' }
+];
+
+var bizGrid = document.getElementById('bizGrid');
+bizData.forEach(function(biz) {
+  var card = document.createElement('div');
+  card.className = 'biz-card reveal';
+
+  var icon = document.createElement('div');
+  icon.className = 'biz-card-icon';
+  icon.textContent = biz.icon;
+  card.appendChild(icon);
+
+  var title = document.createElement('div');
+  title.className = 'biz-card-title';
+  title.textContent = biz.title;
+  card.appendChild(title);
+
+  var desc = document.createElement('div');
+  desc.className = 'biz-card-desc';
+  desc.textContent = biz.desc;
+  card.appendChild(desc);
+
+  var example = document.createElement('div');
+  example.className = 'biz-card-example';
+  var em = document.createElement('em');
+  em.textContent = 'Example prompt: ';
+  example.appendChild(em);
+  example.appendChild(document.createTextNode(biz.example));
+  card.appendChild(example);
+
+  bizGrid.appendChild(card);
   revealObserver.observe(card);
 });
 
