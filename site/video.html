@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>headlessdev — Introduction</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,700&family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --cream: #F7F3EE;
+  --ink: #0F0F0E;
+  --ink-mid: #2A2A26;
+  --ink-muted: #7A7A72;
+  --accent: #C84B31;
+  --accent-glow: #E8623D;
+  --green: #4ADE80;
+  --blue: #60A5FA;
+  --amber: #FBBF24;
+  --red: #F87171;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'DM Sans', sans-serif;
+}
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ SCENE SYSTEM ═══ */
+.scene {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scene.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ═══ PROGRESS BAR ═══ */
+.progress-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 1000;
+  transition: width 0.3s linear;
+}
+
+/* ═══ SCENE 1: HOOK ═══ */
+.scene-hook {
+  background: var(--ink);
+  text-align: center;
+}
+
+.scene-hook .line1 {
+  font-family: var(--serif);
+  font-size: 4.5rem;
+  font-weight: 400;
+  color: var(--cream);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.scene-hook .line2 {
+  font-family: var(--serif);
+  font-size: 4.5rem;
+  font-weight: 400;
+  color: var(--ink-muted);
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin-top: 0.25em;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.scene-hook .line2 em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+.scene-hook.active .line1 {
+  animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+}
+
+.scene-hook.active .line2 {
+  animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
+}
+
+/* ═══ SCENE 2: THE PROBLEM ═══ */
+.scene-problem {
+  background: var(--ink);
+  padding: 0 120px;
+}
+
+.scene-problem .layout {
+  display: flex;
+  align-items: center;
+  gap: 100px;
+  width: 100%;
+  max-width: 1600px;
+}
+
+.scene-problem .text-side {
+  flex: 1;
+}
+
+.scene-problem .label {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-problem .headline {
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-problem .body-text {
+  font-family: var(--sans);
+  font-size: 1.4rem;
+  color: var(--ink-muted);
+  line-height: 1.7;
+  max-width: 500px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-problem .visual-side {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.agent-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 3rem;
+  width: 500px;
+  text-align: center;
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.agent-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.agent-label {
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  color: var(--cream);
+  margin-bottom: 2rem;
+}
+
+.agent-capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.cap-tag {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.cap-tag.yes { color: var(--green); border-color: rgba(74, 222, 128, 0.2); }
+.cap-tag.no { color: var(--red); border-color: rgba(248, 113, 113, 0.2); background: rgba(248, 113, 113, 0.05); text-decoration: line-through; }
+
+.scene-problem.active .label { animation: slideUp 0.6s ease 0.2s forwards; }
+.scene-problem.active .headline { animation: slideUp 0.6s ease 0.4s forwards; }
+.scene-problem.active .body-text { animation: slideUp 0.6s ease 0.6s forwards; }
+.scene-problem.active .agent-box { animation: scaleIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards; }
+
+/* ═══ SCENE 3: THE SOLUTION ═══ */
+.scene-solution {
+  background: var(--cream);
+  text-align: center;
+}
+
+.scene-solution .logo-text {
+  font-family: var(--mono);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-solution .logo-text span { color: var(--accent); }
+
+.scene-solution .headline {
+  font-family: var(--serif);
+  font-size: 5rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.scene-solution .headline em { color: var(--accent); font-style: italic; }
+
+.scene-solution .sub {
+  font-family: var(--sans);
+  font-size: 1.5rem;
+  color: var(--ink-muted);
+  max-width: 700px;
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-solution.active .logo-text { animation: slideUp 0.6s ease 0.2s forwards; }
+.scene-solution.active .headline { animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; }
+.scene-solution.active .sub { animation: slideUp 0.6s ease 0.8s forwards; }
+
+/* ═══ SCENE 4: ONE COMMAND ═══ */
+.scene-install {
+  background: var(--ink);
+  text-align: center;
+}
+
+.scene-install .label {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 3rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.install-terminal {
+  background: #0D0F11;
+  border-radius: 16px;
+  width: 900px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 40px 100px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(30px) scale(0.98);
+}
+
+.install-terminal-bar {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: rgba(255,255,255,0.03);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  gap: 0.5rem;
+}
+
+.install-dot {
+  width: 12px; height: 12px; border-radius: 50%;
+}
+.install-dot:nth-child(1) { background: #FF5F56; }
+.install-dot:nth-child(2) { background: #FFBD2E; }
+.install-dot:nth-child(3) { background: #27C93F; }
+
+.install-body {
+  padding: 2.5rem;
+  font-family: var(--mono);
+  font-size: 1.3rem;
+  line-height: 2.2;
+  color: rgba(255,255,255,0.5);
+  min-height: 220px;
+}
+
+.install-line {
+  opacity: 0;
+  transform: translateX(-10px);
+}
+
+.i-prompt { color: var(--green); }
+.i-cmd { color: #F1F5F9; font-weight: 500; }
+.i-success { color: var(--green); }
+.i-dim { color: rgba(255,255,255,0.25); }
+
+.scene-install .below-text {
+  font-family: var(--sans);
+  font-size: 1.3rem;
+  color: var(--ink-muted);
+  margin-top: 3rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-install.active .label { animation: slideUp 0.5s ease 0.2s forwards; }
+.scene-install.active .install-terminal { animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; }
+
+/* ═══ SCENE 5: THE MAGIC ═══ */
+.scene-magic {
+  background: var(--ink);
+  padding: 0 120px;
+}
+
+.scene-magic .layout {
+  display: flex;
+  align-items: center;
+  gap: 80px;
+  width: 100%;
+  max-width: 1600px;
+}
+
+.scene-magic .text-side { flex: 1; }
+.scene-magic .visual-side { flex: 1.2; }
+
+.scene-magic .label {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-magic .headline {
+  font-family: var(--serif);
+  font-size: 3.2rem;
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-magic .body-text {
+  font-family: var(--sans);
+  font-size: 1.3rem;
+  color: var(--ink-muted);
+  line-height: 1.7;
+  max-width: 480px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.token-comparison {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.token-card {
+  flex: 1;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 2.5rem;
+  text-align: center;
+}
+
+.token-card.after {
+  border-color: rgba(200, 75, 49, 0.3);
+  background: rgba(200, 75, 49, 0.06);
+}
+
+.token-card-label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--ink-muted);
+  margin-bottom: 1rem;
+}
+
+.token-card-number {
+  font-family: var(--serif);
+  font-size: 4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.token-card.before .token-card-number { color: rgba(255,255,255,0.2); }
+.token-card.after .token-card-number { color: var(--accent-glow); }
+
+.token-card-unit {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  margin-top: 0.5rem;
+}
+
+.token-arrow {
+  font-size: 2rem;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.token-savings {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-family: var(--mono);
+  font-size: 1.1rem;
+  color: var(--green);
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.scene-magic.active .label { animation: slideUp 0.5s ease 0.2s forwards; }
+.scene-magic.active .headline { animation: slideUp 0.6s ease 0.4s forwards; }
+.scene-magic.active .body-text { animation: slideUp 0.6s ease 0.6s forwards; }
+.scene-magic.active .token-comparison { animation: scaleIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards; }
+.scene-magic.active .token-savings { animation: slideUp 0.5s ease 1.8s forwards; }
+
+/* ═══ SCENE 6: FOUR TOOLS ═══ */
+.scene-tools {
+  background: var(--cream);
+  text-align: center;
+}
+
+.scene-tools .label {
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-tools .headline {
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin-bottom: 4rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.tools-row {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.tool-pill {
+  background: white;
+  border: 1px solid rgba(26,26,24,0.08);
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 320px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.tool-pill-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.tool-pill-name {
+  font-family: var(--mono);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 0.75rem;
+}
+
+.tool-pill-desc {
+  font-family: var(--sans);
+  font-size: 1rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+.scene-tools.active .label { animation: slideUp 0.5s ease 0.2s forwards; }
+.scene-tools.active .headline { animation: slideUp 0.6s ease 0.4s forwards; }
+.scene-tools.active .tool-pill:nth-child(1) { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards; }
+.scene-tools.active .tool-pill:nth-child(2) { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.75s forwards; }
+.scene-tools.active .tool-pill:nth-child(3) { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards; }
+.scene-tools.active .tool-pill:nth-child(4) { animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.05s forwards; }
+
+/* ═══ SCENE 7: CTA ═══ */
+.scene-cta {
+  background: var(--ink);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.scene-cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 60%, rgba(200, 75, 49, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.scene-cta .logo-final {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-cta .logo-final span { color: var(--accent); }
+
+.scene-cta .headline {
+  font-family: var(--serif);
+  font-size: 5rem;
+  font-weight: 400;
+  color: var(--cream);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.scene-cta .cmd-final {
+  display: inline-block;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  color: var(--green);
+  padding: 1.25rem 3rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-cta .tagline {
+  font-family: var(--sans);
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.scene-cta.active .logo-final { animation: slideUp 0.6s ease 0.2s forwards; }
+.scene-cta.active .headline { animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards; }
+.scene-cta.active .cmd-final { animation: slideUp 0.6s ease 0.8s forwards; }
+.scene-cta.active .tagline { animation: slideUp 0.6s ease 1.1s forwards; }
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes termLineIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ═══ PLAY BUTTON OVERLAY ═══ */
+.play-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ink);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  cursor: pointer;
+  transition: opacity 0.5s ease;
+}
+
+.play-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.play-btn {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  transition: all 0.3s;
+}
+
+.play-btn:hover {
+  border-color: var(--accent);
+  background: rgba(200, 75, 49, 0.1);
+}
+
+.play-triangle {
+  width: 0;
+  height: 0;
+  border-left: 28px solid var(--cream);
+  border-top: 18px solid transparent;
+  border-bottom: 18px solid transparent;
+  margin-left: 6px;
+}
+
+.play-text {
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  color: var(--ink-muted);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<!-- Play overlay -->
+<div class="play-overlay" id="playOverlay">
+  <div class="play-btn">
+    <div class="play-triangle"></div>
+  </div>
+  <div class="play-text">Click to play</div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Scene 1: Hook -->
+<div class="scene scene-hook" id="scene1">
+  <div class="line1">Your AI coding agent is powerful.</div>
+  <div class="line2">But it can't <em>browse.</em></div>
+</div>
+
+<!-- Scene 2: The Problem -->
+<div class="scene scene-problem" id="scene2">
+  <div class="layout">
+    <div class="text-side">
+      <div class="label">The problem</div>
+      <div class="headline">AI agents can write code.<br>They can't see the web.</div>
+      <div class="body-text">Claude Code and Cursor can build entire applications, but they can't check a website, read documentation, or fill out a form.</div>
+    </div>
+    <div class="visual-side">
+      <div class="agent-box">
+        <div class="agent-icon">\uD83E\uDD16</div>
+        <div class="agent-label">Your AI Agent</div>
+        <div class="agent-capabilities">
+          <span class="cap-tag yes">\u2713 Write code</span>
+          <span class="cap-tag yes">\u2713 Edit files</span>
+          <span class="cap-tag yes">\u2713 Run tests</span>
+          <span class="cap-tag no">\u2717 Browse web</span>
+          <span class="cap-tag no">\u2717 Read pages</span>
+          <span class="cap-tag no">\u2717 Fill forms</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 3: The Solution -->
+<div class="scene scene-solution" id="scene3">
+  <div class="logo-text">&lt;<span>headless</span>dev /&gt;</div>
+  <div class="headline">Give your agent<br>a <em>browser.</em></div>
+  <div class="sub">A zero-config MCP server that gives any AI coding agent full browser capabilities. Browse pages. Extract data. Take screenshots. Fill forms.</div>
+</div>
+
+<!-- Scene 4: One Command -->
+<div class="scene scene-install" id="scene4">
+  <div class="label">One command. That's it.</div>
+  <div class="install-terminal">
+    <div class="install-terminal-bar">
+      <span class="install-dot"></span>
+      <span class="install-dot"></span>
+      <span class="install-dot"></span>
+    </div>
+    <div class="install-body" id="installBody"></div>
+  </div>
+  <div class="below-text">No signup. No API key. No cloud. Runs on your machine.</div>
+</div>
+
+<!-- Scene 5: The Magic -->
+<div class="scene scene-magic" id="scene5">
+  <div class="layout">
+    <div class="text-side">
+      <div class="label">The secret sauce</div>
+      <div class="headline">DOM distillation.<br>10-50x fewer tokens.</div>
+      <div class="body-text">Raw HTML wastes 99% of tokens on scripts, styles, and boilerplate. headlessdev distills pages into clean markdown your agent can actually understand.</div>
+    </div>
+    <div class="visual-side">
+      <div class="token-comparison">
+        <div class="token-card before">
+          <div class="token-card-label">Raw HTML</div>
+          <div class="token-card-number" id="beforeCount">84,200</div>
+          <div class="token-card-unit">tokens</div>
+        </div>
+        <div class="token-arrow">\u2192</div>
+        <div class="token-card after">
+          <div class="token-card-label">Distilled</div>
+          <div class="token-card-number" id="afterCount">1,240</div>
+          <div class="token-card-unit">tokens</div>
+        </div>
+      </div>
+      <div class="token-savings">98.5% reduction \u2014 same information, fraction of the cost</div>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 6: Four Tools -->
+<div class="scene scene-tools" id="scene6">
+  <div class="label">Four tools, one protocol</div>
+  <div class="headline">Everything your agent needs.</div>
+  <div class="tools-row">
+    <div class="tool-pill">
+      <div class="tool-pill-icon">\uD83C\uDF10</div>
+      <div class="tool-pill-name">browse</div>
+      <div class="tool-pill-desc">Navigate to any URL, get clean markdown back</div>
+    </div>
+    <div class="tool-pill">
+      <div class="tool-pill-icon">\uD83D\uDCCB</div>
+      <div class="tool-pill-name">extract</div>
+      <div class="tool-pill-desc">Pull structured data with schema guidance</div>
+    </div>
+    <div class="tool-pill">
+      <div class="tool-pill-icon">\uD83D\uDCF7</div>
+      <div class="tool-pill-name">screenshot</div>
+      <div class="tool-pill-desc">Capture full-page or element screenshots</div>
+    </div>
+    <div class="tool-pill">
+      <div class="tool-pill-icon">\uD83D\uDDB1</div>
+      <div class="tool-pill-name">interact</div>
+      <div class="tool-pill-desc">Click, fill forms, select options</div>
+    </div>
+  </div>
+</div>
+
+<!-- Scene 7: CTA -->
+<div class="scene scene-cta" id="scene7">
+  <div class="logo-final">&lt;<span>headless</span>dev /&gt;</div>
+  <div class="headline">Start browsing.</div>
+  <div class="cmd-final">$ npx headlessdev init</div>
+  <div class="tagline">Free. Local. Open source. MIT licensed.</div>
+</div>
+
+<script>
+// ═══ SCENE TIMING ═══
+var scenes = [
+  { id: 'scene1', duration: 5000 },
+  { id: 'scene2', duration: 8000 },
+  { id: 'scene3', duration: 7000 },
+  { id: 'scene4', duration: 9000 },
+  { id: 'scene5', duration: 9000 },
+  { id: 'scene6', duration: 7000 },
+  { id: 'scene7', duration: 8000 }
+];
+
+var totalDuration = scenes.reduce(function(sum, s) { return sum + s.duration; }, 0);
+var currentScene = -1;
+var startTime = 0;
+var progressBar = document.getElementById('progressBar');
+
+function showScene(index) {
+  scenes.forEach(function(s, i) {
+    var el = document.getElementById(s.id);
+    if (i === index) {
+      el.classList.add('active');
+    } else {
+      el.classList.remove('active');
+    }
+  });
+  currentScene = index;
+
+  // Scene-specific animations
+  if (index === 3) { playInstallTerminal(); }
+  if (index === 4) { animateTokenCounts(); }
+}
+
+function updateProgress() {
+  if (startTime === 0) return;
+  var elapsed = Date.now() - startTime;
+  var pct = Math.min((elapsed / totalDuration) * 100, 100);
+  progressBar.style.width = pct + '%';
+  if (pct < 100) requestAnimationFrame(updateProgress);
+}
+
+function startVideo() {
+  document.getElementById('playOverlay').classList.add('hidden');
+  startTime = Date.now();
+  updateProgress();
+
+  var cumulative = 0;
+  scenes.forEach(function(scene, i) {
+    setTimeout(function() { showScene(i); }, cumulative);
+    cumulative += scene.duration;
+  });
+}
+
+document.getElementById('playOverlay').addEventListener('click', startVideo);
+
+// Listen for play message from parent (when embedded as iframe)
+window.addEventListener('message', function(e) {
+  if (e.data === 'play') startVideo();
+});
+
+// ═══ INSTALL TERMINAL ANIMATION ═══
+var installLines = [
+  { parts: [{ cls: 'i-prompt', t: '$ ' }, { cls: 'i-cmd', t: 'npx headlessdev init' }], delay: 0 },
+  { parts: [{ cls: 'i-success', t: '\u2713 ' }, { cls: '', t: 'Configured for Claude Code' }], delay: 800 },
+  { parts: [{ cls: 'i-success', t: '\u2713 ' }, { cls: '', t: 'Your agent now has a browser' }], delay: 500 },
+  { parts: [{ cls: 'i-dim', t: '' }], delay: 300 },
+  { parts: [{ cls: 'i-success', t: 'Ready! ' }, { cls: 'i-dim', t: 'Try: "browse stripe.com and get the pricing"' }], delay: 500 }
+];
+
+function playInstallTerminal() {
+  var container = document.getElementById('installBody');
+  container.textContent = '';
+  var total = 0;
+
+  installLines.forEach(function(line) {
+    total += line.delay;
+    setTimeout(function() {
+      var div = document.createElement('div');
+      div.className = 'install-line';
+      line.parts.forEach(function(p) {
+        var span = document.createElement('span');
+        if (p.cls) span.className = p.cls;
+        span.textContent = p.t;
+        div.appendChild(span);
+      });
+      container.appendChild(div);
+      requestAnimationFrame(function() {
+        div.style.animation = 'termLineIn 0.4s ease forwards';
+      });
+    }, total + 600);
+  });
+}
+
+// ═══ TOKEN COUNT ANIMATION ═══
+function animateTokenCounts() {
+  var beforeEl = document.getElementById('beforeCount');
+  var afterEl = document.getElementById('afterCount');
+
+  animateNumber(beforeEl, 84200, 1200, 300);
+  setTimeout(function() {
+    animateNumber(afterEl, 1240, 1000, 0);
+  }, 1000);
+}
+
+function animateNumber(el, target, duration, startDelay) {
+  setTimeout(function() {
+    var start = performance.now();
+    function tick(now) {
+      var elapsed = now - start;
+      var progress = Math.min(elapsed / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(target * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }, startDelay);
+}
+</script>
+</body>
+</html>

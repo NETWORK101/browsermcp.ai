@@ -4,7 +4,7 @@ Give your AI agent a browser. Zero-config MCP server for headless browser automa
 
 ## Why
 
-AI coding agents like Claude Code and Cursor are powerful — but they can't browse the web. headlessdev fixes that with a single command. Unlike cloud browser services (Browserbase at $20-99/mo) or complex Python frameworks (Browser-Use, Stagehand), headlessdev runs entirely on your machine, costs nothing, and distills pages down to clean markdown with 10-50x fewer tokens than raw HTML.
+AI coding agents like Claude Code, Cursor, and OpenAI Codex CLI are powerful — but they can't browse the web. headlessdev fixes that with a single command. Unlike cloud browser services (Browserbase at $20-99/mo) or complex Python frameworks (Browser-Use, Stagehand), headlessdev runs entirely on your machine, costs nothing, and distills pages down to clean markdown with 10-50x fewer tokens than raw HTML.
 
 ## Quickstart (30 seconds)
 
@@ -12,7 +12,7 @@ AI coding agents like Claude Code and Cursor are powerful — but they can't bro
 npx headlessdev init   # writes config + shows MCP setup
 ```
 
-Then add the printed MCP config block to your AI tool (Claude Code or Cursor). Your agent now has four browser tools: `browse`, `extract`, `screenshot`, and `interact`.
+Then add the printed MCP config block to your AI tool (Claude Code, Cursor, or OpenAI Codex CLI). Your agent now has four browser tools: `browse`, `extract`, `screenshot`, and `interact`.
 
 ## Tools
 
@@ -50,7 +50,7 @@ Returns: Page state after actions
 ## How It Works
 
 ```
-AI Agent (Claude Code / Cursor)
+AI Agent (Claude Code / Cursor / Codex CLI)
   │ MCP protocol
   ▼
 headlessdev MCP Server
@@ -106,6 +106,7 @@ headlessdev tracks sessions and token counts in a local SQLite database. A circu
 | MCP native | Yes | No | No | No |
 | Cloud required | No | Yes | No | Optional |
 | Language | TypeScript | Multi | Python | TypeScript |
+| Works with | Claude Code, Cursor, Codex CLI, any MCP client | Custom SDKs | Python agents | JS agents |
 
 ## License
 

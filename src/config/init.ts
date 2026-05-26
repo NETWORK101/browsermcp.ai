@@ -42,5 +42,25 @@ export async function runInit(): Promise<void> {
     console.log('Add the same mcpServers block to that file.');
   }
 
+  // 5. Detect and configure for OpenAI Codex CLI
+  const codexGlobalDir = join(homedir(), '.codex');
+  const codexGlobalConfig = join(codexGlobalDir, 'config.json');
+  const codexProjectDir = join(process.cwd(), '.codex');
+  const codexProjectConfig = join(codexProjectDir, 'config.json');
+  const agentsMdPath = join(process.cwd(), 'AGENTS.md');
+
+  const codexGlobalDetected = existsSync(codexGlobalDir) || existsSync(codexGlobalConfig);
+  const codexProjectDetected = existsSync(codexProjectDir) || existsSync(codexProjectConfig);
+  const agentsMdDetected = existsSync(agentsMdPath);
+
+  if (codexGlobalDetected || codexProjectDetected || agentsMdDetected) {
+    console.log('\nDetected OpenAI Codex CLI project.');
+  }
+
+  console.log('\nFor OpenAI Codex CLI, add the MCP server to your config:');
+  console.log(`  Global:  ${codexGlobalConfig}`);
+  console.log(`  Project: ${codexProjectConfig}`);
+  console.log('\n' + MCP_CONFIG);
+
   console.log('\nheadlessdev init complete!');
 }

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>headlessdev — Give your AI agent a browser</title>
+<meta name="description" content="Zero-config MCP server for headless browser automation. 10-50x token reduction. Free, local, instant.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --cream: #F7F3EE;
+  --ink: #1A1A18;
+  --ink-light: #3D3D38;
+  --ink-muted: #8A8A82;
+  --accent: #C84B31;
+  --accent-glow: #E8623D;
+  --terminal-bg: #0D0F11;
+  --terminal-green: #4ADE80;
+  --terminal-blue: #60A5FA;
+  --terminal-amber: #FBBF24;
+  --terminal-text: #D4D4D8;
+  --terminal-dim: #52525B;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --sans: 'DM Sans', -apple-system, sans-serif;
+  --max-w: 1200px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--cream);
+  color: var(--ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 128px;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center;
+  background: rgba(247, 243, 238, 0.85); backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(26, 26, 24, 0.06);
+}
+.nav-logo { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; color: var(--ink); text-decoration: none; letter-spacing: -0.03em; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 2rem; align-items: center; list-style: none; }
+.nav-links a { font-size: 0.875rem; color: var(--ink-muted); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: var(--ink); }
+.nav-cta { font-family: var(--mono) !important; font-size: 0.8rem !important; background: var(--ink); color: var(--cream) !important; padding: 0.5rem 1.25rem; border-radius: 6px; transition: background 0.2s !important; }
+.nav-cta:hover { background: var(--accent) !important; color: #fff !important; }
+
+/* HERO */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+  text-align: center; padding: 8rem 2rem 4rem; position: relative;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(circle at 20% 50%, rgba(200, 75, 49, 0.04) 0%, transparent 50%), radial-gradient(circle at 80% 30%, rgba(200, 75, 49, 0.03) 0%, transparent 40%);
+}
+.hero-eyebrow { font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 2rem; opacity: 0; animation: fadeUp 0.8s ease forwards 0.2s; }
+.hero h1 { font-family: var(--serif); font-size: clamp(3rem, 7vw, 6.5rem); font-weight: 400; line-height: 1.05; max-width: 900px; letter-spacing: -0.03em; color: var(--ink); opacity: 0; animation: fadeUp 0.8s ease forwards 0.4s; }
+.hero h1 em { font-style: italic; color: var(--accent); }
+.hero-sub { font-size: 1.2rem; color: var(--ink-muted); max-width: 540px; margin-top: 1.5rem; line-height: 1.7; opacity: 0; animation: fadeUp 0.8s ease forwards 0.6s; }
+.hero-cmd {
+  margin-top: 2.5rem; display: inline-flex; align-items: center; gap: 0.75rem;
+  background: var(--ink); color: var(--terminal-green); font-family: var(--mono); font-size: 1rem;
+  padding: 1rem 2rem; border-radius: 10px; cursor: pointer; border: none;
+  transition: transform 0.2s, box-shadow 0.2s; opacity: 0; animation: fadeUp 0.8s ease forwards 0.8s;
+}
+.hero-cmd:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(26, 26, 24, 0.2); }
+.hero-cmd .prompt { color: var(--terminal-dim); }
+.hero-cmd .copy-hint { font-size: 0.7rem; color: var(--terminal-dim); font-family: var(--sans); font-weight: 500; }
+.hero-cmd.copied .copy-hint { color: var(--terminal-green); }
+.hero-scroll { position: absolute; bottom: 2rem; font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.15em; text-transform: uppercase; opacity: 0; animation: fadeUp 0.8s ease forwards 1s; }
+.hero-scroll::after { content: ''; display: block; width: 1px; height: 40px; background: var(--ink-muted); margin: 0.75rem auto 0; animation: scrollPulse 2s ease infinite; }
+
+/* WALKTHROUGH */
+.walkthrough { padding: 6rem 2rem 8rem; max-width: var(--max-w); margin: 0 auto; }
+.section-label { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.25em; color: var(--accent); margin-bottom: 1rem; }
+.walkthrough h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 400; line-height: 1.15; max-width: 650px; margin-bottom: 3rem; letter-spacing: -0.02em; }
+.terminal-frame { background: var(--terminal-bg); border-radius: 12px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 25px 80px rgba(0,0,0,0.35), 0 10px 30px rgba(0,0,0,0.2); }
+.terminal-bar { display: flex; align-items: center; padding: 0.75rem 1rem; background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.06); gap: 0.5rem; }
+.terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+.terminal-dot:nth-child(1) { background: #FF5F56; }
+.terminal-dot:nth-child(2) { background: #FFBD2E; }
+.terminal-dot:nth-child(3) { background: #27C93F; }
+.terminal-title { font-family: var(--mono); font-size: 0.7rem; color: var(--terminal-dim); margin-left: auto; margin-right: auto; }
+.terminal-body { padding: 1.5rem; font-family: var(--mono); font-size: 0.85rem; line-height: 1.8; color: var(--terminal-text); min-height: 420px; }
+.terminal-line { opacity: 0; white-space: pre-wrap; word-break: break-word; }
+.terminal-line.visible { opacity: 1; animation: terminalFadeIn 0.3s ease; }
+.t-prompt { color: var(--terminal-green); }
+.t-cmd { color: #F1F5F9; font-weight: 500; }
+.t-comment { color: var(--terminal-dim); font-style: italic; }
+.t-output { color: var(--terminal-dim); }
+.t-success { color: var(--terminal-green); }
+.t-info { color: var(--terminal-blue); }
+.t-warn { color: var(--terminal-amber); }
+.t-highlight { color: var(--accent-glow); }
+.t-dim { color: var(--terminal-dim); }
+.terminal-cursor { display: inline-block; width: 8px; height: 16px; background: var(--terminal-green); animation: blink 1s step-end infinite; vertical-align: text-bottom; margin-left: 2px; }
+.terminal-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1.5rem; }
+.terminal-btn { font-family: var(--mono); font-size: 0.75rem; color: var(--ink-muted); background: none; border: 1px solid rgba(26,26,24,0.15); padding: 0.5rem 1.25rem; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.terminal-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* TOKEN REDUCTION */
+.reduction { padding: 8rem 2rem; background: var(--ink); color: var(--cream); position: relative; overflow: hidden; }
+.reduction::before { content: ''; position: absolute; top: -50%; left: -20%; width: 140%; height: 200%; background: radial-gradient(ellipse at center, rgba(200, 75, 49, 0.08) 0%, transparent 60%); pointer-events: none; }
+.reduction-inner { max-width: var(--max-w); margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.reduction-text .section-label { color: var(--accent-glow); }
+.reduction-text h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; line-height: 1.15; margin-bottom: 1.5rem; letter-spacing: -0.02em; }
+.reduction-text p { color: rgba(247, 243, 238, 0.6); font-size: 1.05rem; line-height: 1.7; max-width: 480px; }
+.reduction-viz { display: flex; flex-direction: column; gap: 2rem; }
+.token-block { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 2rem; overflow: hidden; }
+.token-block.raw { opacity: 0.5; }
+.token-block.distilled { border-color: rgba(200, 75, 49, 0.3); background: rgba(200, 75, 49, 0.06); }
+.token-label { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: var(--terminal-dim); margin-bottom: 0.5rem; }
+.token-count { font-family: var(--serif); font-size: 3.5rem; font-weight: 700; line-height: 1; }
+.token-block.raw .token-count { color: rgba(255,255,255,0.3); }
+.token-block.distilled .token-count { color: var(--accent-glow); }
+.token-unit { font-family: var(--mono); font-size: 0.8rem; color: var(--terminal-dim); margin-top: 0.25rem; }
+.token-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.06); margin-top: 1rem; overflow: hidden; }
+.token-bar-fill { height: 100%; border-radius: 2px; transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1); width: 0; }
+.token-block.raw .token-bar-fill { background: rgba(255,255,255,0.15); }
+.token-block.distilled .token-bar-fill { background: var(--accent-glow); }
+.reduction-arrow { text-align: center; font-family: var(--mono); font-size: 0.75rem; color: var(--terminal-green); display: flex; align-items: center; gap: 0.75rem; }
+.reduction-arrow::before, .reduction-arrow::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+
+/* TOOLS */
+.tools { padding: 8rem 2rem; max-width: var(--max-w); margin: 0 auto; }
+.tools h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; line-height: 1.15; margin-bottom: 1rem; letter-spacing: -0.02em; }
+.tools > p { color: var(--ink-muted); font-size: 1.05rem; margin-bottom: 3.5rem; max-width: 500px; }
+.tools-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.tool-card { border: 1px solid rgba(26,26,24,0.08); border-radius: 12px; padding: 2rem; background: #fff; transition: all 0.3s ease; cursor: default; position: relative; overflow: hidden; }
+.tool-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.tool-card:hover { border-color: rgba(200, 75, 49, 0.2); box-shadow: 0 8px 40px rgba(0,0,0,0.06); transform: translateY(-2px); }
+.tool-card:hover::before { transform: scaleX(1); }
+.tool-icon { width: 40px; height: 40px; border-radius: 8px; background: rgba(200, 75, 49, 0.08); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 1.25rem; }
+.tool-name { font-family: var(--mono); font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem; }
+.tool-desc { font-size: 0.9rem; color: var(--ink-muted); line-height: 1.6; margin-bottom: 1.25rem; }
+.tool-example { background: var(--terminal-bg); border-radius: 8px; padding: 1rem; font-family: var(--mono); font-size: 0.72rem; line-height: 1.7; color: var(--terminal-text); overflow-x: auto; max-height: 0; opacity: 0; transition: all 0.4s ease; }
+.tool-card:hover .tool-example, .tool-card.active .tool-example { max-height: 300px; opacity: 1; }
+.t-key { color: var(--terminal-blue); }
+.t-str { color: var(--terminal-green); }
+.t-bool { color: var(--terminal-amber); }
+
+/* COMPARISON */
+.comparison { padding: 8rem 2rem; background: #F2EDE7; }
+.comparison-inner { max-width: var(--max-w); margin: 0 auto; }
+.comparison h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 400; line-height: 1.15; margin-bottom: 3rem; letter-spacing: -0.02em; }
+.comparison table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.comparison thead th { text-align: left; padding: 1rem 1.25rem; font-family: var(--mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ink-muted); border-bottom: 2px solid var(--ink); font-weight: 500; }
+.comparison thead th:first-child { padding-left: 0; }
+.comparison thead th.ours { color: var(--accent); }
+.comparison tbody td { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(26,26,24,0.08); color: var(--ink-light); vertical-align: top; }
+.comparison tbody td:first-child { padding-left: 0; font-weight: 500; color: var(--ink); }
+.comparison tbody td.ours { color: var(--ink); font-weight: 500; }
+.check { color: var(--terminal-green); font-weight: 700; }
+.cross { color: var(--ink-muted); }
+
+/* CTA */
+.cta { padding: 8rem 2rem; background: var(--ink); text-align: center; position: relative; overflow: hidden; }
+.cta::before { content: ''; position: absolute; bottom: -50%; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; border-radius: 50%; background: radial-gradient(circle, rgba(200, 75, 49, 0.12) 0%, transparent 60%); pointer-events: none; }
+.cta h2 { font-family: var(--serif); font-size: clamp(2rem, 5vw, 4rem); color: var(--cream); font-weight: 400; margin-bottom: 1rem; letter-spacing: -0.02em; }
+.cta p { color: rgba(247, 243, 238, 0.5); font-size: 1.1rem; margin-bottom: 2.5rem; }
+.cta-cmd { display: inline-flex; align-items: center; gap: 1rem; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: var(--terminal-green); font-family: var(--mono); font-size: 1.1rem; padding: 1.25rem 2.5rem; border-radius: 10px; cursor: pointer; transition: all 0.2s; margin-bottom: 2rem; }
+.cta-cmd:hover { background: rgba(255,255,255,0.1); border-color: var(--accent); transform: translateY(-2px); }
+.cta-links { display: flex; justify-content: center; gap: 2rem; }
+.cta-links a { color: rgba(247, 243, 238, 0.4); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+.cta-links a:hover { color: var(--cream); }
+
+footer { padding: 2rem; text-align: center; font-size: 0.75rem; color: var(--ink-muted); background: var(--ink); border-top: 1px solid rgba(255,255,255,0.05); }
+footer a { color: var(--accent); text-decoration: none; }
+
+/* ANIMATIONS */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes terminalFadeIn { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes scrollPulse { 0%, 100% { opacity: 0.4; transform: scaleY(1); } 50% { opacity: 1; transform: scaleY(1.2); } }
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* INTRO VIDEO */
+.intro-video { padding: 4rem 2rem 6rem; background: #F2EDE7; }
+.intro-video-inner { max-width: 960px; margin: 0 auto; text-align: center; }
+.intro-video-inner h2 { font-family: var(--serif); font-size: clamp(2rem, 4vw, 3rem); font-weight: 400; line-height: 1.15; margin-bottom: 1rem; letter-spacing: -0.02em; }
+.intro-video-sub { color: var(--ink-muted); font-size: 1.05rem; margin-bottom: 2.5rem; line-height: 1.7; }
+.video-embed { position: relative; width: 100%; aspect-ratio: 16/9; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05); background: var(--ink); }
+.video-embed iframe { width: 100%; height: 100%; border: none; }
+.video-play-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; background: rgba(15,15,14,0.6); backdrop-filter: blur(4px); cursor: pointer; transition: opacity 0.4s; z-index: 10; }
+.video-play-overlay.hidden { opacity: 0; pointer-events: none; }
+.video-play-circle { width: 80px; height: 80px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; transition: all 0.3s; }
+.video-play-circle:hover { border-color: var(--accent); background: rgba(200, 75, 49, 0.15); transform: scale(1.05); }
+.video-play-tri { width: 0; height: 0; border-left: 22px solid white; border-top: 14px solid transparent; border-bottom: 14px solid transparent; margin-left: 4px; }
+.video-play-label { font-family: var(--mono); font-size: 0.8rem; color: rgba(255,255,255,0.6); letter-spacing: 0.1em; text-transform: uppercase; }
+
+@media (max-width: 768px) {
+  .reduction-inner { grid-template-columns: 1fr; gap: 3rem; }
+  .tools-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+  .hero { padding: 6rem 1.5rem 3rem; }
+  .terminal-body { font-size: 0.75rem; padding: 1rem; min-height: 350px; }
+  .comparison { overflow-x: auto; }
+  .comparison table { min-width: 700px; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">&lt;<span>headless</span>dev /&gt;</a>
+  <ul class="nav-links">
+    <li><a href="#intro">Intro</a></li>
+    <li><a href="#walkthrough">Walkthrough</a></li>
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#comparison">Compare</a></li>
+    <li><a href="https://github.com/NETWORK101/headlessdev" class="nav-cta">GitHub</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">MCP Server for AI Agents</div>
+  <h1>Give your AI agent<br>a <em>browser.</em></h1>
+  <p class="hero-sub">Zero-config headless browser automation for Claude Code, Cursor, Codex CLI, and any MCP-compatible agent. Local. Free. 10-50x fewer tokens.</p>
+  <button class="hero-cmd" id="heroCmdBtn">
+    <span class="prompt">$</span>
+    <span class="cmd">npx headlessdev init</span>
+    <span class="copy-hint">click to copy</span>
+  </button>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- ═══ INTRO VIDEO ═══ -->
+<section class="intro-video" id="intro">
+  <div class="intro-video-inner reveal">
+    <div class="section-label">New to headlessdev?</div>
+    <h2>Watch the 60-second intro.</h2>
+    <p class="intro-video-sub">No jargon. No assumptions. Just a clear explanation of what this does and why you might want it.</p>
+    <div class="video-embed">
+      <iframe src="video.html" id="videoFrame" title="headlessdev introduction" allow="autoplay" loading="lazy"></iframe>
+      <div class="video-play-overlay" id="videoPlayOverlay">
+        <div class="video-play-circle">
+          <div class="video-play-tri"></div>
+        </div>
+        <div class="video-play-label">Watch introduction</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="walkthrough" id="walkthrough">
+  <div class="reveal">
+    <div class="section-label">How it works</div>
+    <h2>From install to first browse<br>in thirty seconds.</h2>
+  </div>
+  <div class="terminal-frame reveal">
+    <div class="terminal-bar">
+      <span class="terminal-dot"></span>
+      <span class="terminal-dot"></span>
+      <span class="terminal-dot"></span>
+      <span class="terminal-title">Terminal</span>
+    </div>
+    <div class="terminal-body" id="terminal"></div>
+  </div>
+  <div class="terminal-controls reveal">
+    <button class="terminal-btn" id="replayBtn">Replay</button>
+  </div>
+</section>
+
+<section class="reduction" id="reduction">
+  <div class="reduction-inner">
+    <div class="reduction-text reveal">
+      <div class="section-label">The core advantage</div>
+      <h2>Your agent reads markdown,<br>not HTML soup.</h2>
+      <p>Raw HTML dumps waste 99% of tokens on scripts, styles, and boilerplate. headlessdev distills pages into clean, structured markdown that your agent can actually reason about.</p>
+    </div>
+    <div class="reduction-viz reveal">
+      <div class="token-block raw">
+        <div class="token-label">Raw HTML</div>
+        <div class="token-count" id="raw-count">0</div>
+        <div class="token-unit">tokens</div>
+        <div class="token-bar"><div class="token-bar-fill" id="raw-bar"></div></div>
+      </div>
+      <div class="reduction-arrow">10-50x reduction</div>
+      <div class="token-block distilled">
+        <div class="token-label">Distilled Markdown</div>
+        <div class="token-count" id="distilled-count">0</div>
+        <div class="token-unit">tokens</div>
+        <div class="token-bar"><div class="token-bar-fill" id="distilled-bar"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="tools" id="tools">
+  <div class="reveal">
+    <div class="section-label">Four tools, one protocol</div>
+    <h2>Everything your agent needs<br>to work with the web.</h2>
+    <p>Each tool returns token-efficient output designed for LLM consumption, not human reading.</p>
+  </div>
+  <div class="tools-grid" id="toolsGrid"></div>
+</section>
+
+<section class="comparison" id="comparison">
+  <div class="comparison-inner reveal">
+    <div class="section-label">How it compares</div>
+    <h2>Built different.</h2>
+    <div id="comparisonTable"></div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="reveal">
+    <h2>Ready to browse?</h2>
+    <p>One command. No signup. No API key. No cloud.</p>
+    <button class="cta-cmd" id="ctaCmdBtn">
+      <span style="color: var(--terminal-dim);">$</span>
+      npx headlessdev init
+    </button>
+    <div class="cta-links">
+      <a href="https://github.com/NETWORK101/headlessdev">GitHub</a>
+      <a href="https://www.npmjs.com/package/headlessdev">npm</a>
+      <a href="https://github.com/NETWORK101/headlessdev/issues">Issues</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  Built with obstinate attention to detail. <a href="https://github.com/NETWORK101/headlessdev">MIT License</a>.
+</footer>
+
+<script>
+// ═══ COPY COMMAND ═══
+function setupCopyBtn(btn) {
+  btn.addEventListener('click', function() {
+    navigator.clipboard.writeText('npx headlessdev init');
+    var hint = btn.querySelector('.copy-hint');
+    if (hint) {
+      hint.textContent = 'copied!';
+      btn.classList.add('copied');
+      setTimeout(function() { hint.textContent = 'click to copy'; btn.classList.remove('copied'); }, 2000);
+    }
+  });
+}
+setupCopyBtn(document.getElementById('heroCmdBtn'));
+setupCopyBtn(document.getElementById('ctaCmdBtn'));
+
+// ═══ SCROLL REVEALS ═══
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry, i) {
+    if (entry.isIntersecting) {
+      setTimeout(function() { entry.target.classList.add('visible'); }, i * 100);
+      revealObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+// ═══ TERMINAL WALKTHROUGH ═══
+var terminalData = [
+  { cls: '', parts: [{ cls: 't-prompt', t: '$ ' }, { cls: 't-cmd', t: 'npx headlessdev init' }], delay: 0 },
+  { cls: '', parts: [{ cls: 't-success', t: '\u2713 ' }, { cls: '', t: 'Config written to .headlessdev.json' }], delay: 600 },
+  { cls: '', parts: [{ cls: 't-success', t: '\u2713 ' }, { cls: '', t: 'MCP server configured for Claude Code' }], delay: 300 },
+  { cls: '', parts: [{ cls: '', t: '' }], delay: 200 },
+  { cls: '', parts: [{ cls: 't-info', t: '\u2139 ' }, { cls: '', t: 'Your agent now has 4 browser tools:' }], delay: 300 },
+  { cls: '', parts: [{ cls: '', t: '  ' }, { cls: 't-highlight', t: 'browse' }, { cls: '', t: '  ' }, { cls: 't-highlight', t: 'extract' }, { cls: '', t: '  ' }, { cls: 't-highlight', t: 'screenshot' }, { cls: '', t: '  ' }, { cls: 't-highlight', t: 'interact' }], delay: 200 },
+  { cls: '', parts: [{ cls: '', t: '' }], delay: 400 },
+  { cls: '', parts: [{ cls: 't-comment', t: "# Now your agent can browse the web. Let's try it..." }], delay: 500 },
+  { cls: '', parts: [{ cls: '', t: '' }], delay: 300 },
+  { cls: '', parts: [{ cls: 't-prompt', t: '$ ' }, { cls: 't-cmd', t: 'claude ' }, { cls: 't-dim', t: '"Browse stripe.com/pricing and extract the plan names"' }], delay: 500 },
+  { cls: '', parts: [{ cls: '', t: '' }], delay: 500 },
+  { cls: '', parts: [{ cls: 't-info', t: 'Agent' }, { cls: '', t: ' calling ' }, { cls: 't-highlight', t: 'browse' }, { cls: '', t: '({' }], delay: 400 },
+  { cls: '', parts: [{ cls: '', t: '  url: ' }, { cls: 't-str', t: '"https://stripe.com/pricing"' }, { cls: '', t: ',' }], delay: 100 },
+  { cls: '', parts: [{ cls: '', t: '  instruction: ' }, { cls: 't-str', t: '"extract plan names and pricing"' }], delay: 100 },
+  { cls: '', parts: [{ cls: '', t: '})' }], delay: 100 },
+  { cls: '', parts: [{ cls: '', t: '' }], delay: 800 },
+  { cls: '', parts: [{ cls: 't-dim', t: '\u2500\u2500\u2500 DOM distillation \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500' }], delay: 200 },
+  { cls: '', parts: [{ cls: 't-output', t: 'Raw HTML:     ' }, { cls: 't-warn', t: '84,200 tokens' }], delay: 300 },
+  { cls: '', parts: [{ cls: 't-output', t: 'Distilled:    ' }, { cls: 't-success', t: '1,240 tokens' }, { cls: 't-dim', t: '  (98.5% reduction)' }], delay: 300 },
+  { cls: '', parts: [{ cls: 't-dim', t: '\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500' }], delay: 200 },
+  { cls: '', parts: [{ cls: '', t: '' }], delay: 300 },
+  { cls: '', parts: [{ cls: 't-success', t: 'Agent:' }, { cls: '', t: " Found 3 plans on Stripe's pricing page:" }], delay: 500 },
+  { cls: '', parts: [{ cls: '', t: '  1. ' }, { cls: 't-info', t: 'Starter' }, { cls: '', t: ' \u2014 2.9% + 30\u00a2 per transaction' }], delay: 200 },
+  { cls: '', parts: [{ cls: '', t: '  2. ' }, { cls: 't-info', t: 'Scale' }, { cls: '', t: '   \u2014 Custom pricing, volume discounts' }], delay: 200 },
+  { cls: '', parts: [{ cls: '', t: '  3. ' }, { cls: 't-info', t: 'Enterprise' }, { cls: '', t: ' \u2014 Custom, dedicated support' }], delay: 200 },
+];
+
+var terminalPlayed = false;
+
+function playTerminal() {
+  var container = document.getElementById('terminal');
+  container.textContent = '';
+  var totalDelay = 0;
+
+  terminalData.forEach(function(line, i) {
+    var delay = line.delay || 150;
+    totalDelay += delay;
+
+    setTimeout(function() {
+      var div = document.createElement('div');
+      div.className = 'terminal-line';
+
+      line.parts.forEach(function(part) {
+        var span = document.createElement('span');
+        if (part.cls) span.className = part.cls;
+        span.textContent = part.t;
+        div.appendChild(span);
+      });
+
+      container.appendChild(div);
+      requestAnimationFrame(function() { div.classList.add('visible'); });
+      container.scrollTop = container.scrollHeight;
+
+      // Cursor on last line
+      var oldCursors = container.querySelectorAll('.terminal-cursor');
+      oldCursors.forEach(function(c) { c.remove(); });
+      if (i === terminalData.length - 1) {
+        var cursor = document.createElement('span');
+        cursor.className = 'terminal-cursor';
+        div.appendChild(cursor);
+      }
+    }, totalDelay);
+  });
+}
+
+document.getElementById('replayBtn').addEventListener('click', playTerminal);
+
+var terminalObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting && !terminalPlayed) {
+      terminalPlayed = true;
+      setTimeout(playTerminal, 500);
+    }
+  });
+}, { threshold: 0.3 });
+terminalObserver.observe(document.querySelector('.terminal-frame'));
+
+// ═══ TOKEN COUNTER ═══
+function animateCounter(el, target, duration) {
+  duration = duration || 1500;
+  var start = performance.now();
+  function update(now) {
+    var elapsed = now - start;
+    var progress = Math.min(elapsed / duration, 1);
+    var eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.round(target * eased).toLocaleString();
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+var reductionObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) {
+      animateCounter(document.getElementById('raw-count'), 84200);
+      setTimeout(function() { animateCounter(document.getElementById('distilled-count'), 1240); }, 800);
+      setTimeout(function() { document.getElementById('raw-bar').style.width = '100%'; }, 300);
+      setTimeout(function() { document.getElementById('distilled-bar').style.width = '1.5%'; }, 1200);
+      reductionObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.4 });
+reductionObserver.observe(document.getElementById('reduction'));
+
+// ═══ TOOLS GRID (built safely via DOM) ═══
+var toolsData = [
+  { icon: '\uD83C\uDF10', name: 'browse', desc: 'Navigate to any URL and get back clean, distilled markdown with interactive elements mapped.',
+    example: 'browse({\n  url: "https://docs.stripe.com/api",\n  instruction: "find authentication methods"\n})\n// Returns: structured markdown + element selectors' },
+  { icon: '\uD83D\uDCCB', name: 'extract', desc: 'Pull structured data from pages with optional JSON schema guidance for precise extraction.',
+    example: 'extract({\n  url: "https://example.com/pricing",\n  schema: {\n    plans: [{ name: "string", price: "number" }]\n  }\n})' },
+  { icon: '\uD83D\uDCF7', name: 'screenshot', desc: 'Capture full-page or element-specific screenshots. Returns base64 PNG for visual inspection.',
+    example: 'screenshot({\n  url: "https://myapp.dev",\n  fullPage: true\n})\n// Returns: base64 PNG image' },
+  { icon: '\uD83D\uDDB1', name: 'interact', desc: 'Click buttons, fill forms, select options. Returns the page state after each action completes.',
+    example: 'interact({\n  url: "https://app.com/login",\n  actions: [\n    { type: "fill", selector: "#email", value: "me@dev.com" },\n    { type: "click", selector: "button[type=submit]" }\n  ]\n})' }
+];
+
+var toolsGrid = document.getElementById('toolsGrid');
+toolsData.forEach(function(tool) {
+  var card = document.createElement('div');
+  card.className = 'tool-card reveal';
+
+  var icon = document.createElement('div');
+  icon.className = 'tool-icon';
+  icon.textContent = tool.icon;
+  card.appendChild(icon);
+
+  var name = document.createElement('div');
+  name.className = 'tool-name';
+  name.textContent = tool.name;
+  card.appendChild(name);
+
+  var desc = document.createElement('div');
+  desc.className = 'tool-desc';
+  desc.textContent = tool.desc;
+  card.appendChild(desc);
+
+  var example = document.createElement('pre');
+  example.className = 'tool-example';
+  example.textContent = tool.example;
+  card.appendChild(example);
+
+  card.addEventListener('click', function() {
+    if (window.innerWidth <= 768) card.classList.toggle('active');
+  });
+
+  toolsGrid.appendChild(card);
+  revealObserver.observe(card);
+});
+
+// ═══ COMPARISON TABLE (built safely via DOM) ═══
+var compRows = [
+  ['Setup', 'npx headlessdev init', 'Sign up + API key', 'pip install + config', 'npm install + API key'],
+  ['Cost', 'Free (runs locally)', '$20-99/mo', 'Free (self-host)', 'Free + Browserbase'],
+  ['Token reduction', '10-50x built-in', 'None', 'Some', 'Some'],
+  ['MCP native', 'Yes', 'No', 'No', 'No'],
+  ['Cloud required', 'No', 'Yes', 'No', 'Optional'],
+  ['Cost tracking', 'Built-in', 'Dashboard', 'No', 'No'],
+  ['Circuit breaker', 'Built-in', 'No', 'No', 'No'],
+  ['Agent support', 'Claude Code, Cursor, Codex CLI, any MCP client', 'Custom SDKs', 'Python agents', 'JS agents']
+];
+var headers = ['', 'headlessdev', 'Browserbase', 'Browser-Use', 'Stagehand'];
+var yesValues = ['Free (runs locally)', '10-50x built-in', 'Yes', 'No', 'Built-in'];
+
+var table = document.createElement('table');
+var thead = document.createElement('thead');
+var headerRow = document.createElement('tr');
+headers.forEach(function(h, i) {
+  var th = document.createElement('th');
+  th.textContent = h;
+  if (i === 0) th.style.paddingLeft = '0';
+  if (i === 1) th.className = 'ours';
+  headerRow.appendChild(th);
+});
+thead.appendChild(headerRow);
+table.appendChild(thead);
+
+var tbody = document.createElement('tbody');
+compRows.forEach(function(row) {
+  var tr = document.createElement('tr');
+  row.forEach(function(cell, i) {
+    var td = document.createElement('td');
+    if (i === 0) { td.style.paddingLeft = '0'; td.style.fontWeight = '500'; td.style.color = 'var(--ink)'; }
+    if (i === 1) {
+      td.className = 'ours';
+      if (yesValues.indexOf(cell) !== -1) {
+        var span = document.createElement('span');
+        span.className = 'check';
+        span.textContent = cell;
+        td.appendChild(span);
+      } else {
+        td.textContent = cell;
+      }
+    } else if (i > 1 && cell === 'No') {
+      var span2 = document.createElement('span');
+      span2.className = 'cross';
+      span2.textContent = cell;
+      td.appendChild(span2);
+    } else if (i > 1 && cell === 'None') {
+      var span3 = document.createElement('span');
+      span3.className = 'cross';
+      span3.textContent = cell;
+      td.appendChild(span3);
+    } else {
+      td.textContent = cell;
+    }
+    tr.appendChild(td);
+  });
+  tbody.appendChild(tr);
+});
+table.appendChild(tbody);
+document.getElementById('comparisonTable').appendChild(table);
+
+// ═══ INTRO VIDEO PLAY ═══
+document.getElementById('videoPlayOverlay').addEventListener('click', function() {
+  this.classList.add('hidden');
+  // Send message to iframe to start playing
+  var frame = document.getElementById('videoFrame');
+  frame.contentWindow.postMessage('play', '*');
+});
+</script>
+</body>
+</html>

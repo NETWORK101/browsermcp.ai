@@ -1,0 +1,15 @@
+{
+  "browser": {
+    "timeout": 30000,
+    "headless": true
+  },
+  "distill": {
+    "maxTokens": 4000,
+    "includeLinks": true,
+    "includeImages": false
+  },
+  "limits": {
+    "maxSessionsPerDay": 100,
+    "maxTokensPerDay": 1000000
+  }
+}
