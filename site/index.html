@@ -7,7 +7,7 @@
 <meta name="description" content="Zero-config MCP server for headless browser automation. 10-50x token reduction. Free, local, instant.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Jost:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -24,13 +24,13 @@
   --terminal-amber: #FBBF24;
   --terminal-text: #D4D4D8;
   --terminal-dim: #52525B;
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --mono: 'JetBrains Mono', 'SF Mono', monospace;
-  --sans: 'DM Sans', -apple-system, sans-serif;
+  --serif: 'Bodoni Moda', 'Didot', serif;
+  --sans: 'Jost', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
   --max-w: 1200px;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
 
 body {
   font-family: var(--sans);
@@ -195,8 +195,53 @@ footer a { color: var(--accent); text-decoration: none; }
 @keyframes terminalFadeIn { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: translateX(0); } }
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes scrollPulse { 0%, 100% { opacity: 0.4; transform: scaleY(1); } 50% { opacity: 1; transform: scaleY(1.2); } }
-.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1); }
 .reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* Card 3D hover transition */
+.tool-card, .biz-card {
+  transition: transform 0.1s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  will-change: transform;
+}
+
+/* Hero text split animation base */
+.hero h1 { overflow: hidden; }
+.hero h1 span { will-change: transform, opacity; }
+
+/* Smooth section transitions */
+section { will-change: opacity; }
+
+/* Gradient text for accent words */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-glow) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero command glow */
+.hero-cmd { position: relative; }
+.hero-cmd::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent), transparent, var(--accent));
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s;
+  filter: blur(12px);
+}
+.hero-cmd:hover::after { opacity: 0.4; }
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 /* MULTI-AGENT (Better Together) */
 .multi-agent { padding: 8rem 2rem; background: var(--ink); color: var(--cream); position: relative; overflow: hidden; }
@@ -541,6 +586,64 @@ footer a { color: var(--accent); text-decoration: none; }
   Built with obstinate attention to detail. <a href="https://github.com/NETWORK101/headlessdev">MIT License</a>.
 </footer>
 
+<!-- ═══ AGENT CHAT WIDGET ═══ -->
+<div id="chatWidget" class="chat-widget">
+  <button id="chatToggle" class="chat-toggle">
+    <span class="chat-toggle-icon">?</span>
+    <span class="chat-toggle-close">&times;</span>
+  </button>
+  <div id="chatPanel" class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-left">
+        <div class="chat-header-dot"></div>
+        <span class="chat-header-title">headlessdev agent</span>
+      </div>
+      <span class="chat-header-badge">AI</span>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="chat-msg chat-msg-agent">
+        <div class="chat-msg-content">Hi! I'm the headlessdev agent. Ask me anything about browser automation, MCP servers, or how headlessdev can help your workflow.</div>
+      </div>
+    </div>
+    <div class="chat-input-wrap">
+      <input type="text" id="chatInput" class="chat-input" placeholder="Ask about headlessdev..." autocomplete="off">
+      <button id="chatSend" class="chat-send">Send</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.chat-widget { position: fixed; bottom: 2rem; right: 2rem; z-index: 9000; font-family: var(--sans); }
+.chat-toggle { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); border: none; cursor: pointer; box-shadow: 0 4px 20px rgba(200,75,49,0.3); display: flex; align-items: center; justify-content: center; transition: all 0.3s; position: absolute; bottom: 0; right: 0; }
+.chat-toggle:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(200,75,49,0.4); }
+.chat-toggle-icon { color: white; font-size: 1.5rem; font-weight: 700; font-family: var(--mono); }
+.chat-toggle-close { color: white; font-size: 1.8rem; display: none; }
+.chat-widget.open .chat-toggle-icon { display: none; }
+.chat-widget.open .chat-toggle-close { display: block; }
+.chat-panel { position: absolute; bottom: 70px; right: 0; width: 380px; height: 500px; background: white; border-radius: 16px; box-shadow: 0 12px 50px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.05); display: none; flex-direction: column; overflow: hidden; }
+.chat-widget.open .chat-panel { display: flex; animation: chatSlideUp 0.3s ease; }
+@keyframes chatSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.chat-header { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; border-bottom: 1px solid rgba(26,26,24,0.06); background: var(--cream); }
+.chat-header-left { display: flex; align-items: center; gap: 0.6rem; }
+.chat-header-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.chat-header-title { font-family: var(--mono); font-size: 0.8rem; font-weight: 600; color: var(--ink); }
+.chat-header-badge { font-family: var(--mono); font-size: 0.6rem; background: var(--ink); color: var(--cream); padding: 0.2rem 0.5rem; border-radius: 4px; }
+.chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.chat-msg { max-width: 85%; }
+.chat-msg-agent { align-self: flex-start; }
+.chat-msg-user { align-self: flex-end; }
+.chat-msg-content { font-size: 0.85rem; line-height: 1.5; padding: 0.75rem 1rem; border-radius: 12px; }
+.chat-msg-agent .chat-msg-content { background: var(--cream); color: var(--ink); border-bottom-left-radius: 4px; }
+.chat-msg-user .chat-msg-content { background: var(--ink); color: var(--cream); border-bottom-right-radius: 4px; }
+.chat-msg-typing .chat-msg-content { color: var(--ink-muted); font-style: italic; }
+.chat-input-wrap { display: flex; gap: 0.5rem; padding: 0.75rem; border-top: 1px solid rgba(26,26,24,0.06); }
+.chat-input { flex: 1; font-family: var(--sans); font-size: 0.85rem; padding: 0.6rem 0.85rem; border: 1px solid rgba(26,26,24,0.1); border-radius: 8px; outline: none; transition: border-color 0.2s; }
+.chat-input:focus { border-color: var(--accent); }
+.chat-send { font-family: var(--mono); font-size: 0.75rem; background: var(--ink); color: var(--cream); border: none; padding: 0.6rem 1rem; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+.chat-send:hover { background: var(--accent); }
+.chat-send:disabled { opacity: 0.5; cursor: default; }
+</style>
+
 <script>
 // ═══ COPY COMMAND ═══
 function setupCopyBtn(btn) {
@@ -557,16 +660,104 @@ function setupCopyBtn(btn) {
 setupCopyBtn(document.getElementById('heroCmdBtn'));
 setupCopyBtn(document.getElementById('ctaCmdBtn'));
 
-// ═══ SCROLL REVEALS ═══
+// ═══ SCROLL REVEALS (staggered) ═══
 var revealObserver = new IntersectionObserver(function(entries) {
-  entries.forEach(function(entry, i) {
+  entries.forEach(function(entry) {
     if (entry.isIntersecting) {
-      setTimeout(function() { entry.target.classList.add('visible'); }, i * 100);
+      entry.target.classList.add('visible');
+
+      // Stagger children if they have .stagger-child class
+      var staggerChildren = entry.target.querySelectorAll('.stagger-child');
+      staggerChildren.forEach(function(child, i) {
+        child.style.transitionDelay = (i * 0.1) + 's';
+        child.classList.add('visible');
+      });
+
       revealObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.15 });
+}, { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(function(el) { revealObserver.observe(el); });
+
+// ═══ KINETIC HERO TYPOGRAPHY ═══
+(function animateHeroText() {
+  var h1 = document.querySelector('.hero h1');
+  if (!h1) return;
+
+  // Walk child nodes to preserve <br> and <em> tags
+  var nodes = [];
+  h1.childNodes.forEach(function(node) { nodes.push(node); });
+  h1.innerHTML = '';
+  h1.style.opacity = '1';
+
+  var charIndex = 0;
+  var allSpans = [];
+
+  nodes.forEach(function(node) {
+    if (node.nodeType === 1 && node.tagName === 'BR') {
+      h1.appendChild(document.createElement('br'));
+    } else if (node.nodeType === 1 && node.tagName === 'EM') {
+      var em = document.createElement('em');
+      node.textContent.split('').forEach(function(char) {
+        var span = document.createElement('span');
+        span.textContent = char;
+        span.style.display = 'inline-block';
+        span.style.opacity = '0';
+        span.style.transform = 'translateY(40px)';
+        span.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        span.style.transitionDelay = (0.3 + charIndex * 0.03) + 's';
+        if (char === ' ') span.style.width = '0.3em';
+        em.appendChild(span);
+        allSpans.push(span);
+        charIndex++;
+      });
+      h1.appendChild(em);
+    } else if (node.nodeType === 3) {
+      node.textContent.split('').forEach(function(char) {
+        var span = document.createElement('span');
+        span.textContent = char;
+        span.style.display = 'inline-block';
+        span.style.opacity = '0';
+        span.style.transform = 'translateY(40px)';
+        span.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        span.style.transitionDelay = (0.3 + charIndex * 0.03) + 's';
+        if (char === ' ') span.style.width = '0.3em';
+        h1.appendChild(span);
+        allSpans.push(span);
+        charIndex++;
+      });
+    }
+  });
+
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      allSpans.forEach(function(span) {
+        span.style.opacity = '1';
+        span.style.transform = 'translateY(0)';
+      });
+    });
+  });
+})();
+
+// ═══ SMOOTH PARALLAX SCROLL ═══
+window.addEventListener('scroll', function() {
+  var scrollY = window.pageYOffset;
+
+  // Hero fades and scales slightly on scroll
+  var hero = document.querySelector('.hero');
+  if (hero) {
+    var heroProgress = Math.min(scrollY / (window.innerHeight * 0.8), 1);
+    hero.style.opacity = 1 - heroProgress * 0.6;
+    hero.style.transform = 'scale(' + (1 + heroProgress * 0.05) + ')';
+  }
+
+  // Parallax backgrounds on dark sections
+  document.querySelectorAll('.reduction, .multi-agent, .cta').forEach(function(section) {
+    var rect = section.getBoundingClientRect();
+    var sectionProgress = -rect.top / window.innerHeight;
+    section.style.backgroundPosition = '50% ' + (sectionProgress * 30) + 'px';
+  });
+}, { passive: true });
 
 // ═══ TERMINAL WALKTHROUGH ═══
 var terminalData = [
@@ -649,12 +840,13 @@ terminalObserver.observe(document.querySelector('.terminal-frame'));
 
 // ═══ TOKEN COUNTER ═══
 function animateCounter(el, target, duration) {
-  duration = duration || 1500;
+  duration = duration || 2000;
   var start = performance.now();
   function update(now) {
     var elapsed = now - start;
     var progress = Math.min(elapsed / duration, 1);
-    var eased = 1 - Math.pow(1 - progress, 3);
+    // Spring easing
+    var eased = 1 - Math.pow(1 - progress, 4);
     el.textContent = Math.round(target * eased).toLocaleString();
     if (progress < 1) requestAnimationFrame(update);
   }
@@ -833,9 +1025,126 @@ document.getElementById('comparisonTable').appendChild(table);
 // ═══ INTRO VIDEO PLAY ═══
 document.getElementById('videoPlayOverlay').addEventListener('click', function() {
   this.classList.add('hidden');
-  // Send message to iframe to start playing
   var frame = document.getElementById('videoFrame');
   frame.contentWindow.postMessage('play', '*');
+});
+
+// ═══ AGENT CHAT WIDGET ═══
+(function() {
+  var widget = document.getElementById('chatWidget');
+  var toggle = document.getElementById('chatToggle');
+  var input = document.getElementById('chatInput');
+  var sendBtn = document.getElementById('chatSend');
+  var messages = document.getElementById('chatMessages');
+  var sandboxId = null;
+  var threadId = null;
+  var isLoading = false;
+
+  toggle.addEventListener('click', function() {
+    widget.classList.toggle('open');
+    if (widget.classList.contains('open')) {
+      input.focus();
+      if (!sandboxId) initSession();
+    }
+  });
+
+  function initSession() {
+    fetch('/api/sandbox', { method: 'POST' })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        sandboxId = data.id;
+        if (data.threadId) threadId = data.threadId;
+      })
+      .catch(function() {
+        // Sandbox creation failed — chat will still work but without persistence
+      });
+  }
+
+  function addMessage(text, role) {
+    var msg = document.createElement('div');
+    msg.className = 'chat-msg chat-msg-' + role;
+    var content = document.createElement('div');
+    content.className = 'chat-msg-content';
+    content.textContent = text;
+    msg.appendChild(content);
+    messages.appendChild(msg);
+    messages.scrollTop = messages.scrollHeight;
+    return msg;
+  }
+
+  function sendMessage() {
+    var text = input.value.trim();
+    if (!text || isLoading) return;
+
+    addMessage(text, 'user');
+    input.value = '';
+    isLoading = true;
+    sendBtn.disabled = true;
+
+    var typingMsg = addMessage('Thinking...', 'agent');
+    typingMsg.classList.add('chat-msg-typing');
+
+    fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: text,
+        sandboxId: sandboxId,
+        threadId: threadId
+      })
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      messages.removeChild(typingMsg);
+      var reply = 'Sorry, I could not process that request.';
+      if (data.error) {
+        reply = data.error;
+      } else if (data.messages && data.messages.length > 0) {
+        var last = data.messages[data.messages.length - 1];
+        if (last.parts && last.parts.length > 0) {
+          reply = last.parts.map(function(p) { return p.text || ''; }).join('');
+        }
+      } else if (data.text) {
+        reply = data.text;
+      } else if (typeof data === 'string') {
+        reply = data;
+      }
+      addMessage(reply, 'agent');
+    })
+    .catch(function(err) {
+      messages.removeChild(typingMsg);
+      addMessage('Connection error. Make sure the server is running (node site/server.js).', 'agent');
+    })
+    .finally(function() {
+      isLoading = false;
+      sendBtn.disabled = false;
+      input.focus();
+    });
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') sendMessage();
+  });
+})();
+
+// ═══ MAGNETIC HOVER EFFECTS ON CARDS ═══
+document.querySelectorAll('.tool-card, .biz-card, .uc-card').forEach(function(card) {
+  card.addEventListener('mousemove', function(e) {
+    var rect = card.getBoundingClientRect();
+    var x = (e.clientX - rect.left) / rect.width - 0.5;
+    var y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = 'perspective(800px) rotateY(' + (x * 6) + 'deg) rotateX(' + (-y * 6) + 'deg) translateY(-4px)';
+  });
+
+  card.addEventListener('mouseleave', function() {
+    card.style.transform = 'perspective(800px) rotateY(0deg) rotateX(0deg) translateY(0)';
+    card.style.transition = 'transform 0.5s ease';
+  });
+
+  card.addEventListener('mouseenter', function() {
+    card.style.transition = 'transform 0.1s ease';
+  });
 });
 </script>
 </body>
