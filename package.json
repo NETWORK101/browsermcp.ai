@@ -1,6 +1,6 @@
 {
   "name": "headlessdev",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Give your AI agent a browser. MCP server for headless browser automation with 10-50x token reduction.",
   "type": "module",
   "main": "dist/src/index.js",
