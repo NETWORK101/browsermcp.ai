@@ -1,6 +1,10 @@
 node_modules
 dist
+site-build
 *.db
 .headlessdev
 LAUNCH.md
 .env
+.DS_Store
+hero-proto/dist
+packages/*/dist

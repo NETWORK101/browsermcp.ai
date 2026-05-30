@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "headlessdev": {
+      "command": "npx",
+      "args": ["-y", "@headlessdev/mcp"]
+    }
+  }
+}

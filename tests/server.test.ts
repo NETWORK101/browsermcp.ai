@@ -17,19 +17,20 @@ describe("MCP server", () => {
     return { server, client };
   }
 
-  it("lists exactly 4 tools", async () => {
+  it("lists exactly 5 tools", async () => {
     const { client } = await startServer();
     const result = await client.listTools();
-    expect(result.tools).toHaveLength(4);
+    expect(result.tools).toHaveLength(5);
   });
 
-  it("lists browse, extract, screenshot, and interact tools", async () => {
+  it("lists browse, extract, screenshot, watch, and interact tools", async () => {
     const { client } = await startServer();
     const result = await client.listTools();
     const names = result.tools.map((t) => t.name);
     expect(names).toContain("browse");
     expect(names).toContain("extract");
     expect(names).toContain("screenshot");
+    expect(names).toContain("watch");
     expect(names).toContain("interact");
   });
 

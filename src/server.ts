@@ -8,6 +8,7 @@ import { handleBrowse } from './tools/browse.js';
 import { handleExtract } from './tools/extract.js';
 import { handleScreenshot } from './tools/screenshot.js';
 import { handleInteract } from './tools/interact.js';
+import { handleWatch } from './tools/watch.js';
 import { UsageTracker } from './cost/tracker.js';
 import { CircuitBreaker } from './cost/circuit-breaker.js';
 
@@ -57,6 +58,17 @@ const TOOLS = [
           type: "boolean",
           description: "Whether to take a full-page screenshot",
         },
+      },
+      required: ["url"],
+    },
+  },
+  {
+    name: "watch",
+    description: "Read a page and diff against the previous snapshot. Returns only what changed since the last read — dramatically fewer tokens than re-reading the full page. First call stores a baseline; subsequent calls return a diff.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        url: { type: "string", description: "The URL to watch for changes" },
       },
       required: ["url"],
     },
@@ -141,6 +153,9 @@ export function createServer(): Server {
         break;
       case 'screenshot':
         result = await handleScreenshot(args as any, browserManager);
+        break;
+      case 'watch':
+        result = await handleWatch(args as any, browserManager, tracker);
         break;
       case 'interact':
         result = await handleInteract(args as any, browserManager);

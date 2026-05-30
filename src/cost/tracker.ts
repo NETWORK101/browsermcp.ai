@@ -22,6 +22,14 @@ export class UsageTracker {
         duration_ms INTEGER DEFAULT 0
       )
     `);
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS snapshots (
+        url TEXT PRIMARY KEY,
+        markdown TEXT NOT NULL,
+        token_count INTEGER NOT NULL,
+        updated_at TEXT DEFAULT (datetime('now'))
+      )
+    `);
   }
 
   record(tool: string, tokensOut: number, durationMs: number, url?: string): void {
@@ -53,6 +61,19 @@ export class UsageTracker {
       tokens: row.tokens,
       estimatedCost: `$${cost.toFixed(4)}`
     };
+  }
+
+  getSnapshot(url: string): { markdown: string; tokenCount: number; updatedAt: string } | null {
+    const row = this.db.prepare(
+      'SELECT markdown, token_count as tokenCount, updated_at as updatedAt FROM snapshots WHERE url = ?'
+    ).get(url) as any;
+    return row ?? null;
+  }
+
+  saveSnapshot(url: string, markdown: string, tokenCount: number): void {
+    this.db.prepare(
+      'INSERT INTO snapshots (url, markdown, token_count, updated_at) VALUES (?, ?, ?, datetime(\'now\')) ON CONFLICT(url) DO UPDATE SET markdown = excluded.markdown, token_count = excluded.token_count, updated_at = datetime(\'now\')'
+    ).run(url, markdown, tokenCount);
   }
 
   close(): void {

@@ -12,7 +12,7 @@ If headlessdev is not yet configured, ask the user to run:
 npx headlessdev init
 ```
 
-This writes the MCP config automatically. After restart, you'll have 4 new tools.
+This writes the MCP config automatically. After restart, you'll have 5 new tools.
 
 ## Available Tools
 
@@ -49,6 +49,17 @@ screenshot({ url: "https://myapp.dev", selector: "#hero-section" })
 Returns: Base64 PNG image.
 
 **When to use:** Visual verification after deploys, checking UI appearance, capturing visual evidence.
+
+### watch
+Read a page and diff against the previous snapshot. Returns only what changed — dramatically fewer tokens than re-reading the full page.
+
+```
+watch({ url: "https://docs.stripe.com/changelog" })
+```
+
+Returns: On first call, stores a baseline snapshot and returns the full distilled page. On subsequent calls, returns a unified diff showing only added/removed/changed lines, with the diff token count and savings vs a full re-read.
+
+**When to use:** Monitoring docs for API changes, tracking competitor pricing, watching status pages, detecting content updates. The diff output is typically 90%+ fewer tokens than re-reading the full page.
 
 ### interact
 Click buttons, fill forms, select options on a page. Returns the page state after actions complete.
@@ -119,3 +130,6 @@ The user's `.headlessdev.json` controls behavior:
 | Verify a deploy | screenshot | `screenshot({ url: "https://myapp.dev", fullPage: true })` |
 | Check if a page has errors | browse | `browse({ url: "https://myapp.dev/dashboard" })` — check for error messages in the output |
 | Fill and submit a form | interact | `interact({ url, actions: [{ type: "fill", ... }, { type: "click", ... }] })` |
+| Monitor docs for changes | watch | `watch({ url: "https://docs.stripe.com/changelog" })` |
+| Track competitor pricing | watch | `watch({ url: "https://competitor.com/pricing" })` — returns diff on repeat calls |
+| Watch a status page | watch | `watch({ url: "https://status.aws.amazon.com" })` |
