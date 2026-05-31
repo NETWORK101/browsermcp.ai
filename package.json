@@ -1,6 +1,6 @@
 {
   "name": "headlessdev",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Secure, private browser access for AI agents. Local MCP server with read-optimized markdown extraction.",
   "type": "module",
   "main": "dist/src/index.js",

@@ -20,6 +20,11 @@ export async function handleScreenshot(
         },
       ],
     };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return {
+      content: [{ type: 'text', text: `Error taking screenshot of ${args.url}: ${message}` }],
+    } as any;
   } finally {
     await pageWrapper.close();
   }

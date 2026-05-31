@@ -51,6 +51,9 @@ export async function handleWatch(
     output += `_Diff tokens: ${diff.diffTokens} | Full page: ${diff.fullPageTokens} tokens | Saved: ${Math.round((1 - diff.diffTokens / diff.fullPageTokens) * 100)}% vs re-read_`;
 
     return { content: [{ type: 'text', text: output }] };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { content: [{ type: 'text', text: `Error watching ${args.url}: ${message}` }] };
   } finally {
     await pageWrapper.close();
   }

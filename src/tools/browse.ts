@@ -17,6 +17,9 @@ export async function handleBrowse(
     output += `\n\n---\n_Tokens: ${result.tokenCount} | Reduction: ${Math.round((1 - result.reductionRatio) * 100)}%_`;
 
     return { content: [{ type: 'text', text: output }] };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { content: [{ type: 'text', text: `Error browsing ${args.url}: ${message}` }] };
   } finally {
     await pageWrapper.close();
   }

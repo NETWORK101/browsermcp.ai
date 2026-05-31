@@ -1,13 +1,20 @@
 import { chromium, Browser, BrowserContext } from "playwright";
 import { PageWrapper } from "./page.js";
 
-const DEFAULT_TIMEOUT_MS = 30_000;
+export interface BrowserManagerConfig {
+  timeout: number;
+  headless: boolean;
+}
+
+const DEFAULT_BROWSER_CONFIG: BrowserManagerConfig = { timeout: 30_000, headless: true };
 
 export class BrowserManager {
   private browser: Browser | null = null;
   private contexts: Map<string, BrowserContext> = new Map();
+  private config: BrowserManagerConfig;
 
-  constructor() {
+  constructor(config?: Partial<BrowserManagerConfig>) {
+    this.config = { ...DEFAULT_BROWSER_CONFIG, ...config };
     const cleanup = () => {
       this.cleanup().finally(() => process.exit(0));
     };
@@ -21,10 +28,10 @@ export class BrowserManager {
 
   async getPage(url: string, opts?: { timeout?: number }): Promise<PageWrapper> {
     if (!this.browser) {
-      this.browser = await chromium.launch();
+      this.browser = await chromium.launch({ headless: this.config.headless });
     }
 
-    const timeout = opts?.timeout ?? DEFAULT_TIMEOUT_MS;
+    const timeout = opts?.timeout ?? this.config.timeout;
     const context = await this.browser.newContext();
     const contextId = `ctx-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     this.contexts.set(contextId, context);

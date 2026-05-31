@@ -12,7 +12,7 @@ AI coding agents like Claude Code, Cursor, and OpenAI Codex CLI are powerful —
 npx headlessdev init   # writes config + shows MCP setup
 ```
 
-Then add the printed MCP config block to your AI tool (Claude Code, Cursor, or OpenAI Codex CLI). Your agent now has four browser tools: `browse`, `extract`, `screenshot`, and `interact`.
+Then add the printed MCP config block to your AI tool (Claude Code, Cursor, or OpenAI Codex CLI). Your agent now has five browser tools: `browse`, `extract`, `screenshot`, `watch`, and `interact`.
 
 ## Tools
 
@@ -37,6 +37,14 @@ Agent calls: screenshot({ url: "https://example.com", fullPage: true })
 Returns: Base64 PNG image
 ```
 
+### watch — Monitor a page for changes
+
+```
+Agent calls: watch({ url: "https://docs.stripe.com/changelog" })
+First call: Stores a baseline snapshot and returns the full page content
+Subsequent calls: Returns a unified diff showing only what changed (90%+ fewer tokens vs re-reading)
+```
+
 ### interact — Click, fill forms, select options
 
 ```
@@ -54,7 +62,7 @@ AI Agent (Claude Code / Cursor / Codex CLI)
   │ MCP protocol
   ▼
 headlessdev MCP Server
-  │ Tools: browse, extract, screenshot, interact
+  │ Tools: browse, extract, screenshot, watch, interact
   │ DOM distillation (10-50x token reduction)
   │ Cost tracking + circuit breaker
   │ CDP

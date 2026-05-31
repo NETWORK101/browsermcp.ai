@@ -11,6 +11,7 @@ import { handleInteract } from './tools/interact.js';
 import { handleWatch } from './tools/watch.js';
 import { UsageTracker } from './cost/tracker.js';
 import { CircuitBreaker } from './cost/circuit-breaker.js';
+import { loadConfig } from './config/schema.js';
 
 const TOOLS = [
   {
@@ -120,14 +121,16 @@ function estimateTokensFromResult(result: { content: Array<{ type: string; text?
 }
 
 export function createServer(): Server {
+  const config = loadConfig();
+
   const server = new Server(
-    { name: "headlessdev", version: "0.1.0" },
+    { name: "headlessdev", version: "0.2.0" },
     { capabilities: { tools: {} } }
   );
 
-  const browserManager = new BrowserManager();
+  const browserManager = new BrowserManager(config.browser);
   const tracker = new UsageTracker();
-  const circuitBreaker = new CircuitBreaker(tracker);
+  const circuitBreaker = new CircuitBreaker(tracker, config.limits);
 
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: TOOLS,

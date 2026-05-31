@@ -8,30 +8,6 @@ export interface InteractiveElement {
 }
 
 /**
- * Generate a specific CSS selector for a DOM element.
- * Preference: #id > [name="..."] > tag-with-text > nth-of-type fallback.
- */
-function buildSelector(el: Element, index: number): string {
-  const id = el.id;
-  if (id) return `#${id}`;
-
-  const name = el.getAttribute('name');
-  if (name) return `${el.tagName.toLowerCase()}[name="${name}"]`;
-
-  const tag = el.tagName.toLowerCase();
-
-  // For buttons/links use text content in selector
-  const text = el.textContent?.trim().slice(0, 40);
-  if (text && (tag === 'button' || tag === 'a')) {
-    // Escape quotes in text
-    const escaped = text.replace(/"/g, '\\"');
-    return `${tag}:nth-of-type(${index + 1})`;
-  }
-
-  return `${tag}:nth-of-type(${index + 1})`;
-}
-
-/**
  * Extract all interactive elements from a live Playwright page via page.evaluate().
  */
 export async function extractInteractiveElements(page: Page): Promise<InteractiveElement[]> {
