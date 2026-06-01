@@ -42,7 +42,7 @@ export function SandboxProof() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           Agent-Browser is a CLI. It needs a shell to run. Claude Desktop, ChatGPT, and custom chat UIs
-          don't have one. headlessdev is MCP-native — your sandboxed agent gets the same
+          don't have one. browsermcp is MCP-native — your sandboxed agent gets the same
           read capability the CLI crowd has.
         </motion.p>
 
@@ -56,7 +56,7 @@ export function SandboxProof() {
             transition={{ duration: 0.6, delay: 0.3 }}
           >
             <div className="compat-col-name">Agent / Client</div>
-            <div className="compat-col-hdv">headlessdev</div>
+            <div className="compat-col-hdv">browsermcp</div>
             <div className="compat-col-ab">Agent-Browser</div>
             <div className="compat-col-note">Why</div>
           </motion.div>

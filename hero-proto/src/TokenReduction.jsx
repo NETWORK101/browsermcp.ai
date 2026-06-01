@@ -24,7 +24,7 @@ export function TokenReduction() {
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          What headlessdev does
+          What browsermcp does
         </motion.div>
 
         <motion.h2
@@ -46,7 +46,7 @@ export function TokenReduction() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          headlessdev distills pages into structured markdown your agent can reason about.
+          browsermcp distills pages into structured markdown your agent can reason about.
           And unlike 30-tool automation servers, it keeps the schema small. Page tokens are the obvious cost. Schema tokens — the tool definitions your agent loads
           on every request — are the hidden one.
         </motion.p>
@@ -72,7 +72,7 @@ export function TokenReduction() {
           <div className="schema-vs">vs</div>
           <div className="schema-card schema-card-us">
             <div className="schema-header">
-              <span className="schema-name">headlessdev</span>
+              <span className="schema-name">browsermcp</span>
               <span className="schema-tools">4 tools</span>
             </div>
             <div className="schema-cost">

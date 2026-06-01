@@ -81,7 +81,7 @@ export function ProblemSection() {
           transition={{ duration: 0.6, delay: 0.8 }}
         >
           <p>
-            <strong>headlessdev</strong> is the alternative: a local, read-optimized MCP browser
+            <strong>browsermcp</strong> is the alternative: a local, read-optimized MCP browser
             that works in sandboxed agents and keeps your content on your machine.
           </p>
         </motion.div>

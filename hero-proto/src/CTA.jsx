@@ -5,7 +5,7 @@ export function CTA() {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('npx headlessdev init')
+    navigator.clipboard.writeText('npx browsermcp init')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -32,7 +32,7 @@ export function CTA() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          Install headlessdev locally and give your AI agent secure, private
+          Install browsermcp locally and give your AI agent secure, private
           browser access in minutes. Free forever for local use.
         </motion.p>
 
@@ -45,7 +45,7 @@ export function CTA() {
         >
           <button className="cta-install-big" onClick={handleCopy}>
             <span className="cta-dollar">$</span>
-            <span>npx headlessdev init</span>
+            <span>npx browsermcp init</span>
             <span className="cta-copy">{copied ? '✓ copied' : 'copy'}</span>
           </button>
         </motion.div>
@@ -96,7 +96,7 @@ export function CTA() {
           transition={{ duration: 0.6, delay: 0.8 }}
         >
           <a
-            href="https://github.com/headlessdev/headlessdev"
+            href="https://github.com/browsermcp/browsermcp"
             target="_blank"
             rel="noopener"
             className="cta-link"

@@ -8,6 +8,7 @@ import { WhyLocal } from './WhyLocal.jsx'
 import { TokenReduction } from './TokenReduction.jsx'
 import { Playground } from './Playground.jsx'
 import { Comparison } from './Comparison.jsx'
+import { Pricing } from './Pricing.jsx'
 import { CTA } from './CTA.jsx'
 import { Footer } from './Footer.jsx'
 import './styles.css'
@@ -17,7 +18,7 @@ import './styles.css'
   1. Security-first hero
   2. Problem space
   3. Why local matters
-  4. What headlessdev does (token reduction + playground)
+  4. What browsermcp does (token reduction + playground)
   5. How it compares
   6. CTA with adoption path
 */
@@ -32,6 +33,7 @@ function App() {
         <TokenReduction />
         <Playground />
         <Comparison />
+        <Pricing />
         <CTA />
       </main>
       <Footer />

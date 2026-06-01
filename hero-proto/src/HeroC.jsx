@@ -38,7 +38,7 @@ export function HeroC() {
   const [copied, setCopied] = useState(false)
 
   const demoLines = [
-    { prompt: '$', text: 'npx headlessdev init' },
+    { prompt: '$', text: 'npx browsermcp init' },
     { prompt: '✓', text: 'MCP config written — browsing happens locally', type: 'success' },
     { prompt: '', text: '' },
     { prompt: '→', text: 'browse({ url: "http://localhost:3000/admin" })' },
@@ -69,7 +69,7 @@ export function HeroC() {
   }, [])
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('npx headlessdev init')
+    navigator.clipboard.writeText('npx browsermcp init')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -124,7 +124,7 @@ export function HeroC() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.3, duration: 0.8 }}
         >
-          headlessdev gives AI agents a secure, local, MCP-native browser for reading
+          browsermcp gives AI agents a secure, local, MCP-native browser for reading
           authenticated pages, localhost apps, internal tools, and JS-rendered websites
           as clean markdown. Nothing leaves your machine.
         </motion.p>
@@ -153,13 +153,13 @@ export function HeroC() {
         >
           <button className="cta-install" onClick={handleCopy}>
             <span className="cta-dollar">$</span>
-            <span>npx headlessdev init</span>
+            <span>npx browsermcp init</span>
             <span className="cta-copy">{copied ? '✓ copied' : 'copy'}</span>
           </button>
 
           <a
             className="cta-github"
-            href="https://github.com/headlessdev/headlessdev"
+            href="https://github.com/browsermcp/browsermcp"
             target="_blank"
             rel="noopener"
           >
@@ -183,7 +183,7 @@ export function HeroC() {
               <span style={{ background: '#febc2e' }} />
               <span style={{ background: '#28c840' }} />
             </div>
-            <div className="term-title">headlessdev — local MCP browser</div>
+            <div className="term-title">browsermcp — local MCP browser</div>
           </div>
           <div className="term-body">
             {demoLines.map((line, i) => {

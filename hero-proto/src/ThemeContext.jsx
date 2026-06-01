@@ -5,13 +5,13 @@ const ThemeContext = createContext()
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('headlessdev-theme') || 'dark'
+      return localStorage.getItem('browsermcp-theme') || 'dark'
     }
     return 'dark'
   })
 
   useEffect(() => {
-    localStorage.setItem('headlessdev-theme', theme)
+    localStorage.setItem('browsermcp-theme', theme)
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 

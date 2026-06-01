@@ -6,15 +6,15 @@ export function Footer() {
       <div className="footer-inner">
         <div className="footer-brand">
           <span className="logo-icon">&#x2B21;</span>
-          <span className="logo-text">headlessdev</span>
+          <span className="logo-text">browsermcp</span>
         </div>
         <div className="footer-links">
-          <a href="https://github.com/headlessdev/headlessdev" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/browsermcp/browsermcp" target="_blank" rel="noopener">GitHub</a>
           <a href="#tools">Tools</a>
           <a href="#">Docs</a>
         </div>
         <div className="footer-copy">
-          &copy; {new Date().getFullYear()} headlessdev. Open source under MIT.
+          &copy; {new Date().getFullYear()} browsermcp. Open source under MIT.
         </div>
       </div>
     </footer>

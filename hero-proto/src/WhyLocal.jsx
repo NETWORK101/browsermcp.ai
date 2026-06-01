@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 const capabilities = [
   {
     title: 'Authenticated pages',
-    desc: "Stripe dashboard. AWS console. GitHub settings. headlessdev uses your existing browser session. No credentials leave your machine.",
+    desc: "Stripe dashboard. AWS console. GitHub settings. browsermcp uses your existing browser session. No credentials leave your machine.",
     code: 'browse({ url: "https://dashboard.stripe.com/payments" })',
   },
   {
@@ -19,7 +19,7 @@ const capabilities = [
   },
   {
     title: 'JavaScript-heavy apps',
-    desc: "React dashboards, Next.js apps, Vue admin panels — pages that load content with JavaScript after the initial page load. Plain HTTP fetchers see an empty shell. headlessdev runs a real Chromium browser, so your agent sees the fully rendered page.",
+    desc: "React dashboards, Next.js apps, Vue admin panels — pages that load content with JavaScript after the initial page load. Plain HTTP fetchers see an empty shell. browsermcp runs a real Chromium browser, so your agent sees the fully rendered page.",
     code: 'browse({ url: "https://app.internal.co/dashboard" })',
   },
 ]
@@ -57,7 +57,7 @@ export function WhyLocal() {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          headlessdev runs a real Chromium browser locally. Your authenticated sessions,
+          browsermcp runs a real Chromium browser locally. Your authenticated sessions,
           localhost servers, and internal pages are read directly — no cloud relay,
           no credential sharing, no API keys.
         </motion.p>
@@ -94,7 +94,7 @@ export function WhyLocal() {
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
           <p>
-            Because headlessdev can access local and internal resources, it ships with safe
+            Because browsermcp can access local and internal resources, it ships with safe
             defaults, visible controls, and clear permissions over what agents are allowed to read.
           </p>
         </motion.div>

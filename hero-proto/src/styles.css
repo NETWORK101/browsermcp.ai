@@ -1922,7 +1922,7 @@ body {
   white-space: nowrap;
 }
 
-.th-headlessdev {
+.th-browsermcp {
   color: var(--accent) !important;
 }
 
@@ -1945,7 +1945,7 @@ body {
   color: var(--fg);
 }
 
-.td-headlessdev {
+.td-browsermcp {
   background: var(--reduction-bg);
 }
 
@@ -2074,6 +2074,324 @@ body {
 
 [data-theme="light"] .moat-privacy-strip {
   background: rgba(22, 163, 106, 0.06);
+}
+
+/* ═══════════════════════════════════════════════
+   Pricing Section
+   ═══════════════════════════════════════════════ */
+
+.pricing-section {
+  background: var(--bg);
+}
+
+.pricing-title {
+  text-align: left;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 56px;
+  text-align: left;
+  align-items: start;
+}
+
+/* ── Card base ── */
+.pricing-card {
+  position: relative;
+  padding: 36px 30px 30px;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.35s, box-shadow 0.35s, transform 0.35s;
+}
+
+[data-theme="light"] .pricing-card {
+  background: var(--surface-elevated);
+}
+
+.pricing-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 12px 48px var(--shadow);
+}
+
+/* ── Popular card — green glow ── */
+.pricing-card-popular {
+  border-color: var(--accent-green);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(74, 222, 128, 0.06) 0%, transparent 60%),
+    var(--surface);
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.12),
+    0 0 60px rgba(74, 222, 128, 0.06),
+    0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.pricing-card-popular:hover {
+  border-color: var(--accent-green);
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.2),
+    0 0 80px rgba(74, 222, 128, 0.1),
+    0 24px 64px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] .pricing-card-popular {
+  border-color: var(--accent-green);
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(22, 163, 106, 0.06) 0%, transparent 60%),
+    var(--surface-elevated);
+  box-shadow: 0 0 0 1px rgba(22, 163, 106, 0.15), 0 12px 48px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Badge ── */
+.pricing-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 5px 18px;
+  border-radius: 100px;
+  background: var(--accent-green);
+  box-shadow: 0 4px 16px rgba(74, 222, 128, 0.3);
+  white-space: nowrap;
+}
+
+.pricing-badge-text {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #000;
+}
+
+/* ── Header ── */
+.pricing-header {
+  margin-bottom: 24px;
+}
+
+.pricing-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--fg);
+  margin-bottom: 10px;
+}
+
+.pricing-price {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.pricing-amount {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(3rem, 5vw, 4rem);
+  font-weight: 700;
+  color: var(--fg);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.pricing-period {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--fg-muted);
+}
+
+.pricing-desc {
+  font-size: 14px;
+  color: var(--fg-muted);
+  line-height: 1.5;
+}
+
+/* ── Divider ── */
+.pricing-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 24px;
+}
+
+/* ── Features ── */
+.pricing-features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex: 1;
+}
+
+.pricing-feature-included {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--fg-muted);
+  line-height: 1.4;
+}
+
+.pricing-feature-excluded {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--fg-subtle);
+  line-height: 1.4;
+  opacity: 0.55;
+}
+
+.pricing-feature-included .pricing-feature-icon {
+  color: var(--accent-green);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.pricing-feature-excluded .pricing-feature-icon {
+  color: var(--fg-subtle);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+}
+
+.pricing-dash {
+  font-size: 18px;
+  line-height: 1;
+  display: block;
+  margin-top: -2px;
+}
+
+/* ── CTAs ── */
+.pricing-cta-primary {
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent-green);
+  color: #000;
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+
+.pricing-cta-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.pricing-cta-primary:hover {
+  box-shadow: 0 8px 32px rgba(74, 222, 128, 0.3);
+  filter: brightness(1.08);
+}
+
+.pricing-cta-outline {
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--fg);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+
+.pricing-cta-outline:hover {
+  border-color: var(--border-hover);
+  background: var(--surface);
+}
+
+/* ── Cost comparison callout ── */
+.pricing-compare-callout {
+  margin-top: 48px;
+  padding: 24px 32px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+[data-theme="light"] .pricing-compare-callout {
+  background: var(--surface-elevated);
+}
+
+.pricing-compare-items {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.pricing-compare-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.pricing-compare-label {
+  font-size: 13px;
+  color: var(--fg-muted);
+  font-weight: 500;
+}
+
+.pricing-compare-cost {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--fg);
+  letter-spacing: -0.02em;
+}
+
+.pricing-compare-them .pricing-compare-cost {
+  color: var(--fg-muted);
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.pricing-compare-us .pricing-compare-cost {
+  color: var(--accent-green);
+  font-size: 24px;
+}
+
+.pricing-compare-us .pricing-compare-label {
+  color: var(--accent-green);
+}
+
+@media (max-width: 768px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pricing-compare-items {
+    gap: 24px;
+  }
+
+  .pricing-title {
+    text-align: center;
+  }
 }
 
 /* ═══════════════════════════════════════════════

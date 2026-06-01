@@ -88,7 +88,7 @@ export function Tools() {
           transition={{ duration: 0.6, delay: 0.2 }}
         >
           Other tools expose 30+ browser actions and let the agent figure it out.
-          headlessdev gives it 4 — because 90% of the time, your agent just needs to read.
+          browsermcp gives it 4 — because 90% of the time, your agent just needs to read.
         </motion.p>
 
         <div className="tools-grid">

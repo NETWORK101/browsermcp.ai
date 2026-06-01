@@ -22,7 +22,7 @@ export function Nav() {
       <div className="nav-inner">
         <a href="#" className="nav-logo">
           <span className="logo-icon">&#x2B21;</span>
-          <span className="logo-text">headlessdev</span>
+          <span className="logo-text">browsermcp</span>
         </a>
 
         <div className="nav-links">
@@ -30,7 +30,8 @@ export function Nav() {
           <a href="#local">Why Local</a>
           <a href="#playground">Playground</a>
           <a href="#comparison">Compare</a>
-          <a href="https://github.com/headlessdev/headlessdev" target="_blank" rel="noopener">GitHub</a>
+          <a href="#pricing">Pricing</a>
+          <a href="https://github.com/browsermcp/browsermcp" target="_blank" rel="noopener">GitHub</a>
         </div>
 
         <button

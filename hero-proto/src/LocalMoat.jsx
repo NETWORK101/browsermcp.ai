@@ -11,14 +11,14 @@ const capabilities = [
   },
   {
     title: 'Authenticated dashboards',
-    desc: 'Stripe dashboard. AWS console. GitHub settings. headlessdev uses your existing browser session — no credential exfiltration, no cloud round-trip.',
+    desc: 'Stripe dashboard. AWS console. GitHub settings. browsermcp uses your existing browser session — no credential exfiltration, no cloud round-trip.',
     code: 'browse({ url: "https://dashboard.stripe.com/payments" })',
     icon: '→',
     why: 'Cloud tools can\'t access your sessions',
   },
   {
     title: 'JS-rendered SPAs',
-    desc: 'React apps, Next.js dashboards, Vue admin panels. Unlike mcp-server-fetch (plain HTTP), headlessdev runs a real Chromium browser and renders JavaScript.',
+    desc: 'React apps, Next.js dashboards, Vue admin panels. Unlike mcp-server-fetch (plain HTTP), browsermcp runs a real Chromium browser and renders JavaScript.',
     code: 'browse({ url: "https://app.internal.co/dashboard" })',
     icon: '→',
     why: 'Plain HTTP fetch misses JS-rendered content',
@@ -60,7 +60,7 @@ export function LocalMoat() {
         >
           Cloud readers (Firecrawl, Jina) can't see your localhost or authenticated pages — structurally.
           Plain HTTP fetchers (mcp-server-fetch) can't render JavaScript — architecturally.
-          headlessdev is a real browser, on your machine, in your session.
+          browsermcp is a real browser, on your machine, in your session.
         </motion.p>
 
         <div className="moat-grid">

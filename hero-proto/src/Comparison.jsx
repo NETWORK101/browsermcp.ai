@@ -2,17 +2,17 @@ import React from 'react'
 import { motion } from 'framer-motion'
 
 const features = [
-  { label: 'Built for', headlessdev: 'Reading pages', agentbrowser: 'Driving browsers', playwright: 'Driving browsers', firecrawl: 'Crawling at scale' },
-  { label: 'Runs locally', headlessdev: 'Yes — always', agentbrowser: 'Yes', playwright: 'Yes', firecrawl: 'Cloud only' },
-  { label: 'Authenticated pages', headlessdev: 'Your local session', agentbrowser: 'Your local session', playwright: 'Your local session', firecrawl: 'No' },
-  { label: 'Reads localhost', headlessdev: 'Yes', agentbrowser: 'Yes', playwright: 'Yes', firecrawl: 'No' },
-  { label: 'Sandboxed agents', headlessdev: 'Yes (MCP)', agentbrowser: 'No (needs shell)', playwright: 'Yes (but heavy)', firecrawl: 'Yes (but cloud)' },
-  { label: 'Content → markdown', headlessdev: 'Built-in', agentbrowser: 'No', playwright: 'No', firecrawl: 'Built-in' },
-  { label: 'Schema tax / request', headlessdev: '~800 tokens', agentbrowser: 'N/A (CLI)', playwright: '~13,700 tokens', firecrawl: '~2,000 tokens' },
-  { label: 'Diff mode (since)', headlessdev: 'Built-in', agentbrowser: 'No', playwright: 'No', firecrawl: 'No' },
-  { label: 'JavaScript rendering', headlessdev: 'Full (Chromium)', agentbrowser: 'Full (Chromium)', playwright: 'Full (Chromium)', firecrawl: 'Optional' },
-  { label: 'Data leaves machine', headlessdev: 'Never', agentbrowser: 'Never', playwright: 'Never', firecrawl: 'Always' },
-  { label: 'Cost', headlessdev: 'Free forever', agentbrowser: 'Free', playwright: 'Free', firecrawl: '$16-333/mo' },
+  { label: 'Built for', browsermcp: 'Reading pages', agentbrowser: 'Driving browsers', playwright: 'Driving browsers', firecrawl: 'Crawling at scale' },
+  { label: 'Runs locally', browsermcp: 'Yes — always', agentbrowser: 'Yes', playwright: 'Yes', firecrawl: 'Cloud only' },
+  { label: 'Authenticated pages', browsermcp: 'Your local session', agentbrowser: 'Your local session', playwright: 'Your local session', firecrawl: 'No' },
+  { label: 'Reads localhost', browsermcp: 'Yes', agentbrowser: 'Yes', playwright: 'Yes', firecrawl: 'No' },
+  { label: 'Sandboxed agents', browsermcp: 'Yes (MCP)', agentbrowser: 'No (needs shell)', playwright: 'Yes (but heavy)', firecrawl: 'Yes (but cloud)' },
+  { label: 'Content → markdown', browsermcp: 'Built-in', agentbrowser: 'No', playwright: 'No', firecrawl: 'Built-in' },
+  { label: 'Schema tax / request', browsermcp: '~800 tokens', agentbrowser: 'N/A (CLI)', playwright: '~13,700 tokens', firecrawl: '~2,000 tokens' },
+  { label: 'Diff mode (since)', browsermcp: 'Built-in', agentbrowser: 'No', playwright: 'No', firecrawl: 'No' },
+  { label: 'JavaScript rendering', browsermcp: 'Full (Chromium)', agentbrowser: 'Full (Chromium)', playwright: 'Full (Chromium)', firecrawl: 'Optional' },
+  { label: 'Data leaves machine', browsermcp: 'Never', agentbrowser: 'Never', playwright: 'Never', firecrawl: 'Always' },
+  { label: 'Cost', browsermcp: 'Free forever', agentbrowser: 'Free', playwright: 'Free', firecrawl: '$16-333/mo' },
 ]
 
 function CellValue({ value, isHeadlessdev }) {
@@ -67,7 +67,7 @@ export function Comparison() {
               <thead>
                 <tr>
                   <th className="th-feature"></th>
-                  <th className="th-headlessdev">headlessdev</th>
+                  <th className="th-browsermcp">browsermcp</th>
                   <th>Agent-Browser</th>
                   <th>Playwright MCP</th>
                   <th>Firecrawl</th>
@@ -83,7 +83,7 @@ export function Comparison() {
                     transition={{ duration: 0.5, delay: 0.05 * i + 0.4 }}
                   >
                     <td className="td-feature">{row.label}</td>
-                    <td className="td-headlessdev"><CellValue value={row.headlessdev} isHeadlessdev /></td>
+                    <td className="td-browsermcp"><CellValue value={row.browsermcp} isHeadlessdev /></td>
                     <td><CellValue value={row.agentbrowser} /></td>
                     <td><CellValue value={row.playwright} /></td>
                     <td><CellValue value={row.firecrawl} /></td>
