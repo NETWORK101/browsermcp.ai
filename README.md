@@ -1,80 +1,146 @@
 # headlessdev
 
-Give your AI agent a browser. Zero-config MCP server for headless browser automation.
+**Give your AI a browser it can use.** One command. No cloud. No API key. No cost.
 
-## Why
+headlessdev lets AI tools like Claude Code, Cursor, and Codex CLI browse the web, read pages, fill out forms, take screenshots, and track changes — all running privately on your machine.
 
-AI coding agents like Claude Code, Cursor, and OpenAI Codex CLI are powerful — but they can't browse the web. headlessdev fixes that with a single command. Unlike cloud browser services (Browserbase at $20-99/mo) or complex Python frameworks (Browser-Use, Stagehand), headlessdev runs entirely on your machine, costs nothing, and distills pages down to clean markdown with 10-50x fewer tokens than raw HTML.
+## What can it do?
 
-## Quickstart (30 seconds)
+| You say to your AI... | What happens |
+|------------------------|-------------|
+| "Check the Stripe docs for breaking changes" | **browse** — opens the page, strips the clutter, gives your AI clean text instead of raw HTML |
+| "Get the pricing tiers from Linear's website" | **extract** — reads the page and structures the data however you need it |
+| "Screenshot our homepage after that deploy" | **screenshot** — captures a full-page or element-level PNG |
+| "Has anything changed on the AWS status page?" | **watch** — compares the page to last time and only shows what's different |
+| "Test our signup form with a dummy account" | **interact** — fills inputs, clicks buttons, submits forms |
+
+## Setup (30 seconds)
+
+**Step 1:** Run this in your terminal:
 
 ```bash
-npx headlessdev init   # writes config + shows MCP setup
+npx headlessdev init
 ```
 
-Then add the printed MCP config block to your AI tool (Claude Code, Cursor, or OpenAI Codex CLI). Your agent now has five browser tools: `browse`, `extract`, `screenshot`, `watch`, and `interact`.
+**Step 2:** It prints a config block. Copy it into your AI tool's settings:
 
-## Tools
+- **Claude Code** — paste into `.mcp.json` in your project folder
+- **Cursor** — paste into `~/.cursor/mcp.json`
+- **Codex CLI** — paste into `~/.codex/config.json`
 
-### browse — Navigate to a URL, get token-efficient markdown
+**Step 3:** Restart your AI tool. Done — your AI can now browse the web.
 
-```
-Agent calls: browse({ url: "https://example.com/pricing", instruction: "find the pricing tiers" })
-Returns: Clean markdown with pricing content + interactive elements list
-```
+> Not sure where to paste it? Run `npx headlessdev init` — it detects your tools and tells you exactly where.
 
-### extract — Get structured data from a page
-
-```
-Agent calls: extract({ url: "https://example.com/api", schema: { type: "object", properties: { endpoints: { type: "array" } } } })
-Returns: Page content with schema hint for the agent to parse
-```
-
-### screenshot — Capture a visual snapshot
+## How it works
 
 ```
-Agent calls: screenshot({ url: "https://example.com", fullPage: true })
-Returns: Base64 PNG image
+Your AI (Claude Code / Cursor / Codex CLI)
+  |
+  |  asks headlessdev to browse a page
+  v
+headlessdev (runs on your machine)
+  |
+  |  opens a real browser, reads the page,
+  |  strips out all the junk (ads, scripts, menus),
+  |  and returns just the useful content
+  v
+Your AI gets clean, readable text
 ```
 
-### watch — Monitor a page for changes
+**Why this matters:** A typical webpage is 80,000+ tokens as raw HTML. headlessdev distills it down to 1,000-8,000 tokens — **10 to 50x smaller**. Your AI reads faster, understands better, and costs less.
+
+## The five tools
+
+### browse
+
+Read any webpage. Returns clean markdown text.
 
 ```
-Agent calls: watch({ url: "https://docs.stripe.com/changelog" })
-First call: Stores a baseline snapshot and returns the full page content
-Subsequent calls: Returns a unified diff showing only what changed (90%+ fewer tokens vs re-reading)
+browse({ url: "https://example.com/pricing" })
 ```
 
-### interact — Click, fill forms, select options
+Add an `instruction` to focus on what matters:
 
 ```
-Agent calls: interact({ url: "https://example.com/login", actions: [
-  { type: "fill", selector: "input#email", value: "user@example.com" },
-  { type: "click", selector: "button[type=submit]" }
-] })
-Returns: Page state after actions
+browse({ url: "https://example.com/pricing", instruction: "just the plan names and prices" })
 ```
 
-## How It Works
+### extract
+
+Same as browse, but you tell it what shape you want the data in:
 
 ```
-AI Agent (Claude Code / Cursor / Codex CLI)
-  │ MCP protocol
-  ▼
-headlessdev MCP Server
-  │ Tools: browse, extract, screenshot, watch, interact
-  │ DOM distillation (10-50x token reduction)
-  │ Cost tracking + circuit breaker
-  │ CDP
-  ▼
-Local Chromium (via Playwright)
+extract({
+  url: "https://example.com/team",
+  schema: { people: [{ name: "string", role: "string" }] }
+})
 ```
 
-DOM distillation strips scripts, styles, and boilerplate from pages, then converts the result to markdown. A page that would cost 80,000 tokens as raw HTML typically costs 1,000-8,000 tokens through headlessdev.
+### screenshot
+
+Capture what a page looks like:
+
+```
+screenshot({ url: "https://myapp.dev", fullPage: true })
+```
+
+Or just one part of the page:
+
+```
+screenshot({ url: "https://myapp.dev", selector: "#hero" })
+```
+
+### watch
+
+Track changes on a page over time:
+
+```
+watch({ url: "https://docs.stripe.com/changelog" })
+```
+
+First time: saves a snapshot and returns the full page.
+Next time: returns **only what changed** — 90%+ fewer tokens.
+
+### interact
+
+Fill forms, click buttons, test flows:
+
+```
+interact({
+  url: "https://myapp.dev/signup",
+  actions: [
+    { type: "fill", selector: "input[name='email']", value: "test@example.com" },
+    { type: "click", selector: "button[type='submit']" }
+  ]
+})
+```
+
+## Staying in control
+
+headlessdev tracks how much your AI browses and stops it if it goes overboard.
+
+```bash
+npx headlessdev usage    # see today's and weekly stats
+```
+
+Default limits (changeable in `.headlessdev.json`):
+- 100 browsing sessions per day
+- 1 million tokens per day
+
+## How does this compare?
+
+| | headlessdev | Browserbase | Browser-Use | Stagehand |
+|--|------------|-------------|-------------|-----------|
+| **Setup** | One command | Sign up + API key | pip install + config | npm install + API key |
+| **Cost** | Free | $20-99/mo | Free (self-host) | Free + Browserbase |
+| **Runs on** | Your machine | Cloud | Your machine | Cloud (optional) |
+| **Token savings** | 10-50x built-in | None | Some | Some |
+| **Works with** | Claude Code, Cursor, Codex CLI | Custom SDKs | Python agents | JS agents |
 
 ## Configuration
 
-`npx headlessdev init` writes `.headlessdev.json` to your project directory:
+`npx headlessdev init` creates a `.headlessdev.json` file in your project:
 
 ```json
 {
@@ -94,27 +160,12 @@ DOM distillation strips scripts, styles, and boilerplate from pages, then conver
 }
 ```
 
-You can also place a config at `~/.config/headlessdev/config.json` for global defaults. Local config takes precedence.
+You can also put a config at `~/.config/headlessdev/config.json` for global defaults. Project-level config takes priority.
 
-## Usage Tracking
+## Requirements
 
-```bash
-headlessdev usage   # see today's and weekly stats
-```
-
-headlessdev tracks sessions and token counts in a local SQLite database. A circuit breaker stops the agent if it hits your configured daily limits.
-
-## Comparison
-
-| Feature | headlessdev | Browserbase | Browser-Use | Stagehand |
-|---------|------------|-------------|-------------|-----------|
-| Setup | `npx headlessdev init` | Sign up + API key | pip install + config | npm install + API key |
-| Cost | Free (local) | $20-99/mo | Free (self-host) | Free + Browserbase |
-| Token reduction | 10-50x built-in | None | Some | Some |
-| MCP native | Yes | No | No | No |
-| Cloud required | No | Yes | No | Optional |
-| Language | TypeScript | Multi | Python | TypeScript |
-| Works with | Claude Code, Cursor, Codex CLI, any MCP client | Custom SDKs | Python agents | JS agents |
+- Node.js 20 or later
+- That's it. Playwright installs its own browser automatically.
 
 ## License
 

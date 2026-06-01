@@ -1,6 +1,6 @@
 {
   "name": "headlessdev",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Secure, private browser access for AI agents. Local MCP server with read-optimized markdown extraction.",
   "type": "module",
   "main": "dist/src/index.js",
@@ -15,7 +15,6 @@
     "test": "vitest run",
     "dev": "tsx src/index.ts",
     "prepublishOnly": "npm run build",
-    "build:packages": "npx pnpm@8 -r build",
     "build:site": "cd hero-proto && npx vite build"
   },
   "keywords": [

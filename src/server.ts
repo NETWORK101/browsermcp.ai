@@ -124,7 +124,7 @@ export function createServer(): Server {
   const config = loadConfig();
 
   const server = new Server(
-    { name: "headlessdev", version: "0.2.0" },
+    { name: "headlessdev", version: "0.2.2" },
     { capabilities: { tools: {} } }
   );
 

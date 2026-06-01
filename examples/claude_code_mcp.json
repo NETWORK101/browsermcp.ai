@@ -3,7 +3,7 @@
     "headlessdev": {
       "command": "npx",
       "args": ["-y", "headlessdev"],
-      "env": {}
+      "type": "stdio"
     }
   }
 }
