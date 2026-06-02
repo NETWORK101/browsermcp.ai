@@ -1,17 +1,17 @@
 {
-  "name": "headlessdev",
-  "version": "0.2.2",
-  "description": "Secure, private browser access for AI agents. Local MCP server with read-optimized markdown extraction.",
+  "name": "browsermcpai",
+  "version": "0.1.1",
+  "description": "Free, private browser access for AI agents. Local MCP server with read-optimized markdown extraction.",
   "type": "module",
   "main": "dist/src/index.js",
   "bin": {
-    "headlessdev": "dist/bin/headlessdev.js"
+    "browsermcp": "dist/bin/browsermcp.js"
   },
   "files": [
     "dist/"
   ],
   "scripts": {
-    "build": "tsc && chmod +x dist/bin/headlessdev.js",
+    "build": "tsc && chmod +x dist/bin/browsermcp.js",
     "test": "vitest run",
     "dev": "tsx src/index.ts",
     "prepublishOnly": "npm run build",
@@ -38,9 +38,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NETWORK101/headlessdev"
+    "url": "https://github.com/NETWORK101/browsermcp.ai"
   },
-  "homepage": "https://headlessdev.ai",
+  "homepage": "https://browsermcp.ai",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@mozilla/readability": "^0.5.0",
