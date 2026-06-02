@@ -9,7 +9,7 @@ export function Footer() {
           <span className="logo-text">browsermcp</span>
         </div>
         <div className="footer-links">
-          <a href="https://github.com/browsermcp/browsermcp" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/NETWORK101/browsermcp.ai" target="_blank" rel="noopener">GitHub</a>
           <a href="#tools">Tools</a>
           <a href="#">Docs</a>
         </div>

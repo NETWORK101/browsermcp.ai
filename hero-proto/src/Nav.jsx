@@ -31,7 +31,7 @@ export function Nav() {
           <a href="#playground">Playground</a>
           <a href="#comparison">Compare</a>
           <a href="#pricing">Pricing</a>
-          <a href="https://github.com/browsermcp/browsermcp" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/NETWORK101/browsermcp.ai" target="_blank" rel="noopener">GitHub</a>
         </div>
 
         <button

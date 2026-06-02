@@ -96,7 +96,7 @@ export function CTA() {
           transition={{ duration: 0.6, delay: 0.8 }}
         >
           <a
-            href="https://github.com/browsermcp/browsermcp"
+            href="https://github.com/NETWORK101/browsermcp.ai"
             target="_blank"
             rel="noopener"
             className="cta-link"

@@ -159,7 +159,7 @@ export function HeroC() {
 
           <a
             className="cta-github"
-            href="https://github.com/browsermcp/browsermcp"
+            href="https://github.com/NETWORK101/browsermcp.ai"
             target="_blank"
             rel="noopener"
           >
