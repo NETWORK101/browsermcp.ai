@@ -8,7 +8,7 @@ let dbPath: string;
 let tracker: UsageTracker;
 
 function tmpDb(): string {
-  return `/tmp/headlessdev-test-${Date.now()}-${randomBytes(4).toString('hex')}.db`;
+  return `/tmp/browsermcp-test-${Date.now()}-${randomBytes(4).toString('hex')}.db`;
 }
 
 afterEach(() => {

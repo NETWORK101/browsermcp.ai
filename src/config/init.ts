@@ -6,9 +6,9 @@ import { DEFAULT_CONFIG } from './schema.js';
 const MCP_CONFIG = JSON.stringify(
   {
     mcpServers: {
-      headlessdev: {
+      browsermcp: {
         command: 'npx',
-        args: ['-y', 'headlessdev'],
+        args: ['-y', 'browsermcpai'],
       },
     },
   },
@@ -17,8 +17,8 @@ const MCP_CONFIG = JSON.stringify(
 );
 
 export async function runInit(): Promise<void> {
-  // 1. Write .headlessdev.json to CWD
-  const localConfigPath = join(process.cwd(), '.headlessdev.json');
+  // 1. Write .browsermcp.json to CWD
+  const localConfigPath = join(process.cwd(), '.browsermcp.json');
   writeFileSync(localConfigPath, JSON.stringify(DEFAULT_CONFIG, null, 2) + '\n', 'utf-8');
   console.log(`Created ${localConfigPath}`);
 
@@ -62,5 +62,5 @@ export async function runInit(): Promise<void> {
   console.log(`  Project: ${codexProjectConfig}`);
   console.log('\n' + MCP_CONFIG);
 
-  console.log('\nheadlessdev init complete!');
+  console.log('\nbrowsermcp init complete!');
 }

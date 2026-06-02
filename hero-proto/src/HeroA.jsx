@@ -271,7 +271,7 @@ export function HeroA() {
   // Typewriter effect
   useEffect(() => {
     const lines = [
-      { key: 'cmd1', text: 'npx browsermcp init', delay: 1500 },
+      { key: 'cmd1', text: 'npx browsermcpai init', delay: 1500 },
       { key: 'out1', text: '✓ MCP config written — restart your agent to connect', delay: 3500 },
       { key: 'cmd2', text: 'browse("https://docs.stripe.com/api")', delay: 5500 },
       { key: 'out2', text: '→ 84,201 tokens → 1,847 tokens (97.8% reduction)', delay: 7500 },

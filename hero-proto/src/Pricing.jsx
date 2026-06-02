@@ -7,7 +7,7 @@ const tiers = [
     price: '$0',
     period: '',
     description: 'Everything you need to browse locally.',
-    cta: 'npx browsermcp init',
+    cta: 'npx browsermcpai init',
     ctaStyle: 'pricing-cta-outline',
     features: [
       { text: 'All 5 tools', included: true },

@@ -1,6 +1,6 @@
 {
   "name": "browsermcpai",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "description": "Free, private browser access for AI agents. Local MCP server with read-optimized markdown extraction.",
   "type": "module",
   "main": "dist/src/index.js",

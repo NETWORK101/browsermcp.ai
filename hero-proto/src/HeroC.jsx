@@ -38,7 +38,7 @@ export function HeroC() {
   const [copied, setCopied] = useState(false)
 
   const demoLines = [
-    { prompt: '$', text: 'npx browsermcp init' },
+    { prompt: '$', text: 'npx browsermcpai init' },
     { prompt: '✓', text: 'MCP config written — browsing happens locally', type: 'success' },
     { prompt: '', text: '' },
     { prompt: '→', text: 'browse({ url: "http://localhost:3000/admin" })' },
@@ -69,7 +69,7 @@ export function HeroC() {
   }, [])
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('npx browsermcp init')
+    navigator.clipboard.writeText('npx browsermcpai init')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -112,7 +112,7 @@ export function HeroC() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1, duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
-          Secure, private browser access
+          Free, private browser access
           <br />
           <span className="title-gradient">for your AI agent.</span>
         </motion.h1>
@@ -153,7 +153,7 @@ export function HeroC() {
         >
           <button className="cta-install" onClick={handleCopy}>
             <span className="cta-dollar">$</span>
-            <span>npx browsermcp init</span>
+            <span>npx browsermcpai init</span>
             <span className="cta-copy">{copied ? '✓ copied' : 'copy'}</span>
           </button>
 

@@ -60,7 +60,7 @@ export function HeroB() {
   }, [])
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('npx browsermcp init')
+    navigator.clipboard.writeText('npx browsermcpai init')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -145,7 +145,7 @@ export function HeroB() {
         <div className="cta-area">
           <button className="install-cmd" onClick={handleCopy}>
             <span className="dollar">$</span>
-            npx browsermcp init
+            npx browsermcpai init
             <span className="copy-icon">{copied ? '✓' : '⎘'}</span>
           </button>
           <a className="github-btn" href="https://github.com/browsermcp/browsermcp" target="_blank" rel="noopener">

@@ -42,9 +42,9 @@ function tryLoad(filePath: string): Partial<HeadlessDevConfig> | null {
 }
 
 export function loadConfig(): HeadlessDevConfig {
-  // Resolution order: .headlessdev.json in CWD → ~/.config/headlessdev/config.json → defaults
-  const globalPath = join(homedir(), '.config', 'headlessdev', 'config.json');
-  const localPath = join(process.cwd(), '.headlessdev.json');
+  // Resolution order: .browsermcp.json in CWD → ~/.config/browsermcp/config.json → defaults
+  const globalPath = join(homedir(), '.config', 'browsermcp', 'config.json');
+  const localPath = join(process.cwd(), '.browsermcp.json');
 
   let config = { ...DEFAULT_CONFIG };
 

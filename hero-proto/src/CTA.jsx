@@ -5,7 +5,7 @@ export function CTA() {
   const [copied, setCopied] = useState(false)
 
   const handleCopy = () => {
-    navigator.clipboard.writeText('npx browsermcp init')
+    navigator.clipboard.writeText('npx browsermcpai init')
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -20,7 +20,7 @@ export function CTA() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          Secure, private browser access
+          Free, private browser access
           <br />
           <span className="title-gradient">for your AI agent.</span>
         </motion.h2>
@@ -45,7 +45,7 @@ export function CTA() {
         >
           <button className="cta-install-big" onClick={handleCopy}>
             <span className="cta-dollar">$</span>
-            <span>npx browsermcp init</span>
+            <span>npx browsermcpai init</span>
             <span className="cta-copy">{copied ? '✓ copied' : 'copy'}</span>
           </button>
         </motion.div>

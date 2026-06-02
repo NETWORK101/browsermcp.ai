@@ -7,7 +7,7 @@ export class UsageTracker {
   private db: Database.Database;
 
   constructor(dbPath?: string) {
-    const dir = join(homedir(), '.headlessdev');
+    const dir = join(homedir(), '.browsermcp');
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
     const path = dbPath ?? join(dir, 'usage.db');
     this.db = new Database(path);

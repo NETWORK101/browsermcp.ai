@@ -1,8 +1,8 @@
-# headlessdev
+# browsermcp.ai
 
 **Give your AI a browser it can use.** One command. No cloud. No API key. No cost.
 
-headlessdev lets AI tools like Claude Code, Cursor, and Codex CLI browse the web, read pages, fill out forms, take screenshots, and track changes — all running privately on your machine.
+browsermcp lets AI tools like Claude Code, Cursor, and Codex CLI browse the web, read pages, fill out forms, take screenshots, and track changes — all running privately on your machine.
 
 ## What can it do?
 
@@ -19,7 +19,7 @@ headlessdev lets AI tools like Claude Code, Cursor, and Codex CLI browse the web
 **Step 1:** Run this in your terminal:
 
 ```bash
-npx headlessdev init
+npx browsermcpai init
 ```
 
 **Step 2:** It prints a config block. Copy it into your AI tool's settings:
@@ -30,16 +30,16 @@ npx headlessdev init
 
 **Step 3:** Restart your AI tool. Done — your AI can now browse the web.
 
-> Not sure where to paste it? Run `npx headlessdev init` — it detects your tools and tells you exactly where.
+> Not sure where to paste it? Run `npx browsermcpai init` — it detects your tools and tells you exactly where.
 
 ## How it works
 
 ```
 Your AI (Claude Code / Cursor / Codex CLI)
   |
-  |  asks headlessdev to browse a page
+  |  asks browsermcp to browse a page
   v
-headlessdev (runs on your machine)
+browsermcp (runs on your machine)
   |
   |  opens a real browser, reads the page,
   |  strips out all the junk (ads, scripts, menus),
@@ -48,7 +48,7 @@ headlessdev (runs on your machine)
 Your AI gets clean, readable text
 ```
 
-**Why this matters:** A typical webpage is 80,000+ tokens as raw HTML. headlessdev distills it down to 1,000-8,000 tokens — **10 to 50x smaller**. Your AI reads faster, understands better, and costs less.
+**Why this matters:** A typical webpage is 80,000+ tokens as raw HTML. browsermcp distills it down to 1,000-8,000 tokens — **10 to 50x smaller**. Your AI reads faster, understands better, and costs less.
 
 ## The five tools
 
@@ -118,19 +118,19 @@ interact({
 
 ## Staying in control
 
-headlessdev tracks how much your AI browses and stops it if it goes overboard.
+browsermcp tracks how much your AI browses and stops it if it goes overboard.
 
 ```bash
-npx headlessdev usage    # see today's and weekly stats
+npx browsermcpai usage    # see today's and weekly stats
 ```
 
-Default limits (changeable in `.headlessdev.json`):
+Default limits (changeable in `.browsermcp.json`):
 - 100 browsing sessions per day
 - 1 million tokens per day
 
 ## How does this compare?
 
-| | headlessdev | Browserbase | Browser-Use | Stagehand |
+| | browsermcp | Browserbase | Browser-Use | Stagehand |
 |--|------------|-------------|-------------|-----------|
 | **Setup** | One command | Sign up + API key | pip install + config | npm install + API key |
 | **Cost** | Free | $20-99/mo | Free (self-host) | Free + Browserbase |
@@ -140,7 +140,7 @@ Default limits (changeable in `.headlessdev.json`):
 
 ## Configuration
 
-`npx headlessdev init` creates a `.headlessdev.json` file in your project:
+`npx browsermcpai init` creates a `.browsermcp.json` file in your project:
 
 ```json
 {
@@ -160,7 +160,7 @@ Default limits (changeable in `.headlessdev.json`):
 }
 ```
 
-You can also put a config at `~/.config/headlessdev/config.json` for global defaults. Project-level config takes priority.
+You can also put a config at `~/.config/browsermcp/config.json` for global defaults. Project-level config takes priority.
 
 ## Requirements
 
