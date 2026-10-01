@@ -34,6 +34,7 @@ export async function handleBrowse(
         maxTokens: args.diff ? undefined : (args.maxTokens ?? ctx.config.distill.maxTokens),
         elements: args.elements ?? false,
         includeLinks: ctx.config.distill.includeLinks,
+        publisherMarkdown: ctx.config.distill.publisherMarkdown,
         includeImages: ctx.config.distill.includeImages,
       });
       await ctx.progress(2, total, 'Formatting');
@@ -53,6 +54,8 @@ export async function handleBrowse(
           rawTokens: result.rawTokenCount,
           truncated: result.truncated,
           omittedSections: result.omittedSections,
+          source: result.source,
+          card: result.meta,
         },
       };
     } finally {

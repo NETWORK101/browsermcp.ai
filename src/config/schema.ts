@@ -10,19 +10,28 @@ import { homedir } from 'os';
  */
 export type ProfileMode = 'auto' | 'persistent' | 'ephemeral';
 
+/** Browser engine. Firefox and WebKit (Safari's engine) ship with Playwright alongside Chromium. */
+export type BrowserEngine = 'chromium' | 'firefox' | 'webkit';
+export const ENGINES: BrowserEngine[] = ['chromium', 'firefox', 'webkit'];
+
 export interface BrowserMcpConfig {
   browser: {
     timeout: number;
     headless: boolean;
+    engine: BrowserEngine;
+    /** Chromium only: use an installed branded browser — "chrome", "msedge", "chrome-beta", "msedge-dev"… */
+    channel?: string;
     profile: ProfileMode;
     profileDir: string;
-    /** Attach to an already-running Chrome (e.g. http://localhost:9222) instead of launching one. */
+    /** Attach to an already-running Chromium-based browser (Chrome, Edge, Brave, Arc…) e.g. http://localhost:9222. */
     cdpEndpoint?: string;
   };
   distill: {
     maxTokens: number;
     includeLinks: boolean;
     includeImages: boolean;
+    /** Use markdown the publisher serves for agents (text/markdown alternate or Accept: text/markdown). */
+    publisherMarkdown: boolean;
   };
   policy: {
     /** Host globs the agent may visit. Empty = any host. e.g. ["*.stripe.com", "localhost:*"] */
@@ -49,10 +58,11 @@ export const DEFAULT_CONFIG: BrowserMcpConfig = {
   browser: {
     timeout: 30000,
     headless: true,
+    engine: 'chromium',
     profile: 'auto',
     profileDir: join(STATE_DIR, 'profile'),
   },
-  distill: { maxTokens: 4000, includeLinks: true, includeImages: false },
+  distill: { maxTokens: 4000, includeLinks: true, includeImages: false, publisherMarkdown: true },
   policy: { allow: [], deny: [], allowInteract: true, allowFileUrls: false },
   limits: { maxSessionsPerDay: 100, maxTokensPerDay: 1_000_000 },
 };

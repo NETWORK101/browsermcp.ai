@@ -104,6 +104,7 @@ export async function handleInteract(
         maxTokens: args.maxTokens ?? ctx.config.distill.maxTokens,
         elements: true,
         includeLinks: ctx.config.distill.includeLinks,
+        publisherMarkdown: false, // after actions, the live DOM is the truth
         includeImages: ctx.config.distill.includeImages,
       });
 

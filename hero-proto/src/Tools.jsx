@@ -6,7 +6,7 @@ const TOOLS = [
   {
     name: 'browse',
     what: 'Page → clean markdown.',
-    detail: 'Rank sections against a focus and keep only what fits your token budget. Truncated output names the omitted headings so the agent can ask for more.',
+    detail: 'Uses the publisher’s own markdown when a site offers it, otherwise distills the rendered page. Opens with a page card (type, author, dates, source), ranks sections against a focus, and lists what it left out.',
     params: ['focus', 'maxTokens', 'diff', 'elements'],
     hint: 'read',
   },
@@ -20,7 +20,7 @@ const TOOLS = [
   {
     name: 'links',
     what: 'A map of the page.',
-    detail: 'Deduplicated links, filterable to the same origin or a substring match — find the right page before reading it.',
+    detail: 'Deduplicated links, filterable to the same origin or a substring match. Points out the site’s /llms.txt when it publishes one.',
     params: ['sameOrigin', 'match'],
     hint: 'read',
   },
@@ -44,7 +44,7 @@ export function Tools() {
   return (
     <section className="section" id="tools" aria-labelledby="tools-title">
       <div className="wrap">
-        <SectionHead num="03" kicker="The tools" id="tools-title" title={<>Five tools. <em>About 1.3k tokens</em> of schema.</>}>
+        <SectionHead num="05" kicker="The tools" id="tools-title" title={<>Five tools. <em>About 1.3k tokens</em> of schema.</>}>
           Built for reading first. Four tools never change a page; the fifth says so in its annotations,
           so your client can auto-approve reads and ask before writes.
         </SectionHead>

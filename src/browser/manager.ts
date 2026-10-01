@@ -1,13 +1,16 @@
-import { chromium, Browser, BrowserContext, Page } from "playwright";
+import { chromium, firefox, webkit, Browser, BrowserContext, BrowserType, Page } from "playwright";
 import { existsSync } from "fs";
 import { PageWrapper } from "./page.js";
-import type { ProfileMode } from "../config/schema.js";
+import type { BrowserEngine, ProfileMode } from "../config/schema.js";
 
 export interface BrowserManagerConfig {
   timeout: number;
   headless: boolean;
   /** Defaults to "ephemeral" when constructed directly (tests, library use). */
   profile: ProfileMode;
+  engine?: BrowserEngine;
+  /** Chromium only — an installed branded build such as "chrome" or "msedge". */
+  channel?: string;
   profileDir?: string;
   cdpEndpoint?: string;
 }
@@ -24,6 +27,30 @@ const DEFAULT_BROWSER_CONFIG: BrowserManagerConfig = { timeout: 30_000, headless
 const SETTLE_MS = 2_500;
 
 export type SessionKind = "ephemeral" | "persistent" | "cdp";
+
+const ENGINE_TYPES: Record<BrowserEngine, BrowserType> = { chromium, firefox, webkit };
+
+export function browserTypeFor(engine: BrowserEngine = "chromium"): BrowserType {
+  const t = ENGINE_TYPES[engine];
+  if (!t) throw new Error(`Unknown browser engine "${engine}". Use one of: chromium, firefox, webkit.`);
+  return t;
+}
+
+/**
+ * Engines can't share a profile directory (Chromium, Gecko and WebKit store state differently),
+ * so non-Chromium engines get a sibling directory: ~/.browsermcp/profile-firefox, …-webkit.
+ */
+export function profileDirFor(engine: BrowserEngine = "chromium", profileDir: string): string {
+  return engine === "chromium" ? profileDir : `${profileDir}-${engine}`;
+}
+
+/** Launch options shared by the server and `browsermcp login`. */
+export function launchOptions(engine: BrowserEngine = "chromium", channel?: string): { channel?: string } {
+  if (channel && engine !== "chromium") {
+    throw new Error(`browser.channel "${channel}" only applies to the chromium engine (got "${engine}").`);
+  }
+  return channel ? { channel } : {};
+}
 
 let signalHandlersInstalled = false;
 const liveManagers = new Set<BrowserManager>();
@@ -67,15 +94,26 @@ export class BrowserManager {
     return n;
   }
 
+  private get profilePath(): string | undefined {
+    return this.config.profileDir ? profileDirFor(this.config.engine, this.config.profileDir) : undefined;
+  }
+
   private wantsPersistent(): boolean {
-    const { profile, profileDir } = this.config;
+    const { profile } = this.config;
     if (profile === "persistent") return true;
-    if (profile === "auto") return !!profileDir && existsSync(profileDir);
+    if (profile === "auto") return !!this.profilePath && existsSync(this.profilePath);
     return false;
   }
 
   private async launch(): Promise<void> {
+    const engine = this.config.engine ?? "chromium";
+    const type = browserTypeFor(engine);
+    const extra = launchOptions(engine, this.config.channel);
+
     if (this.config.cdpEndpoint) {
+      if (engine !== "chromium") {
+        throw new Error(`cdpEndpoint attaches to Chromium-based browsers only; browser.engine is "${engine}".`);
+      }
       // Attach to the user's own Chrome: real cookies, real extensions, real sessions.
       this.browser = await chromium.connectOverCDP(this.config.cdpEndpoint);
       this.sharedContext = this.browser.contexts()[0] ?? (await this.browser.newContext());
@@ -83,10 +121,11 @@ export class BrowserManager {
       return;
     }
 
-    if (this.wantsPersistent() && this.config.profileDir) {
+    if (this.wantsPersistent() && this.profilePath) {
       try {
-        this.sharedContext = await chromium.launchPersistentContext(this.config.profileDir, {
+        this.sharedContext = await type.launchPersistentContext(this.profilePath, {
           headless: this.config.headless,
+          ...extra,
         });
         this.kind = "persistent";
         return;
@@ -100,7 +139,7 @@ export class BrowserManager {
       }
     }
 
-    this.browser = await chromium.launch({ headless: this.config.headless });
+    this.browser = await type.launch({ headless: this.config.headless, ...extra });
     this.kind = "ephemeral";
   }
 

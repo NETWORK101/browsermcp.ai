@@ -4,6 +4,10 @@ import { htmlToMarkdown, MarkdownOptions } from './markdown.js';
 import { extractInteractiveElements, InteractiveElement } from './accessibility-tree.js';
 import { estimateTokens } from './token-counter.js';
 import { applyBudget } from './sections.js';
+import {
+  readPageMeta, fetchPublisherMarkdown, splitFrontMatter, mergeFrontMatter, trimMarkdown,
+  type PageMeta, type ContentSource,
+} from './metadata.js';
 
 export type { InteractiveElement } from './accessibility-tree.js';
 
@@ -14,6 +18,8 @@ export interface DistillOptions extends MarkdownOptions {
   maxTokens?: number;
   /** Append the interactive-elements list. Defaults to true for backward compatibility. */
   elements?: boolean;
+  /** Use the publisher's own markdown when the page offers it. Default true. */
+  publisherMarkdown?: boolean;
 }
 
 export interface DistillResult {
@@ -28,6 +34,10 @@ export interface DistillResult {
   reductionRatio: number;
   truncated: boolean;
   omittedSections: string[];
+  /** Provenance read from JSON-LD, OpenGraph, <meta>, canonical and markdown front matter. */
+  meta: PageMeta;
+  /** Where the text came from: the rendered DOM, or markdown the publisher serves for agents. */
+  source: ContentSource;
 }
 
 /**
@@ -51,15 +61,28 @@ export function formatInteractiveElements(elements: InteractiveElement[]): strin
  * Distill a Playwright page into token-efficient markdown plus metadata.
  */
 export async function distill(page: Page, opts: DistillOptions = {}): Promise<DistillResult> {
-  // Step 1: capture raw HTML and measure baseline token cost
+  // Step 1: metadata first — what does the page say about itself?
+  let meta = await readPageMeta(page);
+  const publisherP = opts.publisherMarkdown === false
+    ? Promise.resolve(null)
+    : fetchPublisherMarkdown(page, meta.markdownAlternate);
+
+  // Step 2: capture raw HTML (in parallel with the publisher-markdown request) for the baseline
   const rawHtml = await page.content();
   const rawTokenCount = estimateTokens(rawHtml);
 
-  // Step 2: extract article content (readability → clean HTML)
-  const cleanHtml = extractContent(rawHtml, page.url());
-
-  // Step 3: convert to markdown
-  const fullMarkdown = htmlToMarkdown(cleanHtml, opts);
+  // Step 3: prefer the publisher's markdown; otherwise distill the rendered DOM
+  const publisher = await publisherP;
+  let fullMarkdown: string;
+  let source: ContentSource = 'rendered';
+  if (publisher) {
+    const { body, fields } = splitFrontMatter(publisher.markdown);
+    meta = mergeFrontMatter(meta, fields);
+    fullMarkdown = trimMarkdown(body, opts);
+    source = publisher.source;
+  } else {
+    fullMarkdown = htmlToMarkdown(extractContent(rawHtml, page.url()), opts);
+  }
 
   // Step 4: rank by focus and fit the token budget
   const budget = applyBudget(fullMarkdown, { focus: opts.focus, maxTokens: opts.maxTokens });
@@ -76,7 +99,7 @@ export async function distill(page: Page, opts: DistillOptions = {}): Promise<Di
   return {
     markdown,
     fullMarkdown,
-    title: await page.title(),
+    title: (await page.title()) || meta.title || '',
     url: page.url(),
     interactiveElements,
     tokenCount: estimateTokens(markdown),
@@ -84,5 +107,7 @@ export async function distill(page: Page, opts: DistillOptions = {}): Promise<Di
     reductionRatio,
     truncated: budget.truncated,
     omittedSections: budget.omitted,
+    meta,
+    source,
   };
 }

@@ -28,8 +28,25 @@ browsermcp is the reading-first option: **5 tools, ~1.3k tokens of schema**, pag
 - **Structured extraction with MCP sampling.** `extract` returns JSON-LD, meta tags, and tables as row objects. Pass a `schema` and your *client's own model* fills it — no extra API key.
 - **Current MCP spec.** Tool `annotations`, `outputSchema` + `structuredContent`, server `instructions`, progress notifications, and diff snapshots as resources.
 - **Safety by default.** Domain allow/deny policy, read-only mode, dangerous schemes blocked, and every page wrapped in an untrusted-content fence against prompt injection.
+- **Metadata-first reading (0.2.1).** If a site publishes markdown for agents (a `text/markdown` alternate link, or `Accept: text/markdown`), browsermcp reads that instead of the rendered HTML. Stripe's API reference drops from 428k tokens of HTML to the publisher's own markdown. Every result opens with a page card (type, site, author, published/updated dates, canonical URL, source) read from JSON-LD, OpenGraph, `<meta>` and front matter, and `links` points out a site's `/llms.txt`.
 
 See [CHANGELOG.md](CHANGELOG.md) for the full list and migration notes.
+
+## How a page becomes agent-readable
+
+1. **Ask the publisher.** Use a declared `<link rel="alternate" type="text/markdown">` on the same origin, or request the page with `Accept: text/markdown`. Many docs platforms (Stripe, Vercel, Cloudflare, Anthropic) serve clean markdown this way.
+2. **Read the metadata.** Use JSON-LD (including `@graph`), OpenGraph, `<meta>`, the canonical link and markdown front matter to build a one-line page card covering what the page is, who wrote it, how fresh it is, and where the text came from.
+3. **Read the structure.** If there's no publisher markdown, render the page, strip chrome (nav, footer, banners, hidden and `aria-hidden` nodes), keep semantic landmarks, headings and tables, and convert to GFM.
+4. **Rank and budget.** `focus` ranks sections; `maxTokens` caps the result and lists omitted headings.
+5. **Fence it.** Wrap the result in `<untrusted-page-content>` with typed `structuredContent` (`source`, `card`).
+
+Example card:
+
+```
+> TechArticle · Vercel · updated 2026-09-13 · source: publisher markdown (declared text/markdown alternate)
+```
+
+Turn publisher markdown off with `"distill": { "publisherMarkdown": false }`. Cross-origin alternates are always ignored, so a page can't point the agent at another host.
 
 ## Tools
 
@@ -116,6 +133,21 @@ browsermcp opens its own tabs in your existing session and never closes your bro
 
 > Either way the agent can read anything those sessions can. Pair this with `policy.allow` (below).
 
+## Browsers
+
+| Browser | How | Status |
+|---|---|---|
+| Chromium (bundled) | default | ✓ |
+| Google Chrome, Microsoft Edge | `"channel": "chrome"` / `"msedge"` | ✓ |
+| Firefox | `"engine": "firefox"` | ✓ |
+| WebKit (Safari's engine) | `"engine": "webkit"` | ✓ |
+| Your running Chrome, Edge, Brave, Arc, Vivaldi, Opera | `"cdpEndpoint"` | ✓ |
+| Your running Firefox | WebDriver BiDi attach | Roadmap |
+| Your running Safari | `safaridriver` | Roadmap |
+| Tabs in your everyday browser, no flags | extension bridge | Roadmap |
+
+Firefox and WebKit need a one-time `npx playwright install firefox webkit`. Sign in per engine with `npx browsermcpai login <url> --browser firefox`.
+
 ## Configuration
 
 `npx browsermcpai init` writes `.browsermcp.json`. Global defaults can live in `~/.config/browsermcp/config.json`; project config wins.
@@ -125,13 +157,16 @@ browsermcp opens its own tabs in your existing session and never closes your bro
   "browser": {
     "timeout": 30000,
     "headless": true,
+    "engine": "chromium",         // "chromium" | "firefox" | "webkit"
+    "channel": null,              // chromium only: "chrome" | "msedge" | …
     "profile": "auto",            // "auto" | "persistent" | "ephemeral"
     "cdpEndpoint": null           // e.g. "http://localhost:9222"
   },
   "distill": {
     "maxTokens": 4000,            // default budget for browse/extract/interact
     "includeLinks": true,
-    "includeImages": false
+    "includeImages": false,
+    "publisherMarkdown": true     // prefer markdown the site serves for agents
   },
   "policy": {
     "allow": [],                  // host globs; empty = any. e.g. ["*.stripe.com", "localhost:*"]

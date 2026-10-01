@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.2.1 — 2026-10-01
+
+### Added
+- **More browsers.** `browser.engine` can be `"chromium"` (default), `"firefox"`, or `"webkit"` (Safari's engine). `browser.channel` runs an installed Google Chrome or Microsoft Edge (`"chrome"`, `"msedge"`, beta/dev channels). `cdpEndpoint` attaches to any Chromium-based browser you already run (Chrome, Edge, Brave, Arc, Vivaldi, Opera).
+- `browsermcp login [url] --browser firefox|webkit|chromium`.
+- Each engine keeps its own persistent profile (`~/.browsermcp/profile`, `profile-firefox`, `profile-webkit`), so switching engines never mixes session stores.
+
+- **Metadata-first reading.** `browse`, `extract` and `focus` use the publisher's own markdown when a page offers it: a same-origin `<link rel="alternate" type="text/markdown">`, or `Accept: text/markdown` content negotiation. Otherwise the rendered DOM is distilled as before. Configure with `distill.publisherMarkdown` (default `true`).
+- **Page card.** Each result starts with one line of provenance (type, site, author, published/updated, canonical, content source) built from JSON-LD (including `@graph`), OpenGraph, `<meta>`, canonical links and markdown front matter. It's also returned as `structuredContent.card`, with `structuredContent.source`.
+- **`links` reports `/llms.txt`** when a site publishes one, guarding against soft-404 HTML pages.
+
+### Fixed
+- In-page scripts failed with `__name is not defined` when the server ran through `tsx` (`npm run dev`), because esbuild's keepNames wraps helper functions. Every page script now runs through a wrapper that works with any compiler.
+
+### Roadmap
+- Attach to your running Firefox (WebDriver BiDi) and Safari (`safaridriver`).
+- Optional browser-extension bridge, so the agent can read tabs in your everyday browser without remote-debugging flags.
+
 ## 0.2.0 — 2026-09-30
 
 ### Added

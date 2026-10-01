@@ -2,6 +2,7 @@ import type { BrowserManager } from '../browser/manager.js';
 import type { UsageTracker } from '../cost/tracker.js';
 import { DEFAULT_CONFIG, type BrowserMcpConfig } from '../config/schema.js';
 import type { DistillResult } from '../distill/pipeline.js';
+import { formatPageCard } from '../distill/metadata.js';
 import { checkUrl, fenceUntrusted } from '../security/policy.js';
 
 export type TextBlock = { type: 'text'; text: string };
@@ -46,7 +47,8 @@ export function errorMessage(err: unknown): string {
 
 /** Standard header + fenced body used by every text-returning tool. */
 export function renderPage(
-  d: Pick<DistillResult, 'title' | 'url' | 'tokenCount' | 'reductionRatio' | 'truncated' | 'omittedSections'>,
+  d: Pick<DistillResult, 'title' | 'url' | 'tokenCount' | 'reductionRatio' | 'truncated' | 'omittedSections'> &
+    Partial<Pick<DistillResult, 'meta' | 'source'>>,
   body: string,
   extras: { lead?: string[]; notices?: string[] } = {}
 ): string {
@@ -57,6 +59,7 @@ export function renderPage(
   const out: string[] = [];
   out.push(`# ${d.title || d.url}`);
   out.push(`${d.url} · ${stats.join(' · ')}`);
+  if (d.meta && d.source) out.push(formatPageCard(d.meta, d.url, d.source));
   for (const l of extras.lead ?? []) out.push(l);
   out.push('');
   out.push(fenceUntrusted(body, d.url));

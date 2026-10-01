@@ -4,9 +4,10 @@ import { LINKS, Mark, IconGitHub } from './ui.jsx'
 
 const ITEMS = [
   ['#problem', 'Problem'],
+  ['#versus', 'Why'],
+  ['#how', 'How'],
   ['#local', 'Local'],
   ['#tools', 'Tools'],
-  ['#tokens', 'Tokens'],
   ['#compare', 'Compare'],
   ['#pricing', 'Pricing'],
 ]
@@ -30,7 +31,7 @@ export function Nav() {
         <a href="#top" className="brand" aria-label="browsermcp — home">
           <Mark />
           <span className="brand-name">browsermcp</span>
-          <span className="brand-ver">v0.2.0</span>
+          <span className="brand-ver">v0.2.1</span>
         </a>
 
         <ul className="nav-links">

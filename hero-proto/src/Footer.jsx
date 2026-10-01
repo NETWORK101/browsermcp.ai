@@ -16,7 +16,7 @@ export function Footer() {
           <a href="#top">Back to top ↑</a>
         </nav>
         <p className="footer-colophon">
-          <span>browsermcpai v0.2.0</span>
+          <span>browsermcpai v0.2.1</span>
           <span>Set in Instrument Serif, Geist &amp; Geist Mono</span>
         </p>
       </div>

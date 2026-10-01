@@ -4,6 +4,8 @@ import { ThemeProvider } from './ThemeContext.jsx'
 import { Nav } from './Nav.jsx'
 import { Hero } from './Hero.jsx'
 import { ProblemSection } from './ProblemSection.jsx'
+import { Versus } from './Versus.jsx'
+import { HowItReads } from './HowItReads.jsx'
 import { WhyLocal } from './WhyLocal.jsx'
 import { Tools } from './Tools.jsx'
 import { TokenReduction } from './TokenReduction.jsx'
@@ -24,6 +26,8 @@ function App() {
       <main id="main">
         <Hero />
         <ProblemSection />
+        <Versus />
+        <HowItReads />
         <WhyLocal />
         <Tools />
         <TokenReduction />

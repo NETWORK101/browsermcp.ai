@@ -1,12 +1,23 @@
 import React from 'react'
 import { SectionHead, Command } from './ui.jsx'
 
+const BROWSERS = [
+  ['Chromium', 'Bundled — the default', 'ok', '"engine": "chromium"'],
+  ['Google Chrome · Microsoft Edge', 'Your installed build', 'ok', '"channel": "chrome" | "msedge"'],
+  ['Firefox', 'Gecko engine, own profile', 'ok', '"engine": "firefox"'],
+  ['WebKit', 'Safari’s engine, own profile', 'ok', '"engine": "webkit"'],
+  ['Your running Chrome, Edge, Brave, Arc, Vivaldi', 'Attach over CDP — your real tabs and sessions', 'ok', '"cdpEndpoint"'],
+  ['Your running Firefox', 'Attach via WebDriver BiDi', 'next', 'Roadmap'],
+  ['Your running Safari', 'Attach via safaridriver', 'next', 'Roadmap'],
+  ['Your everyday browser, no flags', 'Optional extension bridge', 'next', 'Roadmap'],
+]
+
 export function WhyLocal() {
   return (
     <section className="section" id="local" aria-labelledby="local-title">
       <div className="wrap">
-        <SectionHead num="02" kicker="Local &amp; authenticated" id="local-title" title={<>Signed in as <em>you.</em> Running on <em>your</em> machine.</>}>
-          browsermcp drives a real Chromium on your computer through Playwright. No API key, no account, no relay —
+        <SectionHead num="04" kicker="Local &amp; authenticated" id="local-title" title={<>Signed in as <em>you.</em> Running on <em>your</em> machine.</>}>
+          browsermcp drives a real browser on your computer — Chromium, Chrome, Edge, Firefox or WebKit — through Playwright. No API key, no account, no relay —
           the page goes from your browser to your agent and nowhere else.
         </SectionHead>
 
@@ -32,8 +43,8 @@ export function WhyLocal() {
             <li className="step">
               <span className="step-n">iii.</span>
               <div>
-                <h3>Or attach to the Chrome you already use.</h3>
-                <p>Start Chrome with remote debugging and point browsermcp at it over CDP.</p>
+                <h3>Or attach to the browser you already use.</h3>
+                <p>Start Chrome, Edge, Brave or Arc with remote debugging and point browsermcp at it over CDP.</p>
               </div>
             </li>
             <li className="step">
@@ -73,6 +84,28 @@ export function WhyLocal() {
               </pre>
             </div>
           </div>
+                </div>
+
+        <div className="browsers reveal">
+          <div className="browsers-head">
+            <h3>Browsers</h3>
+            <p>Each engine keeps its own signed-in profile. <code>npx browsermcpai login &lt;url&gt; --browser firefox</code></p>
+          </div>
+          <table className="browsers-table">
+            <thead>
+              <tr><th scope="col">Browser</th><th scope="col">How</th><th scope="col">Config</th><th scope="col">Status</th></tr>
+            </thead>
+            <tbody>
+              {BROWSERS.map(([name, how, status, cfg]) => (
+                <tr key={name} className={`is-${status}`}>
+                  <th scope="row">{name}</th>
+                  <td>{how}</td>
+                  <td>{status === 'ok' ? <code>{cfg}</code> : <span aria-label="Not yet configurable">—</span>}</td>
+                  <td><span className="br-status">{status === 'ok' ? 'Supported' : 'Roadmap'}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
