@@ -21,12 +21,12 @@ describe('handleBrowse', () => {
     expect(result.content[0].text.length).toBeGreaterThan(0);
   });
 
-  it('browse with instruction prefixes output with the instruction', async () => {
+  it('browse with legacy instruction echoes it as the focus', async () => {
     const result = await handleBrowse(
       { url: simplePageUrl, instruction: 'Find the heading' },
       browserManager
     );
-    expect(result.content[0].text).toMatch(/^> Instruction: Find the heading/);
+    expect(result.content[0].text).toMatch(/^> Focus: Find the heading/m);
   });
 
   it('browse with invalid URL returns error content without crashing', async () => {

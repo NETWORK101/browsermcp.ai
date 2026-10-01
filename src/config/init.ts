@@ -1,66 +1,123 @@
-import { writeFileSync, existsSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
-import { DEFAULT_CONFIG } from './schema.js';
+import { DEFAULT_CONFIG, loadConfig } from './schema.js';
 
-const MCP_CONFIG = JSON.stringify(
-  {
-    mcpServers: {
-      browsermcp: {
-        command: 'npx',
-        args: ['-y', 'browsermcpai'],
-      },
+const SERVER_ENTRY = { command: 'npx', args: ['-y', 'browsermcpai'] };
+
+const bold = (s: string) => (process.stdout.isTTY ? `\x1b[1m${s}\x1b[0m` : s);
+const dim = (s: string) => (process.stdout.isTTY ? `\x1b[2m${s}\x1b[0m` : s);
+const green = (s: string) => (process.stdout.isTTY ? `\x1b[32m${s}\x1b[0m` : s);
+
+interface ClientTarget {
+  name: string;
+  detected: boolean;
+  where: string;
+  snippet: string;
+}
+
+function clientTargets(): ClientTarget[] {
+  const home = homedir();
+  const cwd = process.cwd();
+  const mcpServers = JSON.stringify({ mcpServers: { browsermcp: SERVER_ENTRY } }, null, 2);
+  const claudeDesktop =
+    process.platform === 'darwin'
+      ? join(home, 'Library', 'Application Support', 'Claude', 'claude_desktop_config.json')
+      : process.platform === 'win32'
+        ? join(process.env.APPDATA ?? home, 'Claude', 'claude_desktop_config.json')
+        : join(home, '.config', 'Claude', 'claude_desktop_config.json');
+
+  return [
+    {
+      name: 'Claude Code',
+      detected: existsSync(join(home, '.claude.json')) || existsSync(join(home, '.claude')),
+      where: 'run once in your terminal',
+      snippet: 'claude mcp add browsermcp -- npx -y browsermcpai',
     },
-  },
-  null,
-  2
-);
+    {
+      name: 'Claude Desktop',
+      detected: existsSync(claudeDesktop),
+      where: claudeDesktop,
+      snippet: mcpServers,
+    },
+    {
+      name: 'Cursor',
+      detected: existsSync(join(home, '.cursor')),
+      where: join(home, '.cursor', 'mcp.json'),
+      snippet: mcpServers,
+    },
+    {
+      name: 'VS Code',
+      detected: existsSync(join(cwd, '.vscode')),
+      where: join(cwd, '.vscode', 'mcp.json'),
+      snippet: JSON.stringify({ servers: { browsermcp: { type: 'stdio', ...SERVER_ENTRY } } }, null, 2),
+    },
+    {
+      name: 'Codex CLI',
+      detected: existsSync(join(home, '.codex')),
+      where: join(home, '.codex', 'config.toml'),
+      snippet: '[mcp_servers.browsermcp]\ncommand = "npx"\nargs = ["-y", "browsermcpai"]',
+    },
+  ];
+}
 
 export async function runInit(): Promise<void> {
-  // 1. Write .browsermcp.json to CWD
+  console.log(bold('\nbrowsermcp init\n'));
+
+  // 1. Project config (never clobber an existing one)
   const localConfigPath = join(process.cwd(), '.browsermcp.json');
-  writeFileSync(localConfigPath, JSON.stringify(DEFAULT_CONFIG, null, 2) + '\n', 'utf-8');
-  console.log(`Created ${localConfigPath}`);
-
-  // 2. Print MCP config instructions
-  console.log('\nAdd this to your Claude Code MCP settings:\n');
-  console.log(MCP_CONFIG);
-
-  // 3. Detect Claude Code config location
-  const claudeJsonPath = join(homedir(), '.claude.json');
-  const claudeSettingsPath = join(homedir(), '.claude', 'settings.json');
-  if (existsSync(claudeJsonPath)) {
-    console.log(`\nDetected Claude Code config at: ${claudeJsonPath}`);
-  } else if (existsSync(claudeSettingsPath)) {
-    console.log(`\nDetected Claude Code config at: ${claudeSettingsPath}`);
+  if (existsSync(localConfigPath)) {
+    console.log(`${dim('•')} Keeping existing ${localConfigPath}`);
+  } else {
+    const { profileDir: _omit, ...browser } = DEFAULT_CONFIG.browser;
+    const starter = { ...DEFAULT_CONFIG, browser };
+    writeFileSync(localConfigPath, JSON.stringify(starter, null, 2) + '\n', 'utf-8');
+    console.log(`${green('✓')} Created ${localConfigPath}`);
   }
 
-  // 4. Detect Cursor
-  const cursorMcpPath = join(homedir(), '.cursor', 'mcp.json');
-  if (existsSync(cursorMcpPath)) {
-    console.log(`\nDetected Cursor MCP config at: ${cursorMcpPath}`);
-    console.log('Add the same mcpServers block to that file.');
+  // 2. Per-client setup — detected clients first
+  const targets = clientTargets().sort((a, b) => Number(b.detected) - Number(a.detected));
+  console.log(bold('\nConnect your MCP client'));
+  for (const t of targets) {
+    console.log(`\n${t.detected ? green('●') : dim('○')} ${bold(t.name)}${t.detected ? green(' (detected)') : ''}`);
+    console.log(dim(`  ${t.where}`));
+    console.log(t.snippet.split('\n').map((l) => `  ${l}`).join('\n'));
   }
 
-  // 5. Detect and configure for OpenAI Codex CLI
-  const codexGlobalDir = join(homedir(), '.codex');
-  const codexGlobalConfig = join(codexGlobalDir, 'config.json');
-  const codexProjectDir = join(process.cwd(), '.codex');
-  const codexProjectConfig = join(codexProjectDir, 'config.json');
-  const agentsMdPath = join(process.cwd(), 'AGENTS.md');
+  // 3. Authenticated browsing
+  console.log(bold('\nRead pages you are signed in to'));
+  console.log('  npx browsermcpai login https://dashboard.stripe.com');
+  console.log(dim('  Opens a browser on a private profile (~/.browsermcp/profile). Sign in, close the window,'));
+  console.log(dim('  and your agent reuses that session. Or attach to your own Chrome with "cdpEndpoint".'));
 
-  const codexGlobalDetected = existsSync(codexGlobalDir) || existsSync(codexGlobalConfig);
-  const codexProjectDetected = existsSync(codexProjectDir) || existsSync(codexProjectConfig);
-  const agentsMdDetected = existsSync(agentsMdPath);
+  console.log(`\n${green('Done.')} Restart your MCP client to load the 5 browsermcp tools.\n`);
+}
 
-  if (codexGlobalDetected || codexProjectDetected || agentsMdDetected) {
-    console.log('\nDetected OpenAI Codex CLI project.');
+export async function runLogin(url?: string): Promise<void> {
+  const config = loadConfig();
+  const profileDir = config.browser.profileDir;
+  mkdirSync(profileDir, { recursive: true });
+
+  const { chromium } = await import('playwright');
+  console.log(bold('\nbrowsermcp login'));
+  console.log(`Profile: ${profileDir}`);
+  console.log('Sign in to any sites your agent should read, then close the browser window to save.\n');
+
+  let context;
+  try {
+    context = await chromium.launchPersistentContext(profileDir, { headless: false, viewport: null });
+  } catch (err) {
+    console.error(
+      `Could not open the profile — is browsermcp already running in an MCP client?\n` +
+        `Quit that client (or run login before starting it) and try again.\n\n${(err as Error).message.split('\n')[0]}`
+    );
+    process.exitCode = 1;
+    return;
   }
 
-  console.log('\nFor OpenAI Codex CLI, add the MCP server to your config:');
-  console.log(`  Global:  ${codexGlobalConfig}`);
-  console.log(`  Project: ${codexProjectConfig}`);
-  console.log('\n' + MCP_CONFIG);
+  const page = context.pages()[0] ?? (await context.newPage());
+  if (url) await page.goto(url).catch((e) => console.error(`Could not open ${url}: ${e.message}`));
 
-  console.log('\nbrowsermcp init complete!');
+  await new Promise<void>((resolve) => context.once('close', () => resolve()));
+  console.log(`${green('✓')} Session saved. browsermcp will use it automatically (browser.profile = "auto").\n`);
 }

@@ -1,98 +1,60 @@
 import React from 'react'
-import { motion } from 'framer-motion'
+import { SectionHead } from './ui.jsx'
 
-const features = [
-  { label: 'Built for', browsermcp: 'Reading pages', agentbrowser: 'Driving browsers', playwright: 'Driving browsers', firecrawl: 'Crawling at scale' },
-  { label: 'Runs locally', browsermcp: 'Yes — always', agentbrowser: 'Yes', playwright: 'Yes', firecrawl: 'Cloud only' },
-  { label: 'Authenticated pages', browsermcp: 'Your local session', agentbrowser: 'Your local session', playwright: 'Your local session', firecrawl: 'No' },
-  { label: 'Reads localhost', browsermcp: 'Yes', agentbrowser: 'Yes', playwright: 'Yes', firecrawl: 'No' },
-  { label: 'Sandboxed agents', browsermcp: 'Yes (MCP)', agentbrowser: 'No (needs shell)', playwright: 'Yes (but heavy)', firecrawl: 'Yes (but cloud)' },
-  { label: 'Content → markdown', browsermcp: 'Built-in', agentbrowser: 'No', playwright: 'No', firecrawl: 'Built-in' },
-  { label: 'Schema tax / request', browsermcp: '~800 tokens', agentbrowser: 'N/A (CLI)', playwright: '~13,700 tokens', firecrawl: '~2,000 tokens' },
-  { label: 'Diff mode (since)', browsermcp: 'Built-in', agentbrowser: 'No', playwright: 'No', firecrawl: 'No' },
-  { label: 'JavaScript rendering', browsermcp: 'Full (Chromium)', agentbrowser: 'Full (Chromium)', playwright: 'Full (Chromium)', firecrawl: 'Optional' },
-  { label: 'Data leaves machine', browsermcp: 'Never', agentbrowser: 'Never', playwright: 'Never', firecrawl: 'Always' },
-  { label: 'Cost', browsermcp: 'Free forever', agentbrowser: 'Free', playwright: 'Free', firecrawl: '$16-333/mo' },
+const COLS = ['browsermcp', 'Playwright MCP', 'Agent-Browser', 'Firecrawl']
+
+// [label, browsermcp, playwright, agent-browser, firecrawl]; a leading "+" marks a strength.
+const ROWS = [
+  ['Built for', '+Reading pages', 'Driving a browser', 'Driving a browser', 'Crawling & scraping'],
+  ['Where it runs', '+Your machine', '+Your machine', '+Your machine', 'Hosted API (self-host option)'],
+  ['Interface', '+MCP', '+MCP', 'CLI (needs a shell)', 'API, SDKs, MCP'],
+  ['Signed-in pages', '+Persistent profile or CDP attach', '+Persistent profile or extension', '+Saved session state', 'Cookies/headers sent to the service'],
+  ['Reads localhost', '+Yes', '+Yes', '+Yes', 'Not from the hosted API'],
+  ['Page output', '+Clean markdown', 'Accessibility snapshot', 'Accessibility snapshot', '+Markdown'],
+  ['Tool schema per request', '~1.3k tokens', '~13.7k tokens', 'n/a (CLI)', 'Not measured'],
+  ['Focus + token budget', '+focus, maxTokens', '—', '—', '—'],
+  ['Only-what-changed reads', '+diff: true', '—', '—', 'Change tracking (hosted)'],
+  ['Full automation', '8 basic actions', '+Yes', '+Yes', 'Scripted actions'],
+  ['Price', '+Free, MIT', '+Free, open source', '+Free, open source', 'Paid tiers + free tier'],
 ]
 
-function CellValue({ value, isHeadlessdev }) {
-  const positiveValues = ['Yes', 'Yes — always', 'Free', 'Free forever', 'One command', 'Built-in', 'MCP native', '~800 tokens', 'MIT', 'Reading pages', 'Your local session', 'Full (Chromium)', 'Never', 'Yes (MCP)']
-  const negativeValues = ['No', 'Cloud only', 'No (needs shell)', 'Raw HTML', '~13,700 tokens', 'CLI only', 'AGPL-3.0', 'Always']
-
-  const isPositive = positiveValues.includes(value)
-  const isNegative = negativeValues.includes(value)
-
-  return (
-    <span className={`cell-value ${isHeadlessdev ? 'cell-highlight' : ''} ${isPositive ? 'cell-positive' : ''} ${isNegative ? 'cell-negative' : ''}`}>
-      {value}
-    </span>
-  )
+function Cell({ v }) {
+  const strong = v.startsWith('+')
+  return <span className={strong ? 'cmp-strong' : 'cmp-plain'}>{strong ? v.slice(1) : v}</span>
 }
 
 export function Comparison() {
   return (
-    <section className="section comparison-section" id="comparison">
-      <div className="section-inner">
-        <motion.div
-          className="section-label"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          How it compares
-        </motion.div>
+    <section className="section" id="compare" aria-labelledby="compare-title">
+      <div className="wrap">
+        <SectionHead num="07" kicker="Comparison" id="compare-title" title={<>Good tools. <em>Different jobs.</em></>}>
+          Playwright MCP and Agent-Browser are excellent when an agent needs to drive a browser end to end.
+          Firecrawl is built for crawling at scale. browsermcp is for the far more common job: reading — cheaply, locally, signed in.
+        </SectionHead>
 
-        <motion.h2
-          className="section-title"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-        >
-          Local. Read-optimized. Minimal.
-          <br />
-          <span className="text-muted">No other tool ships all three.</span>
-        </motion.h2>
-
-        <motion.div
-          className="comparison-table-wrap"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-        >
-          <div className="comparison-table-scroll">
-            <table className="comparison-table">
+        <div className="cmp-wrap reveal">
+          <div className="cmp-scroll" tabIndex={0} role="region" aria-label="Comparison table, scrolls horizontally">
+            <table className="cmp">
               <thead>
                 <tr>
-                  <th className="th-feature"></th>
-                  <th className="th-browsermcp">browsermcp</th>
-                  <th>Agent-Browser</th>
-                  <th>Playwright MCP</th>
-                  <th>Firecrawl</th>
+                  <th scope="col"><span className="sr-only">Capability</span></th>
+                  {COLS.map((c, i) => <th scope="col" key={c} className={i === 0 ? 'is-us' : ''}>{c}</th>)}
                 </tr>
               </thead>
               <tbody>
-                {features.map((row, i) => (
-                  <motion.tr
-                    key={row.label}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.05 * i + 0.4 }}
-                  >
-                    <td className="td-feature">{row.label}</td>
-                    <td className="td-browsermcp"><CellValue value={row.browsermcp} isHeadlessdev /></td>
-                    <td><CellValue value={row.agentbrowser} /></td>
-                    <td><CellValue value={row.playwright} /></td>
-                    <td><CellValue value={row.firecrawl} /></td>
-                  </motion.tr>
+                {ROWS.map(([label, ...vals]) => (
+                  <tr key={label}>
+                    <th scope="row">{label}</th>
+                    {vals.map((v, i) => <td key={i} className={i === 0 ? 'is-us' : ''}><Cell v={v} /></td>)}
+                  </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </motion.div>
+          <p className="cmp-note">
+            Based on each project’s public documentation at the time of writing; check their docs for the latest. Schema sizes are approximate.
+          </p>
+        </div>
       </div>
     </section>
   )

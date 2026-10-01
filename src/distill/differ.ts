@@ -25,6 +25,12 @@ export function diffMarkdown(previous: string, current: string): DiffResult {
   // Build LCS table
   const m = prevLines.length;
   const n = currLines.length;
+
+  // The LCS table is O(m·n) memory; past ~4M cells fall back to a set-based diff
+  // (loses ordering precision on moved lines, but never blows the heap on huge pages).
+  if (m * n > 4_000_000) {
+    return setDiff(prevLines, currLines, current);
+  }
   const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
 
   for (let i = 1; i <= m; i++) {
@@ -119,4 +125,19 @@ export function diffMarkdown(previous: string, current: string): DiffResult {
     diffTokens: estimateTokens(diffText),
     fullPageTokens: estimateTokens(current),
   };
+}
+
+function setDiff(prevLines: string[], currLines: string[], current: string): DiffResult {
+  const prev = new Set(prevLines);
+  const curr = new Set(currLines);
+  const lines: DiffLine[] = [];
+  for (const l of prevLines) if (!curr.has(l) && l.trim()) lines.push({ type: 'removed', text: l });
+  for (const l of currLines) if (!prev.has(l) && l.trim()) lines.push({ type: 'added', text: l });
+  const addedCount = lines.filter((l) => l.type === 'added').length;
+  const removedCount = lines.length - addedCount;
+  if (lines.length === 0) {
+    return { lines: [{ type: 'context', text: 'No changes detected.' }], addedCount: 0, removedCount: 0, changedSections: 0, diffTokens: estimateTokens('No changes detected.'), fullPageTokens: estimateTokens(current) };
+  }
+  const diffText = lines.map((l) => (l.type === 'added' ? '+ ' : '- ') + l.text).join('\n');
+  return { lines, addedCount, removedCount, changedSections: 1, diffTokens: estimateTokens(diffText), fullPageTokens: estimateTokens(current) };
 }

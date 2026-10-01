@@ -23,14 +23,15 @@ describe("MCP server", () => {
     expect(result.tools).toHaveLength(5);
   });
 
-  it("lists browse, extract, screenshot, watch, and interact tools", async () => {
+  it("lists browse, extract, links, screenshot, and interact tools", async () => {
     const { client } = await startServer();
     const result = await client.listTools();
     const names = result.tools.map((t) => t.name);
     expect(names).toContain("browse");
     expect(names).toContain("extract");
     expect(names).toContain("screenshot");
-    expect(names).toContain("watch");
+    expect(names).toContain("links");
+    expect(names).not.toContain("watch"); // folded into browse({ diff: true })
     expect(names).toContain("interact");
   });
 
@@ -90,9 +91,10 @@ describe("MCP server", () => {
     expect(items.properties).toHaveProperty("type");
     expect(items.properties).toHaveProperty("selector");
     expect(items.properties).toHaveProperty("value");
-    expect(items.properties.type.enum).toEqual(["click", "fill", "select"]);
-    expect(items.required).toContain("type");
-    expect(items.required).toContain("selector");
+    expect(items.properties.type.enum).toEqual(
+      expect.arrayContaining(["click", "fill", "select", "press", "check", "hover", "scroll", "wait"])
+    );
+    expect(items.required).toEqual(["type"]);
     expect(items.required).not.toContain("value");
   });
 

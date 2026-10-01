@@ -1,108 +1,128 @@
 import { Page } from 'playwright';
 
 export interface InteractiveElement {
-  role: string;       // e.g., "button", "link", "input"
+  role: string;       // e.g., "button", "link", "input:email"
   name: string;       // accessible name or text content
-  selector: string;   // CSS selector to target this element
-  value?: string;     // current value for inputs
+  selector: string;   // CSS selector that uniquely matches this element at capture time
+  value?: string;     // current value for inputs, href for links
 }
 
-/**
- * Extract all interactive elements from a live Playwright page via page.evaluate().
- */
-export async function extractInteractiveElements(page: Page): Promise<InteractiveElement[]> {
-  return page.evaluate(() => {
-    const results: Array<{
-      role: string;
-      name: string;
-      selector: string;
-      value?: string;
-    }> = [];
+/** Elements beyond this are summarised as a count — huge nav menus shouldn't eat the budget. */
+export const MAX_ELEMENTS = 80;
 
-    const getSelectorForElement = (el: Element, tag: string, index: number): string => {
-      if (el.id) return `#${el.id}`;
-      const name = el.getAttribute('name');
-      if (name) return `${tag}[name="${name}"]`;
-      return `${tag}:nth-of-type(${index + 1})`;
+/**
+ * Extract visible interactive elements from a live Playwright page.
+ * Selectors are verified unique in the live DOM, preferring stable hooks
+ * (id, data-testid, name, aria-label) before falling back to a structural path.
+ */
+export async function extractInteractiveElements(
+  page: Page,
+  limit: number = MAX_ELEMENTS
+): Promise<InteractiveElement[]> {
+  return page.evaluate((limit) => {
+    const esc = (s: string) => (window.CSS && CSS.escape ? CSS.escape(s) : s.replace(/["\\]/g, '\\$&'));
+    const unique = (sel: string) => {
+      try {
+        return document.querySelectorAll(sel).length === 1;
+      } catch {
+        return false;
+      }
     };
 
-    // Buttons
-    const buttons = Array.from(document.querySelectorAll('button'));
-    buttons.forEach((btn, i) => {
-      const text = (btn.textContent ?? '').trim();
-      results.push({
-        role: 'button',
-        name: text || btn.getAttribute('aria-label') || 'button',
-        selector: getSelectorForElement(btn, 'button', i),
-      });
-    });
-
-    // Links with href
-    const links = Array.from(document.querySelectorAll('a[href]'));
-    links.forEach((a, i) => {
-      const text = (a.textContent ?? '').trim();
-      const href = a.getAttribute('href') ?? '';
-      results.push({
-        role: 'link',
-        name: text || a.getAttribute('aria-label') || href,
-        selector: getSelectorForElement(a, 'a', i),
-        value: href,
-      });
-    });
-
-    // Inputs
-    const inputs = Array.from(document.querySelectorAll('input'));
-    inputs.forEach((inp, i) => {
-      const type = inp.type || 'text';
-      // Find associated label
-      let label = '';
-      if (inp.id) {
-        const labelEl = document.querySelector(`label[for="${inp.id}"]`);
-        if (labelEl) label = (labelEl.textContent ?? '').trim();
+    const structuralPath = (el: Element): string => {
+      const parts: string[] = [];
+      let node: Element | null = el;
+      while (node && node !== document.documentElement) {
+        if (node.id && unique(`#${esc(node.id)}`)) {
+          parts.unshift(`#${esc(node.id)}`);
+          break;
+        }
+        const tag = node.tagName.toLowerCase();
+        const parent: Element | null = node.parentElement;
+        if (parent) {
+          const same = Array.from(parent.children).filter((c) => c.tagName === node!.tagName);
+          parts.unshift(same.length > 1 ? `${tag}:nth-of-type(${same.indexOf(node) + 1})` : tag);
+        } else {
+          parts.unshift(tag);
+        }
+        node = parent;
       }
-      if (!label) label = inp.getAttribute('placeholder') ?? inp.getAttribute('aria-label') ?? '';
-      results.push({
-        role: `input:${type}`,
-        name: label || `input-${i}`,
-        selector: getSelectorForElement(inp, 'input', i),
-        value: inp.value || undefined,
-      });
-    });
+      return parts.join(' > ');
+    };
 
-    // Selects
-    const selects = Array.from(document.querySelectorAll('select'));
-    selects.forEach((sel, i) => {
-      let label = '';
-      if (sel.id) {
-        const labelEl = document.querySelector(`label[for="${sel.id}"]`);
-        if (labelEl) label = (labelEl.textContent ?? '').trim();
+    const selectorFor = (el: Element): string => {
+      const tag = el.tagName.toLowerCase();
+      if (el.id && unique(`#${esc(el.id)}`)) return `#${esc(el.id)}`;
+      for (const attr of ['data-testid', 'data-test', 'name', 'aria-label']) {
+        const v = el.getAttribute(attr);
+        if (v) {
+          const sel = `${tag}[${attr}="${esc(v)}"]`;
+          if (unique(sel)) return sel;
+        }
       }
-      if (!label) label = sel.getAttribute('aria-label') ?? '';
-      results.push({
-        role: 'select',
-        name: label || `select-${i}`,
-        selector: getSelectorForElement(sel, 'select', i),
-        value: sel.value || undefined,
-      });
-    });
+      return structuralPath(el);
+    };
 
-    // Textareas
-    const textareas = Array.from(document.querySelectorAll('textarea'));
-    textareas.forEach((ta, i) => {
-      let label = '';
-      if (ta.id) {
-        const labelEl = document.querySelector(`label[for="${ta.id}"]`);
-        if (labelEl) label = (labelEl.textContent ?? '').trim();
+    const visible = (el: Element) => {
+      const r = (el as HTMLElement).getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) return false;
+      const cs = getComputedStyle(el);
+      return cs.visibility !== 'hidden' && cs.display !== 'none';
+    };
+
+    const labelFor = (el: Element): string => {
+      const id = el.getAttribute('id');
+      if (id) {
+        const l = document.querySelector(`label[for="${esc(id)}"]`);
+        if (l?.textContent?.trim()) return l.textContent.trim();
       }
-      if (!label) label = ta.getAttribute('placeholder') ?? ta.getAttribute('aria-label') ?? '';
-      results.push({
-        role: 'textarea',
-        name: label || `textarea-${i}`,
-        selector: getSelectorForElement(ta, 'textarea', i),
-        value: ta.value || undefined,
-      });
-    });
+      const wrap = el.closest('label');
+      if (wrap?.textContent?.trim()) return wrap.textContent.trim();
+      return el.getAttribute('aria-label') ?? el.getAttribute('placeholder') ?? el.getAttribute('title') ?? '';
+    };
 
+    const clean = (s: string) => s.replace(/\s+/g, ' ').trim().slice(0, 80);
+
+    const results: Array<{ role: string; name: string; selector: string; value?: string }> = [];
+    const nodes = document.querySelectorAll(
+      'button, a[href], input:not([type=hidden]), select, textarea, [role=button], [role=link], [role=tab], [role=checkbox], [contenteditable=""], [contenteditable=true]'
+    );
+
+    for (const el of Array.from(nodes)) {
+      if (results.length >= limit) break;
+      if (!visible(el)) continue;
+      const tag = el.tagName.toLowerCase();
+
+      if (tag === 'a') {
+        const href = el.getAttribute('href') ?? '';
+        if (href.startsWith('javascript:')) continue;
+        results.push({
+          role: 'link',
+          name: clean(el.textContent ?? '') || el.getAttribute('aria-label') || href,
+          selector: selectorFor(el),
+          value: (el as HTMLAnchorElement).href || href,
+        });
+      } else if (tag === 'input') {
+        const inp = el as HTMLInputElement;
+        results.push({
+          role: `input:${inp.type || 'text'}`,
+          name: clean(labelFor(el)) || inp.name || 'input',
+          selector: selectorFor(el),
+          // Never echo secrets back into the model's context.
+          value: inp.type === 'password' ? undefined : inp.value || undefined,
+        });
+      } else if (tag === 'select' || tag === 'textarea') {
+        const v = (el as HTMLSelectElement | HTMLTextAreaElement).value;
+        results.push({ role: tag, name: clean(labelFor(el)) || tag, selector: selectorFor(el), value: v || undefined });
+      } else {
+        const role = el.getAttribute('role') ?? (tag === 'button' ? 'button' : 'editable');
+        results.push({
+          role,
+          name: clean(el.textContent ?? '') || el.getAttribute('aria-label') || role,
+          selector: selectorFor(el),
+        });
+      }
+    }
     return results;
-  });
+  }, limit);
 }

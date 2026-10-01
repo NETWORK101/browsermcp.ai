@@ -1,114 +1,79 @@
 import React from 'react'
-import { motion } from 'framer-motion'
-
-const capabilities = [
-  {
-    title: 'Authenticated pages',
-    desc: "Stripe dashboard. AWS console. GitHub settings. browsermcp uses your existing browser session. No credentials leave your machine.",
-    code: 'browse({ url: "https://dashboard.stripe.com/payments" })',
-  },
-  {
-    title: 'Localhost & dev servers',
-    desc: "Read your own localhost:3000, staging environments, internal admin panels. Cloud tools structurally can't reach these.",
-    code: 'browse({ url: "http://localhost:3000/admin" })',
-  },
-  {
-    title: 'Internal wikis & docs',
-    desc: "Confluence behind SSO, Notion workspaces, your team's internal docs. If you can see it in Chrome, your agent can read it.",
-    code: 'browse({ url: "https://yourco.atlassian.net/wiki/..." })',
-  },
-  {
-    title: 'JavaScript-heavy apps',
-    desc: "React dashboards, Next.js apps, Vue admin panels — pages that load content with JavaScript after the initial page load. Plain HTTP fetchers see an empty shell. browsermcp runs a real Chromium browser, so your agent sees the fully rendered page.",
-    code: 'browse({ url: "https://app.internal.co/dashboard" })',
-  },
-]
+import { SectionHead, Command } from './ui.jsx'
 
 export function WhyLocal() {
   return (
-    <section className="section why-local-section" id="local">
-      <div className="section-inner">
-        <motion.div
-          className="section-label"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          Why local matters
-        </motion.div>
+    <section className="section" id="local" aria-labelledby="local-title">
+      <div className="wrap">
+        <SectionHead num="02" kicker="Local &amp; authenticated" id="local-title" title={<>Signed in as <em>you.</em> Running on <em>your</em> machine.</>}>
+          browsermcp drives a real Chromium on your computer through Playwright. No API key, no account, no relay —
+          the page goes from your browser to your agent and nowhere else.
+        </SectionHead>
 
-        <motion.h2
-          className="section-title"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-        >
-          Browsing stays on your machine.
-          <br />
-          <span className="text-muted">Always.</span>
-        </motion.h2>
-
-        <motion.p
-          className="section-desc"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          browsermcp runs a real Chromium browser locally. Your authenticated sessions,
-          localhost servers, and internal pages are read directly — no cloud relay,
-          no credential sharing, no API keys.
-        </motion.p>
-
-        <div className="why-local-grid">
-          {capabilities.map((cap, i) => (
-            <motion.div
-              key={cap.title}
-              className="why-local-card"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.15 * i + 0.3 }}
-            >
-              <h3 className="why-local-card-title">{cap.title}</h3>
-              <p className="why-local-card-desc">{cap.desc}</p>
-              <div className="why-local-card-code">
-                <code>{cap.code}</code>
+        <div className="local-grid">
+          <ol className="steps reveal">
+            <li className="step">
+              <span className="step-n">i.</span>
+              <div>
+                <h3>Sign in once, by hand.</h3>
+                <p>
+                  <code>login</code> opens a visible browser on a dedicated, persistent profile at{' '}
+                  <code>~/.browsermcp/profile</code>. Sign in like you normally would — passkeys, SSO, 2FA — then close it.
+                </p>
               </div>
-            </motion.div>
-          ))}
+            </li>
+            <li className="step">
+              <span className="step-n">ii.</span>
+              <div>
+                <h3>Your agent reuses the session.</h3>
+                <p>Every later <code>browse</code> on that site reads the page as you see it. Your credentials never pass through the agent.</p>
+              </div>
+            </li>
+            <li className="step">
+              <span className="step-n">iii.</span>
+              <div>
+                <h3>Or attach to the Chrome you already use.</h3>
+                <p>Start Chrome with remote debugging and point browsermcp at it over CDP.</p>
+              </div>
+            </li>
+            <li className="step">
+              <span className="step-n">iv.</span>
+              <div>
+                <h3>localhost just works.</h3>
+                <p>Your dev server, your staging build behind a VPN, the admin panel on your laptop — all readable, because it’s your machine doing the reading.</p>
+              </div>
+            </li>
+          </ol>
+
+          <div className="local-side reveal" style={{ '--d': '120ms' }}>
+            <div className="panel">
+              <div className="panel-head">
+                <span>Terminal</span>
+                <span className="panel-tag">once per site</span>
+              </div>
+              <div className="panel-body">
+                <Command text="npx browsermcpai login https://dashboard.stripe.com" />
+                <pre className="term-out">
+<span className="t-dim"># a visible Chromium window opens</span>{'\n'}
+<span className="t-dim"># profile: ~/.browsermcp/profile</span>{'\n'}
+<span className="t-dim"># sign in, then close the window</span>
+                </pre>
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <span>.browsermcp.json</span>
+                <span className="panel-tag">optional</span>
+              </div>
+              <pre className="panel-body code-block">
+<span className="c-p">{'{'}</span>{'\n'}
+{'  '}<span className="c-k">"cdpEndpoint"</span><span className="c-p">:</span> <span className="c-s">"http://localhost:9222"</span>{'\n'}
+<span className="c-p">{'}'}</span>
+              </pre>
+            </div>
+          </div>
         </div>
-
-        {/* Trust / safety callout */}
-        <motion.div
-          className="why-local-trust"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.9 }}
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
-          <p>
-            Because browsermcp can access local and internal resources, it ships with safe
-            defaults, visible controls, and clear permissions over what agents are allowed to read.
-          </p>
-        </motion.div>
-
-        {/* Privacy strip */}
-        <motion.div
-          className="why-local-privacy"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 1.0 }}
-        >
-          No data leaves your machine. No API keys. No cloud relay. You stay in control.
-        </motion.div>
       </div>
     </section>
   )

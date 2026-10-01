@@ -1,0 +1,31 @@
+name: Publish to npm
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+      - name: Publish
+        if: env.NODE_AUTH_TOKEN != ''
+        run: npm publish --provenance --access public
+      - name: Skip (no NPM_TOKEN)
+        if: env.NODE_AUTH_TOKEN == ''
+        run: echo "::warning::NPM_TOKEN secret not set — add it under Settings → Secrets → Actions, then re-run this workflow."

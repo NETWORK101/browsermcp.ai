@@ -1,171 +1,202 @@
-# browsermcp.ai
+# browsermcp
 
-**Give your AI a browser it can use.** One command. No cloud. No API key. No cost.
-
-browsermcp lets AI tools like Claude Code, Cursor, and Codex CLI browse the web, read pages, fill out forms, take screenshots, and track changes — all running privately on your machine.
-
-## What can it do?
-
-| You say to your AI... | What happens |
-|------------------------|-------------|
-| "Check the Stripe docs for breaking changes" | **browse** — opens the page, strips the clutter, gives your AI clean text instead of raw HTML |
-| "Get the pricing tiers from Linear's website" | **extract** — reads the page and structures the data however you need it |
-| "Screenshot our homepage after that deploy" | **screenshot** — captures a full-page or element-level PNG |
-| "Has anything changed on the AWS status page?" | **watch** — compares the page to last time and only shows what's different |
-| "Test our signup form with a dummy account" | **interact** — fills inputs, clicks buttons, submits forms |
-
-## Setup (30 seconds)
-
-**Step 1:** Run this in your terminal:
+**A local, read-optimized browser for AI agents.** Your agent reads any page — including the ones you're signed in to — as focused, token-budgeted markdown. Runs a real Chromium on your machine. No cloud relay, no API key, no account.
 
 ```bash
-npx browsermcpai init
+claude mcp add browsermcp -- npx -y browsermcpai     # Claude Code
+npx browsermcpai init                                # everything else: prints config for your clients
 ```
 
-**Step 2:** It prints a config block. Copy it into your AI tool's settings:
+[![npm](https://img.shields.io/npm/v/browsermcpai)](https://www.npmjs.com/package/browsermcpai) · MIT · Node ≥ 20 · [Website](https://browsermcp.pages.dev)
 
-- **Claude Code** — paste into `.mcp.json` in your project folder
-- **Cursor** — paste into `~/.cursor/mcp.json`
-- **Codex CLI** — paste into `~/.codex/config.json`
+---
 
-**Step 3:** Restart your AI tool. Done — your AI can now browse the web.
+## Why
 
-> Not sure where to paste it? Run `npx browsermcpai init` — it detects your tools and tells you exactly where.
+| Option | Problem for agents |
+|---|---|
+| Cloud scrapers (Firecrawl, Jina, Browserbase) | Your Stripe dashboard, internal wiki, and `localhost:3000` go through someone else's servers — or can't be reached at all. |
+| Full automation MCPs (e.g. Playwright MCP) | Great for driving a browser, but ~30 tools and ~13.7k tokens of schema on every request when the job is *reading*. |
+| CLI browser tools | Need a shell. Claude Desktop and other sandboxed clients don't have one. |
 
-## How it works
+browsermcp is the reading-first option: **5 tools, ~1.3k tokens of schema**, pages distilled 4×–46× smaller, and the results stay on your machine.
 
-```
-Your AI (Claude Code / Cursor / Codex CLI)
-  |
-  |  asks browsermcp to browse a page
-  v
-browsermcp (runs on your machine)
-  |
-  |  opens a real browser, reads the page,
-  |  strips out all the junk (ads, scripts, menus),
-  |  and returns just the useful content
-  v
-Your AI gets clean, readable text
-```
+## What's new in 0.2
 
-**Why this matters:** A typical webpage is 80,000+ tokens as raw HTML. browsermcp distills it down to 1,000-8,000 tokens — **10 to 50x smaller**. Your AI reads faster, understands better, and costs less.
+- **Real authenticated browsing.** `npx browsermcpai login <url>` opens a visible browser on a private profile. Sign in once; the agent reuses the session. Or attach to your own Chrome over CDP.
+- **Focus + budget.** `browse({ url, focus: "rate limits", maxTokens: 1500 })` ranks sections by relevance and returns only what fits — and tells the agent which sections it left out.
+- **Structured extraction with MCP sampling.** `extract` returns JSON-LD, meta tags, and tables as row objects. Pass a `schema` and your *client's own model* fills it — no extra API key.
+- **Current MCP spec.** Tool `annotations`, `outputSchema` + `structuredContent`, server `instructions`, progress notifications, and diff snapshots as resources.
+- **Safety by default.** Domain allow/deny policy, read-only mode, dangerous schemes blocked, and every page wrapped in an untrusted-content fence against prompt injection.
 
-## The five tools
+See [CHANGELOG.md](CHANGELOG.md) for the full list and migration notes.
+
+## Tools
+
+| Tool | What it does | Annotations |
+|---|---|---|
+| `browse` | Page → clean markdown. `focus`, `maxTokens`, `diff`, `elements`, `waitFor`. | read-only |
+| `extract` | JSON-LD, meta/OpenGraph, tables as rows, headings; optional `schema` filled via sampling. | read-only |
+| `links` | De-duplicated absolute links; filter by `sameOrigin` or `match`. | read-only |
+| `screenshot` | Viewport, full page, or one `selector`; `png` or `jpeg`. | read-only |
+| `interact` | `click` `fill` `select` `press` `check` `uncheck` `hover` `scroll` `wait`, then returns the resulting page. | **destructive** |
+
+Read-only annotations let clients auto-approve reads while still confirming `interact`.
 
 ### browse
 
-Read any webpage. Returns clean markdown text.
-
-```
-browse({ url: "https://example.com/pricing" })
+```js
+browse({ url: "https://docs.stripe.com/api", focus: "pagination", maxTokens: 1500 })
 ```
 
-Add an `instruction` to focus on what matters:
+```
+# Pagination | Stripe API Reference
+https://docs.stripe.com/api/pagination · 1,204 tokens · 98% smaller than raw HTML · truncated to budget
+> Focus: pagination
 
+<untrusted-page-content source="https://docs.stripe.com/api/pagination">
+…the relevant sections, in page order…
+</untrusted-page-content>
+
+_Omitted sections — call again with `focus` or a larger `maxTokens` to read them: Errors · Idempotent requests · …_
 ```
-browse({ url: "https://example.com/pricing", instruction: "just the plan names and prices" })
-```
+
+- **`diff: true`** — first call saves a baseline; later calls return only a unified diff of what changed (the old `watch` tool; `watch` still works as an alias).
+- **`elements: true`** — appends visible buttons/links/inputs with CSS selectors verified unique in the live DOM, ready for `interact`.
+- **`waitFor: "#app table"`** — wait for a late-rendering SPA element before reading.
 
 ### extract
 
-Same as browse, but you tell it what shape you want the data in:
-
-```
-extract({
-  url: "https://example.com/team",
-  schema: { people: [{ name: "string", role: "string" }] }
-})
+```js
+extract({ url: "https://example.com/pricing", schema: { plans: [{ name: "string", price: "string" }] } })
 ```
 
-### screenshot
+`structuredContent` always contains `title`, `meta`, `jsonLd[]`, `tables[]` (`{ headers, rows: [{ header: value }] }`), and `headings[]`. If the client supports **sampling**, `data` holds the schema filled by the client's model and `method` is `"sampling"`; otherwise the schema is returned as a hint next to the content (`method: "dom"`).
 
-Capture what a page looks like:
+### links
 
+```js
+links({ url: "https://docs.example.com", sameOrigin: true, match: "/api/" })
 ```
-screenshot({ url: "https://myapp.dev", fullPage: true })
-```
-
-Or just one part of the page:
-
-```
-screenshot({ url: "https://myapp.dev", selector: "#hero" })
-```
-
-### watch
-
-Track changes on a page over time:
-
-```
-watch({ url: "https://docs.stripe.com/changelog" })
-```
-
-First time: saves a snapshot and returns the full page.
-Next time: returns **only what changed** — 90%+ fewer tokens.
 
 ### interact
 
-Fill forms, click buttons, test flows:
-
-```
+```js
 interact({
-  url: "https://myapp.dev/signup",
+  url: "http://localhost:3000/signup",
   actions: [
     { type: "fill", selector: "input[name='email']", value: "test@example.com" },
-    { type: "click", selector: "button[type='submit']" }
+    { type: "press", selector: "input[name='email']", value: "Enter" },
+    { type: "wait", selector: ".welcome" }
   ]
 })
 ```
 
-## Staying in control
+Password values are never echoed back. If an action navigates to a host your policy denies, the result is withheld.
 
-browsermcp tracks how much your AI browses and stops it if it goes overboard.
+## Signed-in pages
+
+**Option A: dedicated profile (recommended)**
 
 ```bash
-npx browsermcpai usage    # see today's and weekly stats
+npx browsermcpai login https://dashboard.stripe.com
 ```
 
-Default limits (changeable in `.browsermcp.json`):
-- 100 browsing sessions per day
-- 1 million tokens per day
+A browser window opens on `~/.browsermcp/profile`. Sign in to whatever your agent should read, then close the window. With the default `browser.profile: "auto"`, browsermcp uses that profile from then on. Chromium locks a profile to one process. If two clients run browsermcp at once, the second one falls back to an ephemeral session and says so in its output.
 
-## How does this compare?
+**Option B: your own Chrome**
 
-| | browsermcp | Browserbase | Browser-Use | Stagehand |
-|--|------------|-------------|-------------|-----------|
-| **Setup** | One command | Sign up + API key | pip install + config | npm install + API key |
-| **Cost** | Free | $20-99/mo | Free (self-host) | Free + Browserbase |
-| **Runs on** | Your machine | Cloud | Your machine | Cloud (optional) |
-| **Token savings** | 10-50x built-in | None | Some | Some |
-| **Works with** | Claude Code, Cursor, Codex CLI | Custom SDKs | Python agents | JS agents |
+Start Chrome with `--remote-debugging-port=9222`, then:
+
+```json
+{ "browser": { "cdpEndpoint": "http://localhost:9222" } }
+```
+
+browsermcp opens its own tabs in your existing session and never closes your browser.
+
+> Either way the agent can read anything those sessions can. Pair this with `policy.allow` (below).
 
 ## Configuration
 
-`npx browsermcpai init` creates a `.browsermcp.json` file in your project:
+`npx browsermcpai init` writes `.browsermcp.json`. Global defaults can live in `~/.config/browsermcp/config.json`; project config wins.
 
-```json
+```jsonc
 {
   "browser": {
     "timeout": 30000,
-    "headless": true
+    "headless": true,
+    "profile": "auto",            // "auto" | "persistent" | "ephemeral"
+    "cdpEndpoint": null           // e.g. "http://localhost:9222"
   },
   "distill": {
-    "maxTokens": 4000,
+    "maxTokens": 4000,            // default budget for browse/extract/interact
     "includeLinks": true,
     "includeImages": false
   },
+  "policy": {
+    "allow": [],                  // host globs; empty = any. e.g. ["*.stripe.com", "localhost:*"]
+    "deny": [],                   // checked first
+    "allowInteract": true,        // false = read-only mode (interact is hidden)
+    "allowFileUrls": false
+  },
   "limits": {
-    "maxSessionsPerDay": 100,
+    "maxSessionsPerDay": 100,     // local circuit breaker against runaway agents
     "maxTokensPerDay": 1000000
   }
 }
 ```
 
-You can also put a config at `~/.config/browsermcp/config.json` for global defaults. Project-level config takes priority.
+Host globs: `example.com` (exact host, any port), `*.example.com` (subdomains, not the apex), `localhost:3000`, `localhost:*`.
 
-## Requirements
+## Security model
 
-- Node.js 20 or later
-- That's it. Playwright installs its own browser automatically.
+- **Nothing is relayed.** Pages are fetched and distilled by a Chromium process on your machine.
+- **Policy at the boundary.** Every URL is checked before a browser is touched, and again after redirects or actions that change origin. Only `http(s)` is allowed by default; `file:`, `javascript:`, `chrome:`, `data:` are refused.
+- **Prompt-injection fence.** Page content comes back inside `<untrusted-page-content>` tags, and the server's `instructions` tell the model to treat it as data. Pages that try to close the fence early are neutralised. This *reduces* injection risk; it doesn't eliminate it. Keep `interact` confirmations on in your client.
+- **Circuit breaker.** Daily session and token caps (local SQLite at `~/.browsermcp/usage.db`). `npx browsermcpai usage` shows totals. `BROWSERMCP_NO_LIMIT=1` overrides.
+
+## MCP protocol surface
+
+| Feature | Support |
+|---|---|
+| `tools` with `title`, `annotations`, `outputSchema`, `structuredContent` | ✓ |
+| `isError` tool results | ✓ |
+| Server `instructions` | ✓ |
+| `notifications/progress` (when the client sends a `progressToken`) | ✓ |
+| `sampling/createMessage` (used by `extract` when the client supports it) | ✓ |
+| `resources` — diff snapshots at `browsermcp://snapshot/{url}` | ✓ |
+| Transport | stdio |
+
+## CLI
+
+```
+browsermcp                 Start the MCP server on stdio
+browsermcp init            Create .browsermcp.json and print setup for your MCP clients
+browsermcp login [url]     Sign in once on the persistent profile
+browsermcp usage           Today's and this week's usage
+browsermcp --version
+```
+
+## Token benchmarks
+
+| Page type | Raw HTML | Distilled | Reduction |
+|---|---|---|---|
+| API docs | 84,201 | 1,847 | 46× |
+| E-commerce PDP | 67,300 | 4,200 | 16× |
+| SPA dashboard | 42,800 | 3,100 | 14× |
+| Docs landing | 31,500 | 2,800 | 11× |
+| Blog post | 18,400 | 4,600 | 4× |
+
+Fixtures and the runner are in [`benchmarks/`](benchmarks). We publish the 4× case too.
+
+## Development
+
+```bash
+npm install
+npx playwright install chromium
+npm test          # vitest — unit, browser, and end-to-end MCP protocol tests
+npm run build
+```
 
 ## License
 

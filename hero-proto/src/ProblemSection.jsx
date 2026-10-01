@@ -1,90 +1,52 @@
 import React from 'react'
-import { motion } from 'framer-motion'
+import { SectionHead } from './ui.jsx'
 
-const problems = [
+const ROWS = [
   {
-    title: 'Cloud scraping APIs',
-    desc: "Firecrawl, Jina, Browserbase send your page content through their servers. Fine for public pages. Not fine for your Stripe dashboard, internal wiki, or localhost:3000.",
-    icon: '\u2601',
+    k: 'A',
+    who: 'Cloud scrapers',
+    title: 'Your private pages pass through someone else’s servers.',
+    body: 'Hosted crawlers can’t reach localhost, and reading your signed-in dashboards means handing them your cookies.',
+    cost: 'Costs: your privacy',
   },
   {
-    title: 'CLI browser tools',
-    desc: "Agent-Browser, Stagehand run locally \u2014 but they need a shell. Claude Desktop, ChatGPT, and custom chat UIs don't have one. Your sandboxed agent is locked out.",
-    icon: '>_',
+    k: 'B',
+    who: 'CLI browser tools',
+    title: 'They assume your agent has a shell.',
+    body: 'Great in a terminal. But chat clients and sandboxed agents speak MCP, not bash — so the tool simply isn’t there.',
+    cost: 'Costs: your sandbox',
   },
   {
-    title: 'Full browser automation MCP',
-    desc: "Playwright MCP gives your agent 30+ tools and 13,700 tokens of schema per request. When the job is just to read a page, that's a sledgehammer for a nail.",
-    icon: '\u2699',
+    k: 'C',
+    who: 'Full automation MCPs',
+    title: 'Dozens of tools, loaded on every request.',
+    body: 'Built to drive a browser, not to read one. You pay ~13.7k tokens of tool schema before the page even loads — then an accessibility tree instead of prose.',
+    cost: 'Costs: ~13.7k tokens, every turn',
   },
 ]
 
 export function ProblemSection() {
   return (
-    <section className="section problem-section" id="problem">
-      <div className="section-inner">
-        <motion.div
-          className="section-label"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          The problem
-        </motion.div>
+    <section className="section" id="problem" aria-labelledby="problem-title">
+      <div className="wrap">
+        <SectionHead num="01" kicker="The problem" id="problem-title" title={<>Every way to hand an agent a browser <em>costs something.</em></>}>
+          Agents mostly need to <em>read</em> the web: docs, dashboards, changelogs, the app on localhost:3000.
+          The existing options each charge for it in a different currency.
+        </SectionHead>
 
-        <motion.h2
-          className="section-title"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-        >
-          Three ways to give an agent browser access.
-          <br />
-          <span className="text-muted">None of them are right.</span>
-        </motion.h2>
-
-        <motion.p
-          className="section-desc"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          AI agents increasingly need to read private, authenticated, internal, and localhost
-          content. But the existing options all have trade-offs.
-        </motion.p>
-
-        <div className="problem-grid">
-          {problems.map((problem, i) => (
-            <motion.div
-              key={problem.title}
-              className="problem-card"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.15 * i + 0.3 }}
-            >
-              <div className="problem-card-icon">{problem.icon}</div>
-              <h3 className="problem-card-title">{problem.title}</h3>
-              <p className="problem-card-desc">{problem.desc}</p>
-            </motion.div>
+        <ol className="problem-grid">
+          {ROWS.map((r, i) => (
+            <li key={r.k} className="problem-cell reveal" style={{ '--d': `${i * 80}ms` }}>
+              <div className="pc-top">
+                <span className="pc-k">{r.k}</span>
+                <span className="pc-who">{r.who}</span>
+              </div>
+              <h3 className="pc-title">{r.title}</h3>
+              <p className="pc-body">{r.body}</p>
+              <p className="pc-cost">{r.cost}</p>
+            </li>
           ))}
-        </div>
-
-        <motion.div
-          className="problem-callout"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-        >
-          <p>
-            <strong>browsermcp</strong> is the alternative: a local, read-optimized MCP browser
-            that works in sandboxed agents and keeps your content on your machine.
-          </p>
-        </motion.div>
+        </ol>
       </div>
     </section>
   )

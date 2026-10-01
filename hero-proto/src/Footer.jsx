@@ -1,21 +1,24 @@
 import React from 'react'
+import { LINKS, Mark } from './ui.jsx'
 
 export function Footer() {
   return (
-    <footer className="site-footer">
-      <div className="footer-inner">
+    <footer className="footer">
+      <div className="wrap footer-inner">
         <div className="footer-brand">
-          <span className="logo-icon">&#x2B21;</span>
-          <span className="logo-text">browsermcp</span>
+          <span className="brand"><Mark size={16} /><span className="brand-name">browsermcp</span></span>
+          <p>A read-optimized browser for AI agents. Runs locally. MIT licensed.</p>
         </div>
-        <div className="footer-links">
-          <a href="https://github.com/NETWORK101/browsermcp.ai" target="_blank" rel="noopener">GitHub</a>
-          <a href="#tools">Tools</a>
-          <a href="#">Docs</a>
-        </div>
-        <div className="footer-copy">
-          &copy; {new Date().getFullYear()} browsermcp. Open source under MIT.
-        </div>
+        <nav className="footer-nav" aria-label="Footer">
+          <a href={LINKS.github} target="_blank" rel="noopener noreferrer">GitHub</a>
+          <a href={LINKS.npm} target="_blank" rel="noopener noreferrer">npm</a>
+          <a href={LINKS.docs} target="_blank" rel="noopener noreferrer">Docs</a>
+          <a href="#top">Back to top ↑</a>
+        </nav>
+        <p className="footer-colophon">
+          <span>browsermcpai v0.2.0</span>
+          <span>Set in Instrument Serif, Geist &amp; Geist Mono</span>
+        </p>
       </div>
     </footer>
   )

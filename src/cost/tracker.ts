@@ -53,8 +53,8 @@ export class UsageTracker {
 
   usage(days: number = 7): { sessions: number; tokens: number; estimatedCost: string } {
     const row = this.db.prepare(
-      `SELECT COUNT(*) as sessions, COALESCE(SUM(tokens_out), 0) as tokens FROM usage WHERE timestamp >= datetime('now', '-${days} days')`
-    ).get() as any;
+      "SELECT COUNT(*) as sessions, COALESCE(SUM(tokens_out), 0) as tokens FROM usage WHERE timestamp >= datetime('now', ?)"
+    ).get(`-${Math.max(0, Math.floor(days))} days`) as any;
     const cost = (row.tokens / 1_000_000) * 3;
     return {
       sessions: row.sessions,
@@ -74,6 +74,12 @@ export class UsageTracker {
     this.db.prepare(
       'INSERT INTO snapshots (url, markdown, token_count, updated_at) VALUES (?, ?, ?, datetime(\'now\')) ON CONFLICT(url) DO UPDATE SET markdown = excluded.markdown, token_count = excluded.token_count, updated_at = datetime(\'now\')'
     ).run(url, markdown, tokenCount);
+  }
+
+  listSnapshots(limit: number = 100): Array<{ url: string; tokenCount: number; updatedAt: string }> {
+    return this.db.prepare(
+      'SELECT url, token_count as tokenCount, updated_at as updatedAt FROM snapshots ORDER BY updated_at DESC LIMIT ?'
+    ).all(limit) as Array<{ url: string; tokenCount: number; updatedAt: string }>;
   }
 
   close(): void {

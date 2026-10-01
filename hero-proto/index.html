@@ -1,12 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>browsermcp — Give your agent a browser</title>
+    <title>browsermcp — a read-optimized browser for AI agents</title>
+    <meta name="description" content="browsermcp is a free, local MCP server that renders pages in real Chromium and hands your agent clean, budgeted markdown — 4× to 46× fewer tokens. Signed-in pages included. Nothing relayed through any cloud. MIT licensed." />
+    <meta name="theme-color" content="#0B0B0A" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="canonical" href="https://browsermcp.pages.dev/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="browsermcp" />
+    <meta property="og:title" content="browsermcp — the web, distilled for your agent" />
+    <meta property="og:description" content="A local MCP server that gives AI agents a read-optimized browser. Clean markdown, five tools, about 1.3k tokens of schema. Free, MIT, no account." />
+    <meta property="og:url" content="https://browsermcp.pages.dev/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="browsermcp — the web, distilled for your agent" />
+    <meta name="twitter:description" content="A local MCP server that gives AI agents a read-optimized browser. Free, MIT, no account." />
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%230B0B0A'/%3E%3Cpath d='M6 8l4 4-4 4' fill='none' stroke='%23F3F1EA' stroke-width='2.2'/%3E%3Crect x='12' y='15' width='6' height='2.2' fill='%23C6FF3D'/%3E%3C/svg%3E" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap" />
+
+    <script>
+      try {
+        var t = localStorage.getItem('browsermcp-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    </script>
   </head>
   <body>
+    <a class="skip-link" href="#main">Skip to content</a>
     <div id="root"></div>
+    <noscript><p style="padding:24px;font-family:monospace">browsermcp — a local MCP server that gives AI agents a read-optimized browser. Install with: npx browsermcpai init — source: https://github.com/NETWORK101/browsermcp.ai</p></noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

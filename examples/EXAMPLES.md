@@ -1,6 +1,6 @@
-# headlessdev — Usage Examples
+# browsermcp — Usage Examples
 
-These examples show what happens when your AI agent uses headlessdev's MCP tools. You don't call these directly — your agent does.
+These examples show what happens when your AI agent uses browsermcp's MCP tools. You don't call these directly — your agent does.
 
 ## browse — Read a webpage as markdown
 
@@ -138,4 +138,4 @@ Supported action types:
 | Cursor | `.cursor/mcp.json` in home dir | [cursor_mcp.json](cursor_mcp.json) |
 | OpenAI Codex CLI | `.codex/config.json` | [codex_config.json](codex_config.json) |
 
-Or just run `npx headlessdev init` to auto-detect and configure.
+Or just run `npx browsermcpai init` to auto-detect and configure.
