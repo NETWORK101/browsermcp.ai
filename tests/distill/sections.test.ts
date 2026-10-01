@@ -65,6 +65,14 @@ describe('applyBudget', () => {
     expect(r.omitted).toContain('History');
   });
 
+  it('a page that opens straight into a section has no lead to keep as filler', () => {
+    const doc = `## Install\nRun the installer first.\n\n## Retries\nBack off exponentially.`;
+    const r = applyBudget(doc, { focus: 'retries', maxTokens: 4000 });
+    expect(r.markdown).toContain('## Retries');
+    expect(r.markdown).not.toContain('## Install');
+    expect(r.omitted).toEqual(['Install']);
+  });
+
   it('falls back to document order when the focus matches nothing', () => {
     const r = applyBudget(DOC, { focus: 'kubernetes', maxTokens: 10_000 });
     expect(r.markdown).toBe(DOC);

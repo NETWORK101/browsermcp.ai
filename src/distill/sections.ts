@@ -126,13 +126,17 @@ export function applyBudget(markdown: string, opts: { maxTokens?: number; focus?
     if (scores.some((s) => s > 0)) {
       // Relevant sections get first claim on the budget; the lead (intro/infobox) only
       // fills what's left. Otherwise a bulky intro can starve the answer out entirely.
+      // Only text before the first heading, or an h1 title block, counts as the page's lead.
+      // A page that opens straight into "## Install" has no lead — that's just a section.
+      const first = sections[0];
+      const hasLead = !!first && (first.heading === '' || first.level === 1);
       const relevant = sections
         .map((s, i) => ({ s, score: scores[i] }))
-        .filter(({ s, score }) => score > 0 && s.index !== 0)
+        .filter(({ s, score }) => score > 0 && !(hasLead && s.index === 0))
         .sort((a, b) => b.score - a.score)
         .map(({ s }) => s);
-      const lead = sections[0]?.index === 0 && scores[0] === 0 ? [sections[0]] : [];
-      order = scores[0] > 0 ? [sections[0], ...relevant] : [...relevant, ...lead];
+      const lead = hasLead && scores[0] === 0 ? [first] : [];
+      order = hasLead && scores[0] > 0 ? [first, ...relevant] : [...relevant, ...lead];
       leadIsFiller = lead.length > 0;
     }
     // nothing matched — fall back to document order rather than returning nothing

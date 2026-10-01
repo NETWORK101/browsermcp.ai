@@ -15,11 +15,12 @@ npx browsermcpai init                                # everything else: prints c
 
 | Option | Problem for agents |
 |---|---|
+| Built-in web fetch (e.g. Claude Code's WebFetch) | No cookies, no JavaScript, refuses localhost, and large pages come back as a small-model summary rather than the page. |
 | Cloud scrapers (Firecrawl, Jina, Browserbase) | Your Stripe dashboard, internal wiki, and `localhost:3000` go through someone else's servers — or can't be reached at all. |
-| Full automation MCPs (e.g. Playwright MCP) | Great for driving a browser, but ~30 tools and ~13.7k tokens of schema on every request when the job is *reading*. |
+| Full automation MCPs (e.g. Playwright MCP) | Great for driving a browser. For *reading*, one page snapshot is 13k–87k tokens of accessibility tree ([measured](benchmarks/results.md)). |
 | CLI browser tools | Need a shell. Claude Desktop and other sandboxed clients don't have one. |
 
-browsermcp is the reading-first option: **5 tools, ~1.3k tokens of schema**, pages distilled 4×–46× smaller, and the results stay on your machine.
+browsermcp is the reading-first option: the page itself — no summarizer in the middle — focused and under a token budget, read by a browser on your machine. Five MCP tools, or three shell commands. See the [benchmark](benchmarks/results.md).
 
 ## What's new in 0.2
 
@@ -34,7 +35,7 @@ See [CHANGELOG.md](CHANGELOG.md) for the full list and migration notes.
 
 ## How a page becomes agent-readable
 
-1. **Ask the publisher.** Use a declared `<link rel="alternate" type="text/markdown">` on the same origin, or request the page with `Accept: text/markdown`. Many docs platforms (Stripe, Vercel, Cloudflare, Anthropic) serve clean markdown this way.
+1. **Ask the publisher.** Use a declared `<link rel="alternate" type="text/markdown">` on the same origin, or request the page with `Accept: text/markdown`. Many docs platforms (Stripe, Vercel, Cloudflare, Anthropic, GitHub) serve clean markdown this way. It's used only from the page's own origin and only if it matches the rendered page's title; otherwise the rendered page wins and the result says so.
 2. **Read the metadata.** Use JSON-LD (including `@graph`), OpenGraph, `<meta>`, the canonical link and markdown front matter to build a one-line page card covering what the page is, who wrote it, how fresh it is, and where the text came from.
 3. **Read the structure.** If there's no publisher markdown, render the page, strip chrome (nav, footer, banners, hidden and `aria-hidden` nodes), keep semantic landmarks, headings and tables, and convert to GFM.
 4. **Rank and budget.** `focus` ranks sections; `maxTokens` caps the result and lists omitted headings.
@@ -59,6 +60,18 @@ Turn publisher markdown off with `"distill": { "publisherMarkdown": false }`. Cr
 | `interact` | `click` `fill` `select` `press` `check` `uncheck` `hover` `scroll` `wait`, then returns the resulting page. | **destructive** |
 
 Read-only annotations let clients auto-approve reads while still confirming `interact`.
+
+### From a shell
+
+The same tools and policy, with no tool schema in your agent's context:
+
+```bash
+npx browsermcpai read https://docs.stripe.com/api --focus "pagination" --max-tokens 1500
+npx browsermcpai extract https://example.com/pricing --schema '{"plans":[{"name":"string"}]}' --json
+npx browsermcpai links https://docs.example.com --same-origin --match /api/
+```
+
+`--json` prints `structuredContent`; otherwise you get the same fenced markdown the MCP tools return. Exit code 1 means a policy block or a page error.
 
 ### browse
 
@@ -131,7 +144,7 @@ Start Chrome with `--remote-debugging-port=9222`, then:
 
 browsermcp opens its own tabs in your existing session and never closes your browser.
 
-> Either way the agent can read anything those sessions can. Pair this with `policy.allow` (below).
+> Either way the agent can read anything those sessions can. So while a signed-in session is in use, `interact` is **off by default** (`policy.allowInteract: "auto"`): the agent reads as you but can't click or type as you until you set `allowInteract: true`. Pair this with `policy.allow` (below).
 
 ## Browsers
 
@@ -171,7 +184,7 @@ Firefox and WebKit need a one-time `npx playwright install firefox webkit`. Sign
   "policy": {
     "allow": [],                  // host globs; empty = any. e.g. ["*.stripe.com", "localhost:*"]
     "deny": [],                   // checked first
-    "allowInteract": true,        // false = read-only mode (interact is hidden)
+    "allowInteract": "auto",      // "auto": off while signed in · true · false (read-only)
     "allowFileUrls": false
   },
   "limits": {
@@ -185,8 +198,8 @@ Host globs: `example.com` (exact host, any port), `*.example.com` (subdomains, n
 
 ## Security model
 
-- **Nothing is relayed.** Pages are fetched and distilled by a Chromium process on your machine.
-- **Policy at the boundary.** Every URL is checked before a browser is touched, and again after redirects or actions that change origin. Only `http(s)` is allowed by default; `file:`, `javascript:`, `chrome:`, `data:` are refused.
+- **Nothing is relayed.** Pages are fetched and distilled by a browser on your machine, then go only to the model your agent already uses. No telemetry, no account.
+- **Policy at the boundary.** Every URL is checked before a browser is touched, and again after redirects or actions that change origin. Deny rules also apply to every request a page makes — images, iframes, scripts, fetches — including when attached to your own browser. Only `http(s)` is allowed by default; `file:`, `javascript:`, `chrome:`, `data:` are refused.
 - **Prompt-injection fence.** Page content comes back inside `<untrusted-page-content>` tags, and the server's `instructions` tell the model to treat it as data. Pages that try to close the fence early are neutralised. This *reduces* injection risk; it doesn't eliminate it. Keep `interact` confirmations on in your client.
 - **Circuit breaker.** Daily session and token caps (local SQLite at `~/.browsermcp/usage.db`). `npx browsermcpai usage` shows totals. `BROWSERMCP_NO_LIMIT=1` overrides.
 
@@ -212,17 +225,20 @@ browsermcp usage           Today's and this week's usage
 browsermcp --version
 ```
 
-## Token benchmarks
+## Token benchmark
 
-| Page type | Raw HTML | Distilled | Reduction |
-|---|---|---|---|
-| API docs | 84,201 | 1,847 | 46× |
-| E-commerce PDP | 67,300 | 4,200 | 16× |
-| SPA dashboard | 42,800 | 3,100 | 14× |
-| Docs landing | 31,500 | 2,800 | 11× |
-| Blog post | 18,400 | 4,600 | 4× |
+`npm run bench` measures named public pages four ways — rendered HTML, a Playwright MCP `browser_snapshot`, `browse` with no budget, and `browse` with the 4,000-token default — and writes [benchmarks/results.md](benchmarks/results.md). On 2026-10-01:
 
-Fixtures and the runner are in [`benchmarks/`](benchmarks). We publish the 4× case too.
+| Page | Rendered HTML | Playwright MCP snapshot | browsermcp (full) | browsermcp (default) |
+|---|---:|---:|---:|---:|
+| Stripe API reference | 428,457 | 30,724 | 482 | 482 |
+| GitHub REST: Issues | 330,083 | 87,350 | 20,228 | 4,002 |
+| Next.js docs | 159,921 | 19,721 | 799 | 799 |
+| Wikipedia: Model Context Protocol | 109,268 | 20,288 | 6,387 | 3,991 |
+| Python: json module | 29,700 | 25,381 | 8,624 | 3,996 |
+| Hacker News front page | 8,539 | 12,207 | 4,023 | 3,945 |
+
+Tokens ≈ characters ÷ 4 in every column. Savings range from 2× (a page that is already mostly text) to hundreds of times (a site serving its own markdown); `focus` and `maxTokens` cap any page at the budget you choose. Tool schemas: browsermcp 1,352 tokens, Playwright MCP 5,072 — Claude Code, Cursor and Codex load schemas on demand, so this mainly matters for clients that don't.
 
 ## Development
 
@@ -232,6 +248,10 @@ npx playwright install chromium
 npm test          # vitest — unit, browser, and end-to-end MCP protocol tests
 npm run build
 ```
+
+## Name
+
+browsermcp (`browsermcpai` on npm) is not affiliated with Browser MCP (browsermcp.io), a separate Chrome-extension project.
 
 ## License
 

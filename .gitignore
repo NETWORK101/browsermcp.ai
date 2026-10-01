@@ -8,3 +8,6 @@ LAUNCH.md
 .DS_Store
 hero-proto/dist
 packages/*/dist
+
+# Playwright MCP snapshot output (benchmark runs)
+.playwright-mcp/

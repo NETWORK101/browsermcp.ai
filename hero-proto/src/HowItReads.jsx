@@ -3,7 +3,7 @@ import { SectionHead } from './ui.jsx'
 
 /*
   Metadata-first reading, shown on real pages. Every number and card line below
-  is from a default browse() run on 2026-10-01 with browsermcp 0.2.1.
+  is from a default browse() run on 2026-10-01 with browsermcp 0.3.0.
 */
 
 const STEPS = [

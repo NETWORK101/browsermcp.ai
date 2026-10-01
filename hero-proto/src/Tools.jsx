@@ -1,5 +1,5 @@
 import React from 'react'
-import { SectionHead } from './ui.jsx'
+import { SectionHead, Command } from './ui.jsx'
 import { Playground } from './Playground.jsx'
 
 const TOOLS = [
@@ -34,7 +34,7 @@ const TOOLS = [
   {
     name: 'interact',
     what: 'Act, then read the result.',
-    detail: 'Click, fill, select, press, check, hover, scroll, wait — then get the distilled page that results. Can be switched off by policy.',
+    detail: 'Click, fill, select, press, check, hover, scroll, wait — then get the distilled page that results. Off by default while a signed-in session is in use; switch on with allowInteract: true.',
     params: ['actions'],
     hint: 'write',
   },
@@ -44,9 +44,10 @@ export function Tools() {
   return (
     <section className="section" id="tools" aria-labelledby="tools-title">
       <div className="wrap">
-        <SectionHead num="05" kicker="The tools" id="tools-title" title={<>Five tools. <em>About 1.3k tokens</em> of schema.</>}>
-          Built for reading first. Four tools never change a page; the fifth says so in its annotations,
-          so your client can auto-approve reads and ask before writes.
+        <SectionHead num="05" kicker="The tools" id="tools-title" title={<>Five tools, <em>or three shell commands.</em></>}>
+          Built for reading first. Four tools never change a page; the fifth says so in its annotations, so your client
+          can auto-approve reads and ask before writes — and it stays off while you’re signed in unless you turn it on.
+          Agents with a shell can skip MCP entirely and run the same tools through the same policy.
         </SectionHead>
 
         <ol className="tool-ledger">
@@ -67,6 +68,12 @@ export function Tools() {
             </li>
           ))}
         </ol>
+
+        <div className="cli-strip reveal">
+          <span className="cli-k">Same tools, from a shell</span>
+          <Command text='npx browsermcpai read https://docs.stripe.com/api --focus "pagination" --max-tokens 1500' />
+          <p>No tool schema in context. <code>extract</code> and <code>links</code> work the same way; add <code>--json</code> for structured output. Policy, budget and the untrusted-content fence all still apply.</p>
+        </div>
 
         <Playground />
       </div>

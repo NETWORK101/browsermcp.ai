@@ -3,7 +3,7 @@ import { SectionHead } from './ui.jsx'
 
 /*
   "My agent already runs locally — why add this?" Same task, three ways.
-  Numbers tagged `measured` came from a live run (2026-10-01, browsermcp 0.2.1);
+  Numbers tagged `measured` came from a live run (2026-10-01, browsermcp 0.3.0 and @playwright/mcp 0.0.83);
   everything else is a typical shape, labelled as such.
 */
 
@@ -20,17 +20,17 @@ const TASKS = [
     prompt: 'Which endpoint creates an issue? Check GitHub’s REST docs.',
     runs: {
       fetch: {
-        steps: ['fetch(docs.github.com/en/rest/issues/issues)', '← 286,280 tokens of raw HTML'],
+        steps: ['curl docs.github.com/en/rest/issues/issues', '← 286,280 tokens of raw HTML'],
         calls: '1', context: '286,280', measured: true,
-        outcome: 'fail', note: 'Bigger than a 200k context window. Truncated or rejected before the answer.',
+        outcome: 'fail', note: 'Bigger than a 200k context window. Claude Code’s WebFetch avoids that by summarizing through a small model instead — lossy by design, per its own docs.',
       },
       auto: {
-        steps: ['navigate(url)', 'snapshot() ← full accessibility tree', 'find / scroll / snapshot …'],
-        calls: '3–6', context: '13.7k schema per turn + snapshots',
-        outcome: 'ok', note: 'Gets there, paying for the tool schema on every turn and a page-sized tree each step.',
+        steps: ['navigate(url)', 'snapshot() ← 87,350-token accessibility tree', 'find / scroll / snapshot …'],
+        calls: '3–6', context: '87,350', measured: true,
+        outcome: 'ok', note: 'Gets there. One snapshot of this page is 87k tokens of accessibility tree, and each step adds another.',
       },
       bmcp: {
-        steps: ['browse({ url, focus: "create an issue" })', '← ## Create an issue → Parameters · Status codes · Code samples'],
+        steps: ['browse({ url, focus: "create an issue", maxTokens: 1500 })', '← ## Create an issue → Parameters · Status codes · Code samples'],
         calls: '1', context: '1,500', measured: true,
         outcome: 'ok', note: 'Ranked sections, fitted to budget, omitted headings listed for follow-up.',
       },
@@ -48,7 +48,7 @@ const TASKS = [
       },
       auto: {
         steps: ['navigate(url)', 'snapshot()', 'click(filter) · snapshot() …'],
-        calls: '4+', context: '13.7k schema per turn + snapshots',
+        calls: '4+', context: 'A page-sized snapshot per step',
         outcome: 'ok', note: 'Works if you’ve set up a logged-in profile — at automation prices for a read.',
       },
       bmcp: {
@@ -70,7 +70,7 @@ const TASKS = [
       },
       auto: {
         steps: ['navigate(url)', 'snapshot() ← every node on the page'],
-        calls: '2', context: '13.7k schema per turn + snapshot',
+        calls: '2', context: 'One full-page snapshot',
         outcome: 'ok', note: 'Correct answer, heavier than the question needs.',
       },
       bmcp: {
@@ -142,7 +142,7 @@ export function Versus() {
           </div>
 
           <p className="vs-foot">
-            “Measured” figures: live run on 2026-10-01 with browsermcp 0.2.1, tokens estimated at 4 characters each.
+            “Measured” figures: live run on 2026-10-01 with browsermcp 0.3.0 and @playwright/mcp 0.0.83, tokens estimated at 4 characters each — see the benchmark on GitHub.
             Other figures are typical shapes, not benchmarks. Automation MCPs are the right tool when a task really
             is multi-step driving — browsermcp is for the far more common job of reading.
           </p>

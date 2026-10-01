@@ -11,6 +11,11 @@ Usage:
                              Open a visible browser to sign in; the agent reuses the session
   browsermcp usage           Show today's and this week's usage
   browsermcp --version       Print the version
+
+Read pages from a shell (same tools and policy, no tool schema in your agent's context):
+  browsermcp read <url> [--focus <text>] [--max-tokens <n>] [--diff] [--elements] [--json]
+  browsermcp extract <url> [--schema '<json>'] [--json]
+  browsermcp links <url> [--same-origin] [--match <text>] [--json]
 `;
 
 if (command === 'init') {
@@ -36,6 +41,9 @@ if (command === 'init') {
   const snaps = tracker.listSnapshots(5);
   if (snaps.length) console.log(`Watching:  ${snaps.map((s) => s.url).join(', ')}`);
   tracker.close();
+} else if (command === 'read' || command === 'browse' || command === 'extract' || command === 'links') {
+  const { runCliTool } = await import('../src/cli/tools.js');
+  process.exitCode = await runCliTool(command, process.argv.slice(3));
 } else if (command === '--version' || command === '-v') {
   const { VERSION } = await import('../src/version.js');
   console.log(VERSION);

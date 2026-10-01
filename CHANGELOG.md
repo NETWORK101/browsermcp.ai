@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.3.0 — 2026-10-01
+
+### Added
+- **CLI.** `browsermcp read|extract|links <url>` run the same tools through the same policy, for agents that have a shell and want zero tool schema in context. `--json` prints `structuredContent`.
+- **Signed in, but scoped.** `policy.allowInteract` accepts `"auto"` (now the default): `interact` is off whenever a saved login profile or an attached browser is in use, and on for throwaway sessions. `true` / `false` still force it.
+- **Deny rules on every request.** `policy.deny` now aborts subresources, iframes and fetches to denied hosts, not just navigations, and holds in persistent-profile and CDP modes.
+- **Cloaking guard.** Publisher markdown is used only if it matches the rendered page's title; otherwise the rendered page is used and the result says so.
+- **Reproducible benchmark.** `npm run bench` writes `benchmarks/results.md`, comparing rendered HTML, a Playwright MCP snapshot and `browse` on named public pages.
+
+### Changed
+- Heading self-links (`## [Syntax](#syntax)`, `## Title[](#id)`) are stripped, so `focus` ranks on heading text and omitted-section lists read cleanly.
+- `focus` no longer treats a page that opens straight into a `##` section as having a lead to keep.
+- jsdom's CSS-parse errors no longer spam stderr.
+
+### Breaking
+- Default `policy.allowInteract` changed from `true` to `"auto"`. Set `true` explicitly to let the agent click and type with your signed-in session.
+
 ## 0.2.1 — 2026-10-01
 
 ### Added

@@ -38,8 +38,13 @@ export interface BrowserMcpConfig {
     allow: string[];
     /** Host globs that are always refused, checked before `allow`. */
     deny: string[];
-    /** Set false to disable the `interact` tool entirely (read-only mode). */
-    allowInteract: boolean;
+    /**
+     * Whether the agent may click and type (`interact`).
+     * - "auto" (default): allowed in throwaway sessions, off while a signed-in session is in use
+     *   (persistent profile or an attached browser) — "signed in, but scoped".
+     * - true: always allowed. false: never (read-only mode).
+     */
+    allowInteract: boolean | 'auto';
     /** Allow file:// URLs. Off by default — local files are rarely what an agent should read via a browser. */
     allowFileUrls: boolean;
   };
@@ -63,7 +68,7 @@ export const DEFAULT_CONFIG: BrowserMcpConfig = {
     profileDir: join(STATE_DIR, 'profile'),
   },
   distill: { maxTokens: 4000, includeLinks: true, includeImages: false, publisherMarkdown: true },
-  policy: { allow: [], deny: [], allowInteract: true, allowFileUrls: false },
+  policy: { allow: [], deny: [], allowInteract: 'auto', allowFileUrls: false },
   limits: { maxSessionsPerDay: 100, maxTokensPerDay: 1_000_000 },
 };
 

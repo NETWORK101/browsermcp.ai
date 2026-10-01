@@ -223,3 +223,20 @@ export function trimMarkdown(markdown: string, opts: { includeLinks?: boolean; i
   if (opts.includeLinks === false) out = out.replace(/\[([^\]]+)\]\((?:[^()]|\([^)]*\))*\)/g, '$1');
   return out.replace(/\n{3,}/g, '\n\n').trim();
 }
+
+const GENERIC_TITLE_WORDS = new Set([
+  'docs', 'documentation', 'home', 'page', 'welcome', 'index', 'official', 'guide', 'reference', 'overview', 'site',
+]);
+
+/**
+ * Cheap cloaking guard: publisher markdown should be about the page the browser rendered.
+ * If the rendered title has at least two distinctive words and none of them appear near the
+ * top of the markdown, treat the markdown as a different document and don't use it.
+ */
+export function markdownMatchesPage(markdown: string, renderedTitle: string): boolean {
+  const words = [...new Set((renderedTitle.toLowerCase().match(/[\p{L}\p{N}][\p{L}\p{N}-]{3,}/gu) ?? []))]
+    .filter((w) => !GENERIC_TITLE_WORDS.has(w));
+  if (words.length < 2) return true; // not enough signal to judge
+  const head = markdown.slice(0, 6000).toLowerCase();
+  return words.some((w) => head.includes(w));
+}

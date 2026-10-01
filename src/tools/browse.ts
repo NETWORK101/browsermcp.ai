@@ -38,7 +38,7 @@ export async function handleBrowse(
         includeImages: ctx.config.distill.includeImages,
       });
       await ctx.progress(2, total, 'Formatting');
-      const notices = browserManager.drainNotices();
+      const notices = [...result.notes, ...browserManager.drainNotices()];
 
       if (args.diff) {
         return diffResult(args.url, result, ctx, notices);

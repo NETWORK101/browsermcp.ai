@@ -5,7 +5,7 @@ import { extractInteractiveElements, InteractiveElement } from './accessibility-
 import { estimateTokens } from './token-counter.js';
 import { applyBudget } from './sections.js';
 import {
-  readPageMeta, fetchPublisherMarkdown, splitFrontMatter, mergeFrontMatter, trimMarkdown,
+  readPageMeta, fetchPublisherMarkdown, splitFrontMatter, mergeFrontMatter, trimMarkdown, markdownMatchesPage,
   type PageMeta, type ContentSource,
 } from './metadata.js';
 
@@ -38,6 +38,8 @@ export interface DistillResult {
   meta: PageMeta;
   /** Where the text came from: the rendered DOM, or markdown the publisher serves for agents. */
   source: ContentSource;
+  /** Things the agent should know about how this result was produced. */
+  notes: string[];
 }
 
 /**
@@ -72,7 +74,13 @@ export async function distill(page: Page, opts: DistillOptions = {}): Promise<Di
   const rawTokenCount = estimateTokens(rawHtml);
 
   // Step 3: prefer the publisher's markdown; otherwise distill the rendered DOM
-  const publisher = await publisherP;
+  let publisher = await publisherP;
+  const notes: string[] = [];
+  const renderedTitle = await page.title();
+  if (publisher && !markdownMatchesPage(publisher.markdown, renderedTitle)) {
+    notes.push(`The publisher's markdown (${publisher.url}) didn't match the rendered page, so the rendered page was used.`);
+    publisher = null;
+  }
   let fullMarkdown: string;
   let source: ContentSource = 'rendered';
   if (publisher) {
@@ -99,7 +107,7 @@ export async function distill(page: Page, opts: DistillOptions = {}): Promise<Di
   return {
     markdown,
     fullMarkdown,
-    title: (await page.title()) || meta.title || '',
+    title: renderedTitle || meta.title || '',
     url: page.url(),
     interactiveElements,
     tokenCount: estimateTokens(markdown),
@@ -109,5 +117,6 @@ export async function distill(page: Page, opts: DistillOptions = {}): Promise<Di
     omittedSections: budget.omitted,
     meta,
     source,
+    notes,
   };
 }

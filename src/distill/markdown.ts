@@ -69,8 +69,27 @@ export function htmlToMarkdown(html: string, options: MarkdownOptions = {}): str
     td = buildTurndown(opts);
     cache.set(key, td);
   }
-  return td
-    .turndown(html)
+  return cleanHeadings(td.turndown(html))
     .replace(/\n{3,}/g, '\n\n') // collapse whitespace left by removed nodes
     .trim();
+}
+
+/**
+ * Docs sites wrap headings in self-links ("## [Syntax](#syntax)", "## Title[](#title)").
+ * The fragment is noise for ranking and for the omitted-sections list, so headings keep
+ * only their text. Lines inside fenced code are left alone.
+ */
+function cleanHeadings(markdown: string): string {
+  let inFence = false;
+  return markdown
+    .split('\n')
+    .map((line) => {
+      if (/^\s*(```|~~~)/.test(line)) inFence = !inFence;
+      if (inFence || !/^#{1,6} /.test(line)) return line;
+      return line
+        .replace(/\[\]\(#[^)]*\)/g, '') // empty anchor links
+        .replace(/\[([^\]]+)\]\(#[^)]*\)/g, '$1') // self-links to a fragment
+        .replace(/[ \t]+$/, '');
+    })
+    .join('\n');
 }

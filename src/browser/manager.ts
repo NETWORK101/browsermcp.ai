@@ -11,6 +11,8 @@ export interface BrowserManagerConfig {
   engine?: BrowserEngine;
   /** Chromium only — an installed branded build such as "chrome" or "msedge". */
   channel?: string;
+  /** Abort any request (navigation, subresource, iframe, fetch) for which this returns true. */
+  blockRequest?: (url: string) => boolean;
   profileDir?: string;
   cdpEndpoint?: string;
 }
@@ -168,6 +170,14 @@ export class BrowserManager {
     }
 
     try {
+      if (this.config.blockRequest) {
+        // Page-level (not context-level) routing: in CDP mode the context is the user's own
+        // browser, and their other tabs must not be intercepted.
+        const block = this.config.blockRequest;
+        await page.route('**/*', (route) =>
+          block(route.request().url()) ? route.abort('blockedbyclient') : route.continue()
+        );
+      }
       await navigate(page, url, timeout, opts?.waitFor);
     } catch (err) {
       await (ownedContext ? ownedContext.close() : page.close()).catch(() => {});

@@ -1,4 +1,6 @@
+import { existsSync } from 'fs';
 import type { BrowserMcpConfig } from '../config/schema.js';
+import { profileDirFor } from '../browser/manager.js';
 
 export type Policy = BrowserMcpConfig['policy'];
 
@@ -72,4 +74,46 @@ const FENCE_TAG = 'untrusted-page-content';
 export function fenceUntrusted(content: string, source: string): string {
   const safe = content.replaceAll(`</${FENCE_TAG}`, `<\\/${FENCE_TAG}`);
   return `<${FENCE_TAG} source="${source.replaceAll('"', '%22')}">\n${safe}\n</${FENCE_TAG}>`;
+}
+
+/** True when browsermcp will read as the user: a saved login profile or an attached browser. */
+export function usesSignedInSession(browser: BrowserMcpConfig['browser']): boolean {
+  if (browser.cdpEndpoint) return true;
+  if (browser.profile === 'persistent') return true;
+  if (browser.profile === 'auto') return existsSync(profileDirFor(browser.engine, browser.profileDir));
+  return false;
+}
+
+export type InteractDecision = { allowed: true } | { allowed: false; reason: string };
+
+/**
+ * Resolve policy.allowInteract. "auto" keeps clicks and typing off whenever the agent would act
+ * with the user's credentials — the combination vendors warn about (signed-in browser + injection).
+ */
+export function interactDecision(config: BrowserMcpConfig): InteractDecision {
+  const v = config.policy.allowInteract;
+  if (v === true) return { allowed: true };
+  if (v === false) {
+    return { allowed: false, reason: 'interact is disabled by policy.allowInteract: false (read-only mode).' };
+  }
+  if (!usesSignedInSession(config.browser)) return { allowed: true };
+  return {
+    allowed: false,
+    reason:
+      'interact is off while browsermcp uses your signed-in session (policy.allowInteract: "auto"). ' +
+      'To let the agent click and type as you, set "allowInteract": true in .browsermcp.json.',
+  };
+}
+
+/** Deny rules apply to every request a page makes — subresources, iframes, fetch/XHR — not just navigation. */
+export function isDeniedRequest(raw: string, policy: Policy): boolean {
+  if (policy.deny.length === 0) return false;
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return false;
+  }
+  if (!/^(https?|wss?):$/.test(url.protocol)) return false;
+  return policy.deny.some((p) => hostMatches(p, url));
 }

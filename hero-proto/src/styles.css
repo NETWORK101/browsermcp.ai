@@ -1056,3 +1056,27 @@ em { font-style: normal; }
   .vs-task { border-right: 0; border-bottom: 1px solid var(--rule-2); }
   .vs-task:last-child { border-bottom: 0; }
 }
+
+/* ── 06 Token economics: benchmark table ───────────────────── */
+.bt-wrap { overflow-x: auto; border-top: 1px solid var(--ink); }
+.bt { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 720px; }
+.bt th, .bt td { padding: 12px 14px 12px 0; text-align: right; border-bottom: 1px solid var(--rule); vertical-align: top; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.bt th:first-child, .bt td:first-child { text-align: left; white-space: normal; min-width: 220px; }
+.bt thead th { font-family: var(--mono); font-weight: 400; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); border-bottom: 1px solid var(--rule-2); }
+.bt-page { font-weight: 600; letter-spacing: -0.02em; }
+.bt-url { display: block; font-family: var(--mono); font-size: 11px; color: var(--ink-3); font-weight: 400; margin-top: 2px; }
+.bt-dim { color: var(--ink-3); }
+.bt-us { font-weight: 600; }
+.bt-ratio { color: var(--accent-text); }
+.bt-bar { display: block; height: 4px; margin-top: 8px; background: var(--rule-2); position: relative; max-width: 220px; }
+.bt-bar i { position: absolute; left: 0; top: 0; bottom: 0; width: var(--w); min-width: 2px; background: var(--accent); }
+.bt th.bt-src, .bt td.bt-src { font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-align: left; padding-right: 0; }
+.bt-foot { margin-top: 18px; font-size: 13px; color: var(--ink-3); line-height: 1.55; max-width: 60em; }
+.bt-foot a { color: var(--ink-2); }
+.bt-foot code { font-size: 12px; }
+
+/* ── 05 Tools: CLI strip ───────────────────────────────────── */
+.cli-strip { margin-top: 40px; padding: 20px 0 0; border-top: 1px solid var(--ink); display: grid; gap: 12px; max-width: 760px; }
+.cli-k { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.cli-strip p { font-size: 14px; color: var(--ink-2); }
+.cli-strip code { font-size: 12.5px; }

@@ -16,9 +16,9 @@ const LINES = [
 ]
 
 const GUARANTEES = [
-  ['Local', 'A real Chromium on your machine. No cloud relay, no API key, no account.'],
-  ['Private', 'Signed-in sessions stay in a profile on your disk and are never uploaded.'],
-  ['Guarded', 'Domain allow/deny, read-only mode, and a prompt-injection fence on every page.'],
+  ['Local', 'A real browser on your machine. No scraping cloud, no extension, no API key — pages go only to the model you already use.'],
+  ['Scoped', 'Signed in on a dedicated profile, with host allow/deny lists. Clicks and typing are off by default while signed in.'],
+  ['Not lossy', 'No summarizer in the middle. The page’s own text, tables and links — focused and budgeted, never paraphrased.'],
 ]
 
 export function Hero() {
@@ -35,8 +35,8 @@ export function Hero() {
           <span className="mh-dot mh-hide-xs" aria-hidden="true" />
           <span className="mh-hide-xs">Runs on your machine</span>
           <span className="mh-dot mh-hide" aria-hidden="true" />
-          <span className="mh-hide">Nothing leaves it</span>
-          <span className="mh-right">No. 0.2.1</span>
+          <span className="mh-hide">No relay · no extension · no API key</span>
+          <span className="mh-right">No. 0.3.0</span>
         </div>
 
         <h1 className="hero-title" id="hero-title" aria-label="Let your agent read the web securely and locally">
@@ -56,9 +56,10 @@ export function Hero() {
         <div className="hero-grid">
           <div className="hero-copy">
             <p className="hero-lede">
-              browsermcp is an MCP server that renders pages in a real browser <strong>on your machine</strong> and
-              hands your agent clean, budgeted markdown — <strong>4× to 46× fewer tokens</strong> than raw HTML.
-              Dashboards, intranets and localhost included. Nothing is relayed through anyone’s cloud.
+              browsermcp opens the page in a real browser <strong>on your machine</strong> — your signed-in profile if
+              you want — and hands your agent <strong>the page itself, not a summary</strong>: the sections that match
+              what it asked for, under the token budget you set. JS-rendered, signed-in and localhost pages included.
+              No scraping cloud, no extension, no API key.
             </p>
 
             <ol className="guarantees">
@@ -108,8 +109,8 @@ export function Hero() {
         <dl className="ledger-strip">
           <div><dt>Where it runs</dt><dd>Local</dd></div>
           <div><dt>Cloud relay</dt><dd>None</dd></div>
-          <div><dt>Injection fence</dt><dd>On</dd></div>
-          <div><dt>Page tokens saved</dt><dd>4–46<small>×</small></dd></div>
+          <div><dt>Signed-in default</dt><dd>Read-only</dd></div>
+          <div><dt>Summary model in the loop</dt><dd>None</dd></div>
         </dl>
       </div>
     </section>

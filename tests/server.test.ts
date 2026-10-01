@@ -1,12 +1,14 @@
 import { describe, it, expect } from "vitest";
 import { createServer } from "../src/server.js";
+import { DEFAULT_CONFIG } from "../src/config/schema.js";
 import { ListToolsRequestSchema, CallToolRequestSchema } from "@modelcontextprotocol/sdk/types.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 
 describe("MCP server", () => {
   async function startServer() {
-    const server = createServer();
+    // Explicit throwaway session: with a saved login profile on the machine, allowInteract "auto" would hide interact.
+    const server = createServer({ config: { ...DEFAULT_CONFIG, browser: { ...DEFAULT_CONFIG.browser, profile: 'ephemeral' } } });
     const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
 
     await server.connect(serverTransport);

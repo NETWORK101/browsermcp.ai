@@ -1,5 +1,10 @@
 import { Readability } from '@mozilla/readability';
-import { JSDOM } from 'jsdom';
+import { JSDOM, VirtualConsole } from 'jsdom';
+
+// jsdom can't parse some modern CSS (@layer, nesting) and logs an error per stylesheet.
+// We never use styles, so route those nowhere — keeps MCP stderr and the CLI quiet.
+const quietConsole = new VirtualConsole();
+quietConsole.on('jsdomError', () => {});
 
 /**
  * Strips noisy tags from an HTML string in-place on a JSDOM document.
@@ -48,7 +53,7 @@ function primaryRoot(document: Document): Element | null {
 export function extractContent(rawHtml: string, baseUrl?: string): string {
   // Giving JSDOM the page URL makes relative links/images resolve to absolute ones.
   const hasBase = !!baseUrl && /^(https?|file):/.test(baseUrl);
-  const dom = new JSDOM(rawHtml, hasBase ? { url: baseUrl } : {});
+  const dom = new JSDOM(rawHtml, { virtualConsole: quietConsole, ...(hasBase ? { url: baseUrl } : {}) });
   const document = dom.window.document;
   if (hasBase) absolutizeUrls(document);
 
@@ -65,7 +70,7 @@ export function extractContent(rawHtml: string, baseUrl?: string): string {
     // div it scores as boilerplate). Headings are what `focus` ranks on, so if it lost most
     // of them, prefer the structure-preserving fallback.
     const sourceHeadings = root?.querySelectorAll(HEADINGS).length ?? 0;
-    const keptHeadings = new JSDOM(article.content).window.document.querySelectorAll(HEADINGS).length;
+    const keptHeadings = new JSDOM(article.content, { virtualConsole: quietConsole }).window.document.querySelectorAll(HEADINGS).length;
     if (sourceHeadings < 3 || keptHeadings >= sourceHeadings / 2) {
       return article.content;
     }

@@ -7,13 +7,14 @@ const COLS = ['browsermcp', 'Playwright MCP', 'Agent-Browser', 'Firecrawl']
 const ROWS = [
   ['Built for', '+Reading pages', 'Driving a browser', 'Driving a browser', 'Crawling & scraping'],
   ['Where it runs', '+Your machine', '+Your machine', '+Your machine', 'Hosted API (self-host option)'],
-  ['Interface', '+MCP', '+MCP', 'CLI (needs a shell)', 'API, SDKs, MCP'],
+  ['Interface', '+MCP and CLI', '+MCP (CLI via playwright-cli)', 'CLI and MCP', 'API, SDKs, MCP'],
   ['Browsers', '+Chromium, Chrome, Edge, Firefox, WebKit', '+Chromium, Chrome, Edge, Firefox, WebKit', 'Chromium (default)', 'Hosted (not your browser)'],
   ['Signed-in pages', '+Persistent profile or CDP attach', '+Persistent profile or extension', '+Saved session state', 'Cookies/headers sent to the service'],
+  ['Host policy while signed in', '+Allow/deny hold in profile and CDP modes; interact off by default', 'allowed-origins: “not a security boundary”, ignores redirects', 'Not with profiles or CDP attach', '—'],
   ['Reads localhost', '+Yes', '+Yes', '+Yes', 'Not from the hosted API'],
   ['Page output', '+Publisher markdown when offered, else distilled markdown', 'Accessibility snapshot', 'Accessibility snapshot', '+Markdown'],
   ['Provenance per page', '+Page card: type, author, dates, canonical, source', '—', '—', 'Metadata fields'],
-  ['Tool schema per request', '~1.3k tokens', '~13.7k tokens', 'n/a (CLI)', 'Not measured'],
+  ['Tool schema (tools/list, measured)', '1,352 tokens · 5 tools', '5,072 tokens · 25 tools', 'Paginated', 'Not measured'],
   ['Focus + token budget', '+focus, maxTokens', '—', '—', '—'],
   ['Only-what-changed reads', '+diff: true', '—', '—', 'Change tracking (hosted)'],
   ['Full automation', '8 basic actions', '+Yes', '+Yes', 'Scripted actions'],
@@ -54,7 +55,7 @@ export function Comparison() {
             </table>
           </div>
           <p className="cmp-note">
-            Based on each project’s public documentation at the time of writing; check their docs for the latest. Schema sizes are approximate.
+            Based on each project’s public documentation and README on 2026-10-01; check their docs for the latest. Tool-schema sizes are measured from tools/list (browsermcp 0.3.0, @playwright/mcp 0.0.83).
           </p>
         </div>
       </div>
