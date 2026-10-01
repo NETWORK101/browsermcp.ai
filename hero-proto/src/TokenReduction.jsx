@@ -15,7 +15,7 @@ export function TokenReduction() {
   return (
     <section className="section" id="tokens" aria-labelledby="tokens-title">
       <div className="wrap">
-        <SectionHead num="04" kicker="Token economics" id="tokens-title" title={<>Pay for the <em>content,</em> not the markup.</>}>
+        <SectionHead num="06" kicker="Token economics" id="tokens-title" title={<>Pay for the <em>content,</em> not the markup.</>}>
           There are two bills. The obvious one is the page itself. The hidden one is tool schema —
           definitions your client loads into context on every single request.
         </SectionHead>

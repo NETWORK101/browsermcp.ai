@@ -69,6 +69,7 @@ export async function handleExtract(
         maxTokens: args.maxTokens ?? ctx.config.distill.maxTokens,
         elements: false,
         includeLinks: ctx.config.distill.includeLinks,
+        publisherMarkdown: ctx.config.distill.publisherMarkdown,
         includeImages: false,
       });
       await ctx.progress(2, total, 'Formatting');
@@ -109,6 +110,8 @@ export async function handleExtract(
           ...structured,
           ...(data !== undefined ? { data } : {}),
           method,
+          source: result.source,
+          card: result.meta,
         },
       };
     } finally {

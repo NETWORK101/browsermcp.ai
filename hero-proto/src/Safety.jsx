@@ -5,7 +5,7 @@ export function Safety() {
   return (
     <section className="section" id="safety" aria-labelledby="safety-title">
       <div className="wrap">
-        <SectionHead num="06" kicker="Safety" id="safety-title" title={<>Guardrails you can read <em>in one file.</em></>}>
+        <SectionHead num="08" kicker="Safety" id="safety-title" title={<>Guardrails you can read <em>in one file.</em></>}>
           An agent with a browser is an agent reading text written by strangers. browsermcp treats every page that way.
         </SectionHead>
 

@@ -7,7 +7,8 @@ const HELP = `browsermcp — a local, read-optimized browser for AI agents (MCP)
 Usage:
   browsermcp                 Start the MCP server on stdio (what your MCP client runs)
   browsermcp init            Create .browsermcp.json and print setup for your MCP clients
-  browsermcp login [url]     Open a visible browser to sign in; the agent reuses the session
+  browsermcp login [url] [--browser chromium|firefox|webkit]
+                             Open a visible browser to sign in; the agent reuses the session
   browsermcp usage           Show today's and this week's usage
   browsermcp --version       Print the version
 `;
@@ -17,7 +18,14 @@ if (command === 'init') {
   await runInit();
 } else if (command === 'login') {
   const { runLogin } = await import('../src/config/init.js');
-  await runLogin(process.argv[3]);
+  const args = process.argv.slice(3);
+  const flag = args.findIndex((a) => a === '--browser' || a.startsWith('--browser='));
+  let engine: string | undefined;
+  if (flag !== -1) {
+    engine = args[flag].includes('=') ? args[flag].split('=')[1] : args[flag + 1];
+    args.splice(flag, args[flag].includes('=') ? 1 : 2);
+  }
+  await runLogin(args[0], engine);
 } else if (command === 'usage') {
   const { UsageTracker } = await import('../src/cost/tracker.js');
   const tracker = new UsageTracker();

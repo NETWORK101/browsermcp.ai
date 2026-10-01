@@ -145,6 +145,25 @@ function MdLine({ kind, text }) {
   return <div className="md md-p">{text}</div>
 }
 
+/** Fit a sample's markdown lines into a token budget, like browse({ maxTokens }). */
+function budgetView(sample, budget) {
+  const body = sample.md.filter(([k]) => k !== 'meta')
+  if (budget == null || budget >= sample.out) return { lines: sample.md, tokens: sample.out }
+  const totalLen = body.reduce((a, [, t]) => a + t.length, 0)
+  const cost = body.map(([, t]) => (sample.out * t.length) / totalLen)
+  const lines = []
+  const omitted = []
+  let used = 0
+  body.forEach((line, i) => {
+    if (i === 0 || used + cost[i] <= budget) { lines.push(line); used += cost[i] }
+    else if (line[0] === 'h2') omitted.push(line[1])
+  })
+  lines.push(['meta', omitted.length
+    ? `[budget ${fmt(budget)} · omitted: ${omitted.map(o => `## ${o}`).join(', ')}]`
+    : `[budget ${fmt(budget)} · ${body.length - lines.length} lines trimmed]`])
+  return { lines, tokens: Math.max(1, Math.round(used)) }
+}
+
 export function Distill() {
   const reduced = useMemo(prefersReducedMotion, [])
   const [idx, setIdx] = useState(0)
@@ -155,19 +174,28 @@ export function Distill() {
   const visibleRef = useRef(true)
   const noises = useMemo(() => SAMPLES.map((_, i) => makeNoise(17 + i * 31)), [])
   const s = SAMPLES[idx]
+  const [budget, setBudget] = useState(null)
+  const budgetRef = useRef(null)
+  const view = useMemo(() => budgetView(s, budget), [s, budget])
+  const viewRef = useRef(view)
+  viewRef.current = view
 
   const apply = (p, phase, sample) => {
     const el = rootRef.current
     if (!el) return
     el.style.setProperty('--p', p.toFixed(4))
     el.dataset.phase = phase
-    if (countRef.current && !reduced) {
-      countRef.current.textContent = fmt(sample.raw - (sample.raw - sample.out) * p)
+    if (countRef.current) {
+      countRef.current.textContent = budgetRef.current != null
+        ? fmt(viewRef.current.tokens)
+        : reduced ? fmt(sample.out) : fmt(sample.raw - (sample.raw - sample.out) * p)
     }
   }
 
   // Jump to a sample (tab click) and restart its cycle.
   const select = i => {
+    budgetRef.current = null
+    setBudget(null)
     idxRef.current = i
     setIdx(i)
     startRef.current = performance.now()
@@ -189,6 +217,12 @@ export function Distill() {
         return
       }
       if (pausedAt) { startRef.current += now - pausedAt; pausedAt = 0 }
+      if (budgetRef.current != null) {
+        // The visitor is steering the budget: hold the finished state.
+        startRef.current = now - (HOLD_RAW + SCAN)
+        apply(1, 'done', SAMPLES[idxRef.current])
+        return
+      }
       let t = now - startRef.current
       if (t >= CYCLE) {
         const next = (idxRef.current + 1) % SAMPLES.length
@@ -207,7 +241,19 @@ export function Distill() {
     return () => { cancelAnimationFrame(raf); io.disconnect() }
   }, [reduced])
 
-  const pct = ((s.out / s.raw) * 100).toFixed(2)
+  const pct = ((view.tokens / s.raw) * 100).toFixed(2)
+  const ratio = budget == null ? s.ratio : `${Math.round(s.raw / view.tokens)}×`
+  const onBudget = e => {
+    const v = Number(e.target.value)
+    budgetRef.current = v
+    setBudget(v)
+    apply(1, 'done', s)
+  }
+  const resume = () => {
+    budgetRef.current = null
+    setBudget(null)
+    startRef.current = performance.now()
+  }
 
   return (
     <figure
@@ -237,7 +283,7 @@ export function Distill() {
       <div className="distill-stage" aria-hidden="true">
         <pre className="distill-raw">{noises[idx]}</pre>
         <div className="distill-md">
-          {s.md.map(([k, t], i) => <MdLine key={`${s.id}-${i}`} kind={k} text={t} />)}
+          {view.lines.map(([k, t], i) => <MdLine key={`${s.id}-${i}-${k}`} kind={k} text={t} />)}
         </div>
         <div className="distill-scan" />
       </div>
@@ -247,7 +293,24 @@ export function Distill() {
           <span className="df-label">tokens</span>
           <span className="df-num" ref={countRef}>{fmt(reduced ? s.out : s.raw)}</span>
           <span className="df-from">from {fmt(s.raw)}</span>
-          <span className="df-ratio">{s.ratio}</span>
+          <span className="df-ratio">{ratio}</span>
+        </div>
+        <div className="df-budget">
+          <label className="df-label" htmlFor="df-budget-range">maxTokens</label>
+          <input
+            id="df-budget-range"
+            type="range"
+            min={Math.max(150, Math.round(s.out * 0.12))}
+            max={s.out}
+            step={10}
+            value={budget ?? s.out}
+            onChange={onBudget}
+            aria-valuetext={`${fmt(budget ?? s.out)} tokens`}
+          />
+          <output htmlFor="df-budget-range" className="df-budget-val">{fmt(budget ?? s.out)}</output>
+          {budget != null
+            ? <button type="button" className="df-resume" onClick={resume}>Auto ↺</button>
+            : <span className="df-budget-hint">drag me</span>}
         </div>
         <div className="df-meter" aria-hidden="true">
           <span className="df-meter-raw" />

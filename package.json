@@ -1,6 +1,6 @@
 {
   "name": "browsermcpai",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Local, read-optimized browser for AI agents over MCP: focused markdown, structured extraction, diffs, and your real logged-in sessions. Nothing leaves your machine.",
   "type": "module",
   "main": "dist/src/index.js",
@@ -38,7 +38,11 @@
     "model-context-protocol",
     "mcp-server",
     "web-scraping",
-    "sampling"
+    "sampling",
+    "firefox",
+    "webkit",
+    "safari",
+    "edge"
   ],
   "license": "MIT",
   "engines": {

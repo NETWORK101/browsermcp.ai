@@ -1,4 +1,5 @@
 import { Page } from 'playwright';
+import { evaluateFn } from '../browser/evaluate.js';
 
 export interface TableData {
   caption?: string;
@@ -30,8 +31,9 @@ const MAX_HEADINGS = 60;
  * Tables become arrays of row objects keyed by header text.
  */
 export async function extractStructured(page: Page): Promise<StructuredPage> {
-  return page.evaluate(
-    ({ MAX_TABLES, MAX_ROWS, MAX_HEADINGS }) => {
+  return evaluateFn(
+    page,
+    ({ MAX_TABLES, MAX_ROWS, MAX_HEADINGS }: { MAX_TABLES: number; MAX_ROWS: number; MAX_HEADINGS: number }) => {
       const text = (el: Element | null | undefined) => (el?.textContent ?? '').replace(/\s+/g, ' ').trim();
 
       const meta: Record<string, string> = {};
@@ -111,7 +113,7 @@ export async function extractLinks(
   page: Page,
   opts: { sameOrigin?: boolean; match?: string; limit?: number } = {}
 ): Promise<{ links: LinkEntry[]; total: number }> {
-  const all = await page.evaluate(() => {
+  const all = await evaluateFn(page, () => {
     const out: Array<{ href: string; text: string; sameOrigin: boolean }> = [];
     const seen = new Set<string>();
     for (const a of Array.from(document.querySelectorAll('a[href]'))) {
@@ -131,7 +133,7 @@ export async function extractLinks(
       out.push({ href, text: label.slice(0, 120), sameOrigin: u.origin === location.origin });
     }
     return out;
-  });
+  }, undefined);
 
   const needle = opts.match?.toLowerCase();
   const filtered = all.filter(

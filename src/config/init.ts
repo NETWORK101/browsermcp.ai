@@ -1,7 +1,8 @@
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
-import { DEFAULT_CONFIG, loadConfig } from './schema.js';
+import { DEFAULT_CONFIG, ENGINES, loadConfig, type BrowserEngine } from './schema.js';
+import { browserTypeFor, launchOptions, profileDirFor } from '../browser/manager.js';
 
 const SERVER_ENTRY = { command: 'npx', args: ['-y', 'browsermcpai'] };
 
@@ -89,23 +90,36 @@ export async function runInit(): Promise<void> {
   console.log('  npx browsermcpai login https://dashboard.stripe.com');
   console.log(dim('  Opens a browser on a private profile (~/.browsermcp/profile). Sign in, close the window,'));
   console.log(dim('  and your agent reuses that session. Or attach to your own Chrome with "cdpEndpoint".'));
+  console.log(bold('\nOther browsers'));
+  console.log(dim('  "engine": "firefox" | "webkit" (Safari\'s engine) · "channel": "chrome" | "msedge"'));
+  console.log(dim('  Non-Chromium engines need a one-time download: npx playwright install firefox webkit'));
 
   console.log(`\n${green('Done.')} Restart your MCP client to load the 5 browsermcp tools.\n`);
 }
 
-export async function runLogin(url?: string): Promise<void> {
+export async function runLogin(url?: string, engineOverride?: string): Promise<void> {
   const config = loadConfig();
-  const profileDir = config.browser.profileDir;
+  const engine = (engineOverride ?? config.browser.engine) as BrowserEngine;
+  if (!ENGINES.includes(engine)) {
+    console.error(`Unknown browser "${engine}". Use one of: ${ENGINES.join(', ')}.`);
+    process.exitCode = 1;
+    return;
+  }
+  const profileDir = profileDirFor(engine, config.browser.profileDir);
   mkdirSync(profileDir, { recursive: true });
 
-  const { chromium } = await import('playwright');
   console.log(bold('\nbrowsermcp login'));
+  console.log(`Browser: ${engine}${config.browser.channel ? ` (${config.browser.channel})` : ''}`);
   console.log(`Profile: ${profileDir}`);
   console.log('Sign in to any sites your agent should read, then close the browser window to save.\n');
 
   let context;
   try {
-    context = await chromium.launchPersistentContext(profileDir, { headless: false, viewport: null });
+    context = await browserTypeFor(engine).launchPersistentContext(profileDir, {
+      headless: false,
+      viewport: null,
+      ...launchOptions(engine, engine === 'chromium' ? config.browser.channel : undefined),
+    });
   } catch (err) {
     console.error(
       `Could not open the profile — is browsermcp already running in an MCP client?\n` +
@@ -119,5 +133,6 @@ export async function runLogin(url?: string): Promise<void> {
   if (url) await page.goto(url).catch((e) => console.error(`Could not open ${url}: ${e.message}`));
 
   await new Promise<void>((resolve) => context.once('close', () => resolve()));
-  console.log(`${green('✓')} Session saved. browsermcp will use it automatically (browser.profile = "auto").\n`);
+  const hint = engine === config.browser.engine ? '' : ` Set "browser": { "engine": "${engine}" } in .browsermcp.json to use it.`;
+  console.log(`${green('✓')} Session saved. browsermcp will use it automatically (browser.profile = "auto").${hint}\n`);
 }

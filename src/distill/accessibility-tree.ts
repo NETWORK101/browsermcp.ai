@@ -1,4 +1,5 @@
 import { Page } from 'playwright';
+import { evaluateFn } from '../browser/evaluate.js';
 
 export interface InteractiveElement {
   role: string;       // e.g., "button", "link", "input:email"
@@ -19,7 +20,7 @@ export async function extractInteractiveElements(
   page: Page,
   limit: number = MAX_ELEMENTS
 ): Promise<InteractiveElement[]> {
-  return page.evaluate((limit) => {
+  return evaluateFn(page, (limit: number) => {
     const esc = (s: string) => (window.CSS && CSS.escape ? CSS.escape(s) : s.replace(/["\\]/g, '\\$&'));
     const unique = (sel: string) => {
       try {

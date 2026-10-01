@@ -21,7 +21,7 @@ export function Pricing() {
   return (
     <section className="section" id="pricing" aria-labelledby="pricing-title">
       <div className="wrap">
-        <SectionHead num="08" kicker="Pricing" id="pricing-title" title={<>Free. <em>Actually</em> free.</>}>
+        <SectionHead num="10" kicker="Pricing" id="pricing-title" title={<>Free. <em>Actually</em> free.</>}>
           Everything on this page runs on your machine at no cost, under the MIT license. There’s nothing to sign up for.
         </SectionHead>
 
