@@ -1,6 +1,6 @@
 import type { BrowserManager } from '../browser/manager.js';
 import type { UsageTracker } from '../cost/tracker.js';
-import { DEFAULT_CONFIG, type BrowserMcpConfig } from '../config/schema.js';
+import { DEFAULT_CONFIG, type LocalMcpConfig } from '../config/schema.js';
 import type { DistillResult } from '../distill/pipeline.js';
 import { formatPageCard } from '../distill/metadata.js';
 import { checkUrl, fenceUntrusted } from '../security/policy.js';
@@ -16,7 +16,7 @@ export interface ToolResult {
 }
 
 export interface ToolContext {
-  config: BrowserMcpConfig;
+  config: LocalMcpConfig;
   tracker?: UsageTracker;
   /** Report coarse progress to clients that sent a progressToken. No-op otherwise. */
   progress: (progress: number, total: number, message: string) => Promise<void>;
@@ -78,7 +78,7 @@ export function renderPage(
  * clicks can land somewhere else. Return a reason string if the page left the approved
  * origin for one the policy refuses.
  */
-export function landedOutsidePolicy(requested: string, landedUrl: string, config: BrowserMcpConfig): string | null {
+export function landedOutsidePolicy(requested: string, landedUrl: string, config: LocalMcpConfig): string | null {
   let from: URL;
   let to: URL;
   try {

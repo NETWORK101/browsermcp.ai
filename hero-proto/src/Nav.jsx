@@ -28,9 +28,9 @@ export function Nav() {
   return (
     <header className={`nav ${scrolled ? 'is-scrolled' : ''}`}>
       <nav className="nav-inner wrap" aria-label="Primary">
-        <a href="#top" className="brand" aria-label="browsermcp — home">
+        <a href="#top" className="brand" aria-label="localmcp — home">
           <Mark />
-          <span className="brand-name">browsermcp</span>
+          <span className="brand-name">localmcp</span>
           <span className="brand-ver">v0.3.0</span>
         </a>
 

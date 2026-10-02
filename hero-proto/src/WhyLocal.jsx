@@ -17,7 +17,7 @@ export function WhyLocal() {
     <section className="section" id="local" aria-labelledby="local-title">
       <div className="wrap">
         <SectionHead num="04" kicker="Local &amp; authenticated" id="local-title" title={<>Signed in as <em>you.</em> Running on <em>your</em> machine.</>}>
-          browsermcp drives a real browser on your computer — Chromium, Chrome, Edge, Firefox or WebKit — through Playwright. No API key, no account, no relay —
+          localmcp drives a real browser on your computer — Chromium, Chrome, Edge, Firefox or WebKit — through Playwright. No API key, no account, no relay —
           the page goes from your browser to your agent and nowhere else.
         </SectionHead>
 
@@ -29,7 +29,7 @@ export function WhyLocal() {
                 <h3>Sign in once, by hand.</h3>
                 <p>
                   <code>login</code> opens a visible browser on a dedicated, persistent profile at{' '}
-                  <code>~/.browsermcp/profile</code>. Sign in like you normally would — passkeys, SSO, 2FA — then close it.
+                  <code>~/.localmcp/profile</code>. Sign in like you normally would — passkeys, SSO, 2FA — then close it.
                 </p>
               </div>
             </li>
@@ -44,7 +44,7 @@ export function WhyLocal() {
               <span className="step-n">iii.</span>
               <div>
                 <h3>Or attach to the browser you already use.</h3>
-                <p>Start Chrome, Edge, Brave or Arc with remote debugging and point browsermcp at it over CDP.</p>
+                <p>Start Chrome, Edge, Brave or Arc with remote debugging and point localmcp at it over CDP.</p>
               </div>
             </li>
             <li className="step">
@@ -63,10 +63,10 @@ export function WhyLocal() {
                 <span className="panel-tag">once per site</span>
               </div>
               <div className="panel-body">
-                <Command text="npx browsermcpai login https://dashboard.stripe.com" />
+                <Command text="npx localmcp login https://dashboard.stripe.com" />
                 <pre className="term-out">
 <span className="t-dim"># a visible Chromium window opens</span>{'\n'}
-<span className="t-dim"># profile: ~/.browsermcp/profile</span>{'\n'}
+<span className="t-dim"># profile: ~/.localmcp/profile</span>{'\n'}
 <span className="t-dim"># sign in, then close the window</span>
                 </pre>
               </div>
@@ -74,7 +74,7 @@ export function WhyLocal() {
 
             <div className="panel">
               <div className="panel-head">
-                <span>.browsermcp.json</span>
+                <span>.localmcp.json</span>
                 <span className="panel-tag">optional</span>
               </div>
               <pre className="panel-body code-block">
@@ -89,7 +89,7 @@ export function WhyLocal() {
         <div className="browsers reveal">
           <div className="browsers-head">
             <h3>Browsers</h3>
-            <p>Each engine keeps its own signed-in profile. <code>npx browsermcpai login &lt;url&gt; --browser firefox</code></p>
+            <p>Each engine keeps its own signed-in profile. <code>npx localmcp login &lt;url&gt; --browser firefox</code></p>
           </div>
           <table className="browsers-table">
             <thead>

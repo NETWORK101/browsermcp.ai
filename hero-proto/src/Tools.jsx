@@ -71,7 +71,7 @@ export function Tools() {
 
         <div className="cli-strip reveal">
           <span className="cli-k">Same tools, from a shell</span>
-          <Command text='npx browsermcpai read https://docs.stripe.com/api --focus "pagination" --max-tokens 1500' />
+          <Command text='npx localmcp read https://docs.stripe.com/api --focus "pagination" --max-tokens 1500' />
           <p>No tool schema in context. <code>extract</code> and <code>links</code> work the same way; add <code>--json</code> for structured output. Policy, budget and the untrusted-content fence all still apply.</p>
         </div>
 

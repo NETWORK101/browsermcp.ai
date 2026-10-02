@@ -9,13 +9,13 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { createServer } from '../../src/server.js';
 import { UsageTracker } from '../../src/cost/tracker.js';
-import { DEFAULT_CONFIG, type BrowserMcpConfig } from '../../src/config/schema.js';
+import { DEFAULT_CONFIG, type LocalMcpConfig } from '../../src/config/schema.js';
 import { interactDecision, isDeniedRequest } from '../../src/security/policy.js';
 
 type Text = { type: string; text: string };
 const tmp = () => fs.mkdtempSync(path.join(os.tmpdir(), 'bmcp-scope-'));
 
-function config(browser: Partial<BrowserMcpConfig['browser']> = {}, policy: Partial<BrowserMcpConfig['policy']> = {}): BrowserMcpConfig {
+function config(browser: Partial<LocalMcpConfig['browser']> = {}, policy: Partial<LocalMcpConfig['policy']> = {}): LocalMcpConfig {
   return {
     ...DEFAULT_CONFIG,
     browser: { ...DEFAULT_CONFIG.browser, profile: 'ephemeral', ...browser },
@@ -28,7 +28,7 @@ afterEach(async () => {
   while (closers.length) await closers.pop()!();
 });
 
-async function connect(cfg: BrowserMcpConfig) {
+async function connect(cfg: LocalMcpConfig) {
   const tracker = new UsageTracker(path.join(tmp(), 'usage.db'));
   const server = createServer({ config: cfg, tracker });
   const [ct, st] = InMemoryTransport.createLinkedPair();

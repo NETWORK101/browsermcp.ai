@@ -1,12 +1,11 @@
 {
-  "name": "browsermcpai",
+  "name": "localmcp",
   "version": "0.3.0",
-  "description": "Local, read-optimized browser for AI agents over MCP: focused markdown, structured extraction, diffs, and your real logged-in sessions. Nothing leaves your machine.",
+  "description": "localmcp: a local, scoped, read-first browser for AI agents over MCP and the shell. The page itself, not a summary.",
   "type": "module",
   "main": "dist/src/index.js",
   "bin": {
-    "browsermcp": "dist/bin/browsermcp.js",
-    "browsermcpai": "dist/bin/browsermcp.js"
+    "localmcp": "dist/bin/localmcp.js"
   },
   "files": [
     "dist/",
@@ -15,7 +14,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "rm -rf dist && tsc && chmod +x dist/bin/browsermcp.js",
+    "build": "rm -rf dist && tsc && chmod +x dist/bin/localmcp.js",
     "test": "vitest run",
     "dev": "tsx src/index.ts",
     "prepublishOnly": "npm run build",
@@ -53,7 +52,7 @@
     "type": "git",
     "url": "https://github.com/NETWORK101/browsermcp.ai"
   },
-  "homepage": "https://browsermcp.ai",
+  "homepage": "https://github.com/NETWORK101/browsermcp.ai#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
     "@mozilla/readability": "^0.6.0",
@@ -72,5 +71,5 @@
     "typescript": "^5.0.0",
     "vitest": "^4.1.8"
   },
-  "mcpName": "io.github.network101/browsermcp"
+  "mcpName": "io.github.network101/localmcp"
 }

@@ -1,10 +1,10 @@
 # Token benchmark
 
-Run on 2026-10-01 with browsermcp 0.3.0 and Playwright MCP 1.64.0-alpha-1790635538000 (`@playwright/mcp@0.0.83`). Reproduce with `npm run bench`.
+Run on 2026-10-01 with localmcp 0.3.0 and Playwright MCP 1.64.0-alpha-1790635538000 (`@playwright/mcp@0.0.83`). Reproduce with `npm run bench`.
 
 Tokens are estimated as characters ÷ 4 for every column, so the columns compare like with like. Live pages change, so expect different numbers on a re-run.
 
-| Page | URL | Rendered HTML | Playwright MCP snapshot | browsermcp full | browsermcp default (4k budget) | HTML ÷ full | browsermcp source |
+| Page | URL | Rendered HTML | Playwright MCP snapshot | localmcp full | localmcp default (4k budget) | HTML ÷ full | localmcp source |
 |---|---|---:|---:|---:|---:|---:|---|
 | Stripe API reference | https://docs.stripe.com/api | 428,457 | 30,724 | 482 | 482 | 889× | publisher-negotiated |
 | Vercel docs | https://vercel.com/docs | 212,432 | 13,061 | 2,120 | 2,120 | 100× | publisher-alternate |
@@ -17,7 +17,7 @@ Tokens are estimated as characters ÷ 4 for every column, so the columns compare
 
 - **Rendered HTML** is the page after load, which is what a raw dump would put into context.
 - **Playwright MCP snapshot** is `browser_snapshot`, the accessibility-tree text an agent reads to see the page. In this version, `browser_navigate` returns a link to a snapshot file rather than inlining it.
-- **browsermcp full** is `browse` with no budget. **default** is `browse` with its 4,000-token default; `focus` picks which sections fill that budget.
-- **source** is `publisher-*` when the site served its own markdown, or `rendered` when browsermcp distilled the page.
+- **localmcp full** is `browse` with no budget. **default** is `browse` with its 4,000-token default; `focus` picks which sections fill that budget.
+- **source** is `publisher-*` when the site served its own markdown, or `rendered` when localmcp distilled the page.
 
-Tool schemas (tools/list JSON): browsermcp 1,352 tokens (5 tools); Playwright MCP 5,072 tokens. Claude Code, Cursor and Codex load MCP tool schemas on demand, so this matters mainly for clients that don't.
+Tool schemas (tools/list JSON): localmcp 1,352 tokens (5 tools); Playwright MCP 5,072 tokens. Claude Code, Cursor and Codex load MCP tool schemas on demand, so this matters mainly for clients that don't.

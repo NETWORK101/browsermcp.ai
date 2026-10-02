@@ -3,19 +3,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>browsermcp — a local, secure browser for AI agents</title>
-    <meta name="description" content="browsermcp is a free, local MCP server that renders pages in real Chromium and hands your agent the page itself as focused, budgeted markdown — not a summary. Signed-in pages included. Nothing relayed through any cloud. MIT licensed." />
+    <title>localmcp — a local, secure browser for AI agents</title>
+    <meta name="description" content="localmcp is a free, local MCP server that renders pages in real Chromium and hands your agent the page itself as focused, budgeted markdown — not a summary. Signed-in pages included. Nothing relayed through any cloud. MIT licensed." />
     <meta name="theme-color" content="#0B0B0A" />
     <meta name="color-scheme" content="dark light" />
     <link rel="canonical" href="https://browsermcp.pages.dev/" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="browsermcp" />
-    <meta property="og:title" content="browsermcp — let your agent read the web securely and locally" />
+    <meta property="og:site_name" content="localmcp" />
+    <meta property="og:title" content="localmcp — let your agent read the web securely and locally" />
     <meta property="og:description" content="A local, secure MCP browser for AI agents. Pages render on your machine, signed-in sessions never leave it, and page text is fenced as untrusted data. Free, MIT." />
     <meta property="og:url" content="https://browsermcp.pages.dev/" />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="browsermcp — let your agent read the web securely and locally" />
+    <meta name="twitter:title" content="localmcp — let your agent read the web securely and locally" />
     <meta name="twitter:description" content="A local, secure MCP browser for AI agents. The page itself, not a summary. No scraping cloud, no extension, no API key. Free, MIT." />
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' fill='%230B0B0A'/%3E%3Cpath d='M6 8l4 4-4 4' fill='none' stroke='%23F3F1EA' stroke-width='2.2'/%3E%3Crect x='12' y='15' width='6' height='2.2' fill='%23C6FF3D'/%3E%3C/svg%3E" />
@@ -26,7 +26,7 @@
 
     <script>
       try {
-        var t = localStorage.getItem('browsermcp-theme');
+        var t = localStorage.getItem('localmcp-theme');
         if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
       } catch (e) {}
     </script>
@@ -34,7 +34,7 @@
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <div id="root"></div>
-    <noscript><p style="padding:24px;font-family:monospace">browsermcp — a local MCP server that gives AI agents a read-optimized browser. Install with: npx browsermcpai init — source: https://github.com/NETWORK101/browsermcp.ai</p></noscript>
+    <noscript><p style="padding:24px;font-family:monospace">localmcp — a local MCP server that gives AI agents a read-optimized browser. Install with: npx localmcp init — source: https://github.com/NETWORK101/browsermcp.ai</p></noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -49,7 +49,7 @@ const SAMPLES = [
       ['h2', 'Summary'],
       ['li', '- Revenue (7d): $48,210'],
       ['li', '- Refund rate: 1.8%'],
-      ['meta', '[signed-in session · profile ~/.browsermcp]'],
+      ['meta', '[signed-in session · profile ~/.localmcp]'],
     ],
   },
   {

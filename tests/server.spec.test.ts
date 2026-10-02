@@ -8,7 +8,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CreateMessageRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 import { createServer, TOOLS } from '../src/server.js';
 import { UsageTracker } from '../src/cost/tracker.js';
-import { DEFAULT_CONFIG, type BrowserMcpConfig } from '../src/config/schema.js';
+import { DEFAULT_CONFIG, type LocalMcpConfig } from '../src/config/schema.js';
 
 const fixtures = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'fixtures');
 const docsUrl = `file://${path.join(fixtures, 'docs-page.html')}`;
@@ -16,7 +16,7 @@ const tableUrl = `file://${path.join(fixtures, 'table-heavy.html')}`;
 
 type Text = { type: string; text: string };
 
-function config(policy: Partial<BrowserMcpConfig['policy']> = {}): BrowserMcpConfig {
+function config(policy: Partial<LocalMcpConfig['policy']> = {}): LocalMcpConfig {
   return {
     ...DEFAULT_CONFIG,
     browser: { ...DEFAULT_CONFIG.browser, profile: 'ephemeral' },
@@ -29,8 +29,8 @@ afterEach(async () => {
   while (closers.length) await closers.pop()!();
 });
 
-async function connect(opts: { policy?: Partial<BrowserMcpConfig['policy']>; sampling?: (prompt: string) => string } = {}) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'browsermcp-test-'));
+async function connect(opts: { policy?: Partial<LocalMcpConfig['policy']>; sampling?: (prompt: string) => string } = {}) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'localmcp-test-'));
   const tracker = new UsageTracker(path.join(dir, 'usage.db'));
   const server = createServer({ config: config(opts.policy), tracker });
   const [ct, st] = InMemoryTransport.createLinkedPair();
@@ -97,7 +97,7 @@ describe('policy enforcement at the protocol boundary', () => {
     const { client } = await connect({ policy: { allowFileUrls: false } });
     const r = await client.callTool({ name: 'browse', arguments: { url: docsUrl } });
     expect(r.isError).toBe(true);
-    expect((r.content as Text[])[0].text).toMatch(/Blocked by browsermcp policy/);
+    expect((r.content as Text[])[0].text).toMatch(/Blocked by localmcp policy/);
   });
 
   it('refuses hosts in policy.deny without launching a browser', async () => {

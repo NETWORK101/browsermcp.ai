@@ -31,7 +31,7 @@ export function Hero() {
       <TokenField />
       <div className="wrap hero-inner">
         <div className="masthead">
-          <span>Local MCP server</span>
+          <span>Read-only browser for agents</span>
           <span className="mh-dot mh-hide-xs" aria-hidden="true" />
           <span className="mh-hide-xs">Runs on your machine</span>
           <span className="mh-dot mh-hide" aria-hidden="true" />
@@ -56,7 +56,7 @@ export function Hero() {
         <div className="hero-grid">
           <div className="hero-copy">
             <p className="hero-lede">
-              browsermcp opens the page in a real browser <strong>on your machine</strong> — your signed-in profile if
+              localmcp opens the page in a real browser <strong>on your machine</strong> — your signed-in profile if
               you want — and hands your agent <strong>the page itself, not a summary</strong>: the sections that match
               what it asked for, under the token budget you set. JS-rendered, signed-in and localhost pages included.
               No scraping cloud, no extension, no API key.

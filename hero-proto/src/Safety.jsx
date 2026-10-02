@@ -7,14 +7,14 @@ export function Safety() {
       <div className="wrap">
         <SectionHead num="08" kicker="Safety" id="safety-title" title={<>Signed in, <em>but scoped.</em></>}>
           An agent with your browser is an agent reading text written by strangers, with your cookies. Anthropic and
-          OpenAI both advise the same shape: a separate profile, limited logged-in access, an allowlist. browsermcp
+          OpenAI both advise the same shape: a separate profile, limited logged-in access, an allowlist. localmcp
           ships that shape as defaults you can read in one file.
         </SectionHead>
 
         <div className="safety-grid">
           <div className="panel reveal">
             <div className="panel-head">
-              <span>.browsermcp.json</span>
+              <span>.localmcp.json</span>
               <span className="panel-tag">policy</span>
             </div>
             <pre className="panel-body code-block">
@@ -48,7 +48,7 @@ export function Safety() {
             <div>
               <dt><span className="sl-n">e</span>Daily circuit breaker</dt>
               <dd>Local caps on sessions and tokens per day stop a runaway loop. No telemetry, no account. Check the meter any time:
-                <Command text="npx browsermcpai usage" />
+                <Command text="npx localmcp usage" />
               </dd>
             </div>
           </dl>

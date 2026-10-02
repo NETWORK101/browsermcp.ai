@@ -1,13 +1,13 @@
 import Database from 'better-sqlite3';
 import { mkdirSync, existsSync } from 'fs';
 import { join } from 'path';
-import { homedir } from 'os';
+import { STATE_DIR } from '../config/schema.js';
 
 export class UsageTracker {
   private db: Database.Database;
 
   constructor(dbPath?: string) {
-    const dir = join(homedir(), '.browsermcp');
+    const dir = STATE_DIR;
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
     const path = dbPath ?? join(dir, 'usage.db');
     this.db = new Database(path);

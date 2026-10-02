@@ -3,7 +3,7 @@ import { SectionHead } from './ui.jsx'
 
 /*
   Metadata-first reading, shown on real pages. Every number and card line below
-  is from a default browse() run on 2026-10-01 with browsermcp 0.3.0.
+  is from a default browse() run on 2026-10-01 with localmcp 0.3.0.
 */
 
 const STEPS = [
@@ -98,7 +98,7 @@ export function HowItReads() {
     <section className="section" id="how" aria-labelledby="how-title">
       <div className="wrap">
         <SectionHead num="03" kicker="How it reads" id="how-title" title={<>Metadata first. <em>The page tells us how to read it.</em></>}>
-          Before distilling anything, browsermcp checks what the page says about itself. If the publisher serves markdown
+          Before distilling anything, localmcp checks what the page says about itself. If the publisher serves markdown
           for agents, it uses that. Either way it turns the page’s metadata into a one-line card — so your agent knows what
           it’s reading, who wrote it, and how fresh it is.
         </SectionHead>

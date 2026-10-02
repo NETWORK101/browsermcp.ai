@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react'
 
 export const LINKS = {
   github: 'https://github.com/NETWORK101/browsermcp.ai',
-  npm: 'https://www.npmjs.com/package/browsermcpai',
+  npm: 'https://www.npmjs.com/package/localmcp',
   docs: 'https://github.com/NETWORK101/browsermcp.ai#readme',
 }
 
-export const INSTALL = 'npx browsermcpai init'
-export const CLAUDE_CODE = 'claude mcp add browsermcp -- npx -y browsermcpai'
+export const INSTALL = 'npx localmcp init'
+export const CLAUDE_CODE = 'claude mcp add localmcp -- npx -y localmcp'
 
 export function prefersReducedMotion() {
   if (typeof window === 'undefined' || !window.matchMedia) return false

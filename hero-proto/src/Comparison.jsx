@@ -1,9 +1,9 @@
 import React from 'react'
 import { SectionHead } from './ui.jsx'
 
-const COLS = ['browsermcp', 'Playwright MCP', 'Agent-Browser', 'Firecrawl']
+const COLS = ['localmcp', 'Playwright MCP', 'Agent-Browser', 'Firecrawl']
 
-// [label, browsermcp, playwright, agent-browser, firecrawl]; a leading "+" marks a strength.
+// [label, localmcp, playwright, agent-browser, firecrawl]; a leading "+" marks a strength.
 const ROWS = [
   ['Built for', '+Reading pages', 'Driving a browser', 'Driving a browser', 'Crawling & scraping'],
   ['Where it runs', '+Your machine', '+Your machine', '+Your machine', 'Hosted API (self-host option)'],
@@ -32,7 +32,7 @@ export function Comparison() {
       <div className="wrap">
         <SectionHead num="09" kicker="Comparison" id="compare-title" title={<>Good tools. <em>Different jobs.</em></>}>
           Playwright MCP and Agent-Browser are excellent when an agent needs to drive a browser end to end.
-          Firecrawl is built for crawling at scale. browsermcp is for the far more common job: reading — cheaply, locally, signed in.
+          Firecrawl is built for crawling at scale. localmcp is for the far more common job: reading — cheaply, locally, signed in.
         </SectionHead>
 
         <div className="cmp-wrap reveal">
@@ -55,7 +55,7 @@ export function Comparison() {
             </table>
           </div>
           <p className="cmp-note">
-            Based on each project’s public documentation and README on 2026-10-01; check their docs for the latest. Tool-schema sizes are measured from tools/list (browsermcp 0.3.0, @playwright/mcp 0.0.83).
+            Based on each project’s public documentation and README on 2026-10-01; check their docs for the latest. Tool-schema sizes are measured from tools/list (localmcp 0.3.0, @playwright/mcp 0.0.83).
           </p>
         </div>
       </div>

@@ -2,7 +2,7 @@ import React from 'react'
 import { SectionHead, LINKS } from './ui.jsx'
 
 /*
-  Figures from benchmarks/results.md — `npm run bench` on 2026-10-01 with browsermcp 0.3.0
+  Figures from benchmarks/results.md — `npm run bench` on 2026-10-01 with localmcp 0.3.0
   and @playwright/mcp 0.0.83. Tokens ≈ characters ÷ 4 in every column, so columns compare alike.
 */
 const BENCH = [
@@ -23,7 +23,7 @@ export function TokenReduction() {
       <div className="wrap">
         <SectionHead num="06" kicker="Token economics" id="tokens-title" title={<>Pay for the <em>content,</em> not the markup.</>}>
           The page is the bill. A raw dump, or a full accessibility snapshot, can cost more than the answer is worth.
-          browsermcp returns the page’s own text — focused, under a budget you set. Here is what that costs on real pages.
+          localmcp returns the page’s own text — focused, under a budget you set. Here is what that costs on real pages.
         </SectionHead>
 
         <div className="bt-wrap reveal">
@@ -33,8 +33,8 @@ export function TokenReduction() {
                 <th scope="col">Page</th>
                 <th scope="col">Rendered HTML</th>
                 <th scope="col">Playwright MCP snapshot</th>
-                <th scope="col">browsermcp, full</th>
-                <th scope="col">browsermcp, 4k default</th>
+                <th scope="col">localmcp, full</th>
+                <th scope="col">localmcp, 4k default</th>
                 <th scope="col" className="bt-src">Source</th>
               </tr>
             </thead>
@@ -68,10 +68,10 @@ export function TokenReduction() {
         </p>
 
         <p className="bt-foot reveal">
-          Measured 2026-10-01 with browsermcp 0.3.0 and @playwright/mcp 0.0.83; the snapshot column is <code>browser_snapshot</code>, the page
+          Measured 2026-10-01 with localmcp 0.3.0 and @playwright/mcp 0.0.83; the snapshot column is <code>browser_snapshot</code>, the page
           text an agent reads. Reproduce it with <code>npm run bench</code> —{' '}
           <a href={`${LINKS.github}/blob/main/benchmarks/results.md`} target="_blank" rel="noopener noreferrer">results on GitHub</a>.
-          Tool schemas: browsermcp 1,352 tokens for 5 tools, Playwright MCP 5,072 for 25. Claude Code, Cursor and Codex load tool
+          Tool schemas: localmcp 1,352 tokens for 5 tools, Playwright MCP 5,072 for 25. Claude Code, Cursor and Codex load tool
           schemas on demand, so that mostly matters for clients that don’t.
         </p>
       </div>

@@ -40,13 +40,13 @@ export function browserTypeFor(engine: BrowserEngine = "chromium"): BrowserType 
 
 /**
  * Engines can't share a profile directory (Chromium, Gecko and WebKit store state differently),
- * so non-Chromium engines get a sibling directory: ~/.browsermcp/profile-firefox, …-webkit.
+ * so non-Chromium engines get a sibling directory: ~/.localmcp/profile-firefox, …-webkit.
  */
 export function profileDirFor(engine: BrowserEngine = "chromium", profileDir: string): string {
   return engine === "chromium" ? profileDir : `${profileDir}-${engine}`;
 }
 
-/** Launch options shared by the server and `browsermcp login`. */
+/** Launch options shared by the server and `localmcp login`. */
 export function launchOptions(engine: BrowserEngine = "chromium", channel?: string): { channel?: string } {
   if (channel && engine !== "chromium") {
     throw new Error(`browser.channel "${channel}" only applies to the chromium engine (got "${engine}").`);
@@ -132,7 +132,7 @@ export class BrowserManager {
         this.kind = "persistent";
         return;
       } catch (err) {
-        // Chromium locks a profile to one process. If another browsermcp (or `browsermcp login`)
+        // Chromium locks a profile to one process. If another localmcp (or `localmcp login`)
         // holds it, degrade to ephemeral rather than failing every call.
         this.notices.push(
           `Persistent profile unavailable (${(err as Error).message.split("\n")[0]}). ` +

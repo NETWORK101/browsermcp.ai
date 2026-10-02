@@ -39,7 +39,7 @@ export function McpSpec() {
     <section className="section" id="spec" aria-labelledby="spec-title">
       <div className="wrap">
         <SectionHead num="07" kicker="Protocol" id="spec-title" title={<>Built on the <em>current</em> MCP spec.</>}>
-          Not a wrapper around a CLI. browsermcp uses the parts of the protocol that make tools safer and cheaper to call.
+          Not a wrapper around a CLI. localmcp uses the parts of the protocol that make tools safer and cheaper to call.
         </SectionHead>
 
         <ul className="spec-grid">

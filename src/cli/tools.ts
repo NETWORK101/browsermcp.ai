@@ -1,4 +1,4 @@
-import { loadConfig, type BrowserMcpConfig } from '../config/schema.js';
+import { loadConfig, type LocalMcpConfig } from '../config/schema.js';
 import { createRuntime, runTool } from '../runtime.js';
 import { UsageTracker } from '../cost/tracker.js';
 
@@ -6,9 +6,9 @@ import { UsageTracker } from '../cost/tracker.js';
  * CLI entry points for agents that have a shell (Claude Code, Codex…): same tools, same policy,
  * zero tool-schema tokens. Output is the same fenced markdown the MCP tools return, or --json.
  *
- *   browsermcp read <url> [--focus <text>] [--max-tokens <n>] [--diff] [--elements] [--wait-for <css>] [--json]
- *   browsermcp extract <url> [--schema '<json>'] [--focus <text>] [--max-tokens <n>] [--json]
- *   browsermcp links <url> [--same-origin] [--match <text>] [--limit <n>] [--json]
+ *   localmcp read <url> [--focus <text>] [--max-tokens <n>] [--diff] [--elements] [--wait-for <css>] [--json]
+ *   localmcp extract <url> [--schema '<json>'] [--focus <text>] [--max-tokens <n>] [--json]
+ *   localmcp links <url> [--same-origin] [--match <text>] [--limit <n>] [--json]
  */
 
 export const CLI_TOOLS: Record<string, 'browse' | 'extract' | 'links'> = {
@@ -72,9 +72,9 @@ export function toToolArgs(url: string, flags: ParsedArgs['flags']): Record<stri
 }
 
 export const CLI_HELP = `Read pages from a shell (same tools and policy as the MCP server, no tool schema in context):
-  browsermcp read <url> [--focus <text>] [--max-tokens <n>] [--diff] [--elements] [--wait-for <css>] [--json]
-  browsermcp extract <url> [--schema '<json>'] [--focus <text>] [--max-tokens <n>] [--json]
-  browsermcp links <url> [--same-origin] [--match <text>] [--limit <n>] [--json]`;
+  localmcp read <url> [--focus <text>] [--max-tokens <n>] [--diff] [--elements] [--wait-for <css>] [--json]
+  localmcp extract <url> [--schema '<json>'] [--focus <text>] [--max-tokens <n>] [--json]
+  localmcp links <url> [--same-origin] [--match <text>] [--limit <n>] [--json]`;
 
 export interface CliIO {
   out: (s: string) => void;
@@ -90,7 +90,7 @@ const defaultIO: CliIO = {
 export async function runCliTool(
   command: string,
   argv: string[],
-  opts: { config?: BrowserMcpConfig; tracker?: UsageTracker; io?: CliIO } = {}
+  opts: { config?: LocalMcpConfig; tracker?: UsageTracker; io?: CliIO } = {}
 ): Promise<number> {
   const io = opts.io ?? defaultIO;
   const tool = CLI_TOOLS[command];

@@ -6,7 +6,7 @@ export function Footer() {
     <footer className="footer">
       <div className="wrap footer-inner">
         <div className="footer-brand">
-          <span className="brand"><Mark size={16} /><span className="brand-name">browsermcp</span></span>
+          <span className="brand"><Mark size={16} /><span className="brand-name">localmcp</span></span>
           <p>A read-optimized browser for AI agents. Runs locally. MIT licensed.</p>
         </div>
         <nav className="footer-nav" aria-label="Footer">
@@ -16,9 +16,9 @@ export function Footer() {
           <a href="#top">Back to top ↑</a>
         </nav>
         <p className="footer-colophon">
-          <span>browsermcpai v0.3.0</span>
+          <span>localmcp v0.3.0</span>
           <span>Set in Inter Tight &amp; Geist Mono</span>
-          <span>Not affiliated with Browser MCP (browsermcp.io)</span>
+          <span>Not affiliated with Browser MCP (browsermcp.io) or the local-mcp / @localmcp packages</span>
         </p>
       </div>
     </footer>

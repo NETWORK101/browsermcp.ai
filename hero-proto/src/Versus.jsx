@@ -3,14 +3,14 @@ import { SectionHead } from './ui.jsx'
 
 /*
   "My agent already runs locally — why add this?" Same task, three ways.
-  Numbers tagged `measured` came from a live run (2026-10-01, browsermcp 0.3.0 and @playwright/mcp 0.0.83);
+  Numbers tagged `measured` came from a live run (2026-10-01, localmcp 0.3.0 and @playwright/mcp 0.0.83);
   everything else is a typical shape, labelled as such.
 */
 
 const APPROACHES = [
   { id: 'fetch', name: 'Your agent alone', sub: 'built-in web fetch / curl' },
   { id: 'auto', name: 'Agent + automation MCP', sub: 'drives a browser step by step' },
-  { id: 'bmcp', name: 'Agent + browsermcp', sub: 'one focused read', us: true },
+  { id: 'bmcp', name: 'Agent + localmcp', sub: 'one focused read', us: true },
 ]
 
 const TASKS = [
@@ -52,7 +52,7 @@ const TASKS = [
         outcome: 'ok', note: 'Works if you’ve set up a logged-in profile — at automation prices for a read.',
       },
       bmcp: {
-        steps: ['npx browsermcpai login dashboard.stripe.com  # once', 'browse({ url, focus: "failed payouts" })'],
+        steps: ['npx localmcp login dashboard.stripe.com  # once', 'browse({ url, focus: "failed payouts" })'],
         calls: '1', context: '~1–3k typical',
         outcome: 'ok', note: 'Your session, on your disk. The page never touches a third-party server.',
       },
@@ -142,9 +142,9 @@ export function Versus() {
           </div>
 
           <p className="vs-foot">
-            “Measured” figures: live run on 2026-10-01 with browsermcp 0.3.0 and @playwright/mcp 0.0.83, tokens estimated at 4 characters each — see the benchmark on GitHub.
+            “Measured” figures: live run on 2026-10-01 with localmcp 0.3.0 and @playwright/mcp 0.0.83, tokens estimated at 4 characters each — see the benchmark on GitHub.
             Other figures are typical shapes, not benchmarks. Automation MCPs are the right tool when a task really
-            is multi-step driving — browsermcp is for the far more common job of reading.
+            is multi-step driving — localmcp is for the far more common job of reading.
           </p>
         </div>
       </div>

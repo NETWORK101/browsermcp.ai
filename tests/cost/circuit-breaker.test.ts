@@ -8,7 +8,7 @@ let dbPath: string;
 let tracker: UsageTracker;
 
 function tmpDb(): string {
-  return `/tmp/browsermcp-test-${Date.now()}-${randomBytes(4).toString('hex')}.db`;
+  return `/tmp/localmcp-test-${Date.now()}-${randomBytes(4).toString('hex')}.db`;
 }
 
 afterEach(() => {
@@ -44,7 +44,7 @@ describe('CircuitBreaker', () => {
     expect(result.allowed).toBe(false);
     expect(result.message).toContain('Daily session limit reached');
     expect(result.message).toContain('2/2');
-    expect(result.message).toContain('BROWSERMCP_NO_LIMIT=1');
+    expect(result.message).toContain('LOCALMCP_NO_LIMIT=1');
   });
 
   it('over token limit → allowed: false with message', () => {
@@ -58,7 +58,7 @@ describe('CircuitBreaker', () => {
     expect(result.allowed).toBe(false);
     expect(result.message).toContain('Daily token limit reached');
     expect(result.message).toContain('600/500');
-    expect(result.message).toContain('BROWSERMCP_NO_LIMIT=1');
+    expect(result.message).toContain('LOCALMCP_NO_LIMIT=1');
   });
 
   it('HEADLESSDEV_NO_LIMIT=1 → allowed: true even when over limit', () => {

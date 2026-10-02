@@ -7,7 +7,7 @@ import { handleInteract } from './tools/interact.js';
 import { errorResult, type ToolContext, type ToolResult } from './tools/common.js';
 import { UsageTracker } from './cost/tracker.js';
 import { CircuitBreaker } from './cost/circuit-breaker.js';
-import type { BrowserMcpConfig } from './config/schema.js';
+import type { LocalMcpConfig } from './config/schema.js';
 import { checkUrl, interactDecision, isDeniedRequest, type InteractDecision } from './security/policy.js';
 
 export const TOOL_NAMES = ['browse', 'extract', 'links', 'screenshot', 'interact'] as const;
@@ -17,7 +17,7 @@ export const TOOL_NAMES = ['browse', 'extract', 'links', 'screenshot', 'interact
  * policy, limits, fencing and usage tracking.
  */
 export interface Runtime {
-  config: BrowserMcpConfig;
+  config: LocalMcpConfig;
   tracker: UsageTracker;
   browserManager: BrowserManager;
   breaker: CircuitBreaker;
@@ -25,7 +25,7 @@ export interface Runtime {
   interact: InteractDecision;
 }
 
-export function createRuntime(config: BrowserMcpConfig, tracker: UsageTracker = new UsageTracker()): Runtime {
+export function createRuntime(config: LocalMcpConfig, tracker: UsageTracker = new UsageTracker()): Runtime {
   return {
     config,
     tracker,
@@ -70,7 +70,7 @@ export async function runTool(
   }
   const decision = checkUrl(args.url, rt.config.policy);
   if (!decision.ok) {
-    return errorResult(`Blocked by browsermcp policy: ${decision.reason}`);
+    return errorResult(`Blocked by localmcp policy: ${decision.reason}`);
   }
   const check = rt.breaker.check();
   if (!check.allowed) {

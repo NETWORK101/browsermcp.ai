@@ -75,19 +75,19 @@ describe('CLI commands (in-process)', () => {
     const c = capture();
     const code = await runCliTool('read', ['file:///etc/passwd'], { config, tracker: tracker(), io: c.io });
     expect(code).toBe(1);
-    expect(c.err.join('')).toMatch(/Blocked by browsermcp policy/);
+    expect(c.err.join('')).toMatch(/Blocked by localmcp policy/);
   });
 
   it('prints usage and exits 2 on a missing URL', async () => {
     const c = capture();
     expect(await runCliTool('read', [], { config, tracker: tracker(), io: c.io })).toBe(2);
-    expect(c.err.join('')).toMatch(/browsermcp read <url>/);
+    expect(c.err.join('')).toMatch(/localmcp read <url>/);
   });
 });
 
 describe('CLI binary (end to end)', () => {
   // Async spawn on purpose: spawnSync would block this process, which is also serving the test page.
-  it('`browsermcp read` runs through tsx with an isolated home directory', async () => {
+  it('`localmcp read` runs through tsx with an isolated home directory', async () => {
     const home = tmp();
     const browsers =
       process.env.PLAYWRIGHT_BROWSERS_PATH ??
@@ -97,7 +97,7 @@ describe('CLI binary (end to end)', () => {
           ? path.join(os.homedir(), 'AppData', 'Local', 'ms-playwright')
           : path.join(os.homedir(), '.cache', 'ms-playwright'));
     const r = await new Promise<{ status: number | null; stdout: string; stderr: string }>((resolve) => {
-      const child = spawn(process.execPath, [path.join(root, 'node_modules', 'tsx', 'dist', 'cli.mjs'), path.join(root, 'bin', 'browsermcp.ts'), 'read', base, '--max-tokens', '300'], {
+      const child = spawn(process.execPath, [path.join(root, 'node_modules', 'tsx', 'dist', 'cli.mjs'), path.join(root, 'bin', 'localmcp.ts'), 'read', base, '--max-tokens', '300'], {
         cwd: home,
         env: { ...process.env, HOME: home, USERPROFILE: home, PLAYWRIGHT_BROWSERS_PATH: browsers },
       });
@@ -110,6 +110,6 @@ describe('CLI binary (end to end)', () => {
     expect(r.stderr).not.toMatch(/__name is not defined/);
     expect(r.status).toBe(0);
     expect(r.stdout).toContain('# CLI page');
-    expect(fs.existsSync(path.join(home, '.browsermcp', 'usage.db'))).toBe(true); // usage stayed in the isolated home
+    expect(fs.existsSync(path.join(home, '.localmcp', 'usage.db'))).toBe(true); // usage stayed in the isolated home
   });
 });

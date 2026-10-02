@@ -4,7 +4,7 @@ import { homedir } from 'os';
 
 /**
  * How the browser keeps (or doesn't keep) session state between calls.
- * - "auto":       use the persistent profile if `browsermcp login` has created one, else ephemeral
+ * - "auto":       use the persistent profile if `localmcp login` has created one, else ephemeral
  * - "persistent": always use the persistent profile at `profileDir`
  * - "ephemeral":  fresh incognito-style context per call (no cookies survive)
  */
@@ -14,7 +14,7 @@ export type ProfileMode = 'auto' | 'persistent' | 'ephemeral';
 export type BrowserEngine = 'chromium' | 'firefox' | 'webkit';
 export const ENGINES: BrowserEngine[] = ['chromium', 'firefox', 'webkit'];
 
-export interface BrowserMcpConfig {
+export interface LocalMcpConfig {
   browser: {
     timeout: number;
     headless: boolean;
@@ -55,11 +55,17 @@ export interface BrowserMcpConfig {
 }
 
 /** @deprecated kept for API compatibility with <=0.1.x imports */
-export type HeadlessDevConfig = BrowserMcpConfig;
+export type HeadlessDevConfig = LocalMcpConfig;
 
-export const STATE_DIR = join(homedir(), '.browsermcp');
+/** ~/.localmcp — or the pre-rename ~/.browsermcp when only that exists, so saved logins and usage carry over. */
+export function resolveStateDir(home: string = homedir()): string {
+  const next = join(home, '.localmcp');
+  const prev = join(home, '.browsermcp');
+  return existsSync(next) || !existsSync(prev) ? next : prev;
+}
+export const STATE_DIR = resolveStateDir();
 
-export const DEFAULT_CONFIG: BrowserMcpConfig = {
+export const DEFAULT_CONFIG: LocalMcpConfig = {
   browser: {
     timeout: 30000,
     headless: true,
@@ -74,7 +80,7 @@ export const DEFAULT_CONFIG: BrowserMcpConfig = {
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K] };
 
-function deepMerge(base: BrowserMcpConfig, override: DeepPartial<BrowserMcpConfig>): BrowserMcpConfig {
+function deepMerge(base: LocalMcpConfig, override: DeepPartial<LocalMcpConfig>): LocalMcpConfig {
   return {
     browser: { ...base.browser, ...override.browser },
     distill: { ...base.distill, ...override.distill },
@@ -83,21 +89,31 @@ function deepMerge(base: BrowserMcpConfig, override: DeepPartial<BrowserMcpConfi
   };
 }
 
-function tryLoad(filePath: string): DeepPartial<BrowserMcpConfig> | null {
+function tryLoad(filePath: string): DeepPartial<LocalMcpConfig> | null {
   if (!existsSync(filePath)) return null;
   try {
-    return JSON.parse(readFileSync(filePath, 'utf-8')) as DeepPartial<BrowserMcpConfig>;
+    return JSON.parse(readFileSync(filePath, 'utf-8')) as DeepPartial<LocalMcpConfig>;
   } catch (err) {
     // A broken config should be loud, not silently ignored — but must not crash the stdio server.
-    console.error(`[browsermcp] Ignoring invalid JSON in ${filePath}: ${(err as Error).message}`);
+    console.error(`[localmcp] Ignoring invalid JSON in ${filePath}: ${(err as Error).message}`);
     return null;
   }
 }
 
-export function loadConfig(): BrowserMcpConfig {
-  // Resolution order: defaults ← ~/.config/browsermcp/config.json ← .browsermcp.json in CWD
-  const globalPath = join(homedir(), '.config', 'browsermcp', 'config.json');
-  const localPath = join(process.cwd(), '.browsermcp.json');
+function firstExisting(...paths: string[]): string {
+  return paths.find((p) => existsSync(p)) ?? paths[0];
+}
+
+export function loadConfig(opts: { cwd?: string; home?: string } = {}): LocalMcpConfig {
+  const home = opts.home ?? homedir();
+  const cwd = opts.cwd ?? process.cwd();
+  // Resolution order: defaults ← ~/.config/localmcp/config.json ← .localmcp.json in CWD.
+  // The pre-rename names (browsermcp) are still read when the new ones don't exist.
+  const globalPath = firstExisting(
+    join(home, '.config', 'localmcp', 'config.json'),
+    join(home, '.config', 'browsermcp', 'config.json')
+  );
+  const localPath = firstExisting(join(cwd, '.localmcp.json'), join(cwd, '.browsermcp.json'));
 
   let config = deepMerge(DEFAULT_CONFIG, {});
 

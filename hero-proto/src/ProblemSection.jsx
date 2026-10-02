@@ -3,14 +3,14 @@ import { SectionHead } from './ui.jsx'
 
 /*
   Lead with the moment people recognise: the agent's reply when it can't read
-  the page. Each card is symptom → cause → what browsermcp does instead.
+  the page. Each card is symptom → cause → what localmcp does instead.
 */
 const PAINS = [
   {
     tag: 'Login wall',
     says: '“I can’t access that page — it looks like it requires you to sign in.”',
     why: 'Your agent’s fetch has none of your cookies, so Stripe, Jira, Notion and your admin panel all return a login screen.',
-    fix: 'Sign in once with browsermcp login. The session stays in a profile on your disk.',
+    fix: 'Sign in once with localmcp login. The session stays in a profile on your disk.',
   },
   {
     tag: 'Empty shell',
@@ -29,7 +29,7 @@ const PAINS = [
     tag: 'Unreachable',
     says: '“I can’t reach localhost:3000 from here.”',
     why: 'Hosted browsing and scraping services run on someone else’s servers — your dev server, VPN and intranet are invisible to them.',
-    fix: 'browsermcp runs on your machine, so it reaches what you can reach.',
+    fix: 'localmcp runs on your machine, so it reaches what you can reach.',
   },
   {
     tag: 'Data exposure',
@@ -67,7 +67,7 @@ export function ProblemSection() {
                 {p.says}
               </blockquote>
               <p className="pain-why">{p.why}</p>
-              <p className="pain-fix"><span className="pain-fix-k">browsermcp</span> {p.fix}</p>
+              <p className="pain-fix"><span className="pain-fix-k">localmcp</span> {p.fix}</p>
             </li>
           ))}
         </ol>

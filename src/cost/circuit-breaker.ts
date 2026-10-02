@@ -12,7 +12,7 @@ export class CircuitBreaker {
   ) {}
 
   check(): { allowed: boolean; message?: string } {
-    if (process.env.BROWSERMCP_NO_LIMIT === '1' || process.env.HEADLESSDEV_NO_LIMIT === '1') {
+    if (process.env.LOCALMCP_NO_LIMIT === '1' || process.env.BROWSERMCP_NO_LIMIT === '1' || process.env.HEADLESSDEV_NO_LIMIT === '1') {
       return { allowed: true };
     }
 
@@ -21,14 +21,14 @@ export class CircuitBreaker {
     if (usage.sessions >= this.config.maxSessionsPerDay) {
       return {
         allowed: false,
-        message: `Daily session limit reached (${usage.sessions}/${this.config.maxSessionsPerDay}). Raise limits in .browsermcp.json or set BROWSERMCP_NO_LIMIT=1 to override.`
+        message: `Daily session limit reached (${usage.sessions}/${this.config.maxSessionsPerDay}). Raise limits in .localmcp.json or set LOCALMCP_NO_LIMIT=1 to override.`
       };
     }
 
     if (usage.tokens >= this.config.maxTokensPerDay) {
       return {
         allowed: false,
-        message: `Daily token limit reached (${usage.tokens}/${this.config.maxTokensPerDay}). Raise limits in .browsermcp.json or set BROWSERMCP_NO_LIMIT=1 to override.`
+        message: `Daily token limit reached (${usage.tokens}/${this.config.maxTokensPerDay}). Raise limits in .localmcp.json or set LOCALMCP_NO_LIMIT=1 to override.`
       };
     }
 

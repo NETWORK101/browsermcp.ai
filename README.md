@@ -1,13 +1,13 @@
-# browsermcp
+# localmcp
 
 **A local, read-optimized browser for AI agents.** Your agent reads any page — including the ones you're signed in to — as focused, token-budgeted markdown. Runs a real Chromium on your machine. No cloud relay, no API key, no account.
 
 ```bash
-claude mcp add browsermcp -- npx -y browsermcpai     # Claude Code
-npx browsermcpai init                                # everything else: prints config for your clients
+claude mcp add localmcp -- npx -y localmcp     # Claude Code
+npx localmcp init                                # everything else: prints config for your clients
 ```
 
-[![npm](https://img.shields.io/npm/v/browsermcpai)](https://www.npmjs.com/package/browsermcpai) · MIT · Node ≥ 20 · [Website](https://browsermcp.pages.dev)
+[![npm](https://img.shields.io/npm/v/localmcp)](https://www.npmjs.com/package/localmcp) · MIT · Node ≥ 20 · [Website](https://browsermcp.pages.dev)
 
 ---
 
@@ -20,16 +20,16 @@ npx browsermcpai init                                # everything else: prints c
 | Full automation MCPs (e.g. Playwright MCP) | Great for driving a browser. For *reading*, one page snapshot is 13k–87k tokens of accessibility tree ([measured](benchmarks/results.md)). |
 | CLI browser tools | Need a shell. Claude Desktop and other sandboxed clients don't have one. |
 
-browsermcp is the reading-first option: the page itself — no summarizer in the middle — focused and under a token budget, read by a browser on your machine. Five MCP tools, or three shell commands. See the [benchmark](benchmarks/results.md).
+localmcp is the reading-first option: the page itself — no summarizer in the middle — focused and under a token budget, read by a browser on your machine. Five MCP tools, or three shell commands. See the [benchmark](benchmarks/results.md).
 
 ## What's new in 0.2
 
-- **Real authenticated browsing.** `npx browsermcpai login <url>` opens a visible browser on a private profile. Sign in once; the agent reuses the session. Or attach to your own Chrome over CDP.
+- **Real authenticated browsing.** `npx localmcp login <url>` opens a visible browser on a private profile. Sign in once; the agent reuses the session. Or attach to your own Chrome over CDP.
 - **Focus + budget.** `browse({ url, focus: "rate limits", maxTokens: 1500 })` ranks sections by relevance and returns only what fits — and tells the agent which sections it left out.
 - **Structured extraction with MCP sampling.** `extract` returns JSON-LD, meta tags, and tables as row objects. Pass a `schema` and your *client's own model* fills it — no extra API key.
 - **Current MCP spec.** Tool `annotations`, `outputSchema` + `structuredContent`, server `instructions`, progress notifications, and diff snapshots as resources.
 - **Safety by default.** Domain allow/deny policy, read-only mode, dangerous schemes blocked, and every page wrapped in an untrusted-content fence against prompt injection.
-- **Metadata-first reading (0.2.1).** If a site publishes markdown for agents (a `text/markdown` alternate link, or `Accept: text/markdown`), browsermcp reads that instead of the rendered HTML. Stripe's API reference drops from 428k tokens of HTML to the publisher's own markdown. Every result opens with a page card (type, site, author, published/updated dates, canonical URL, source) read from JSON-LD, OpenGraph, `<meta>` and front matter, and `links` points out a site's `/llms.txt`.
+- **Metadata-first reading (0.2.1).** If a site publishes markdown for agents (a `text/markdown` alternate link, or `Accept: text/markdown`), localmcp reads that instead of the rendered HTML. Stripe's API reference drops from 428k tokens of HTML to the publisher's own markdown. Every result opens with a page card (type, site, author, published/updated dates, canonical URL, source) read from JSON-LD, OpenGraph, `<meta>` and front matter, and `links` points out a site's `/llms.txt`.
 
 See [CHANGELOG.md](CHANGELOG.md) for the full list and migration notes.
 
@@ -66,9 +66,9 @@ Read-only annotations let clients auto-approve reads while still confirming `int
 The same tools and policy, with no tool schema in your agent's context:
 
 ```bash
-npx browsermcpai read https://docs.stripe.com/api --focus "pagination" --max-tokens 1500
-npx browsermcpai extract https://example.com/pricing --schema '{"plans":[{"name":"string"}]}' --json
-npx browsermcpai links https://docs.example.com --same-origin --match /api/
+npx localmcp read https://docs.stripe.com/api --focus "pagination" --max-tokens 1500
+npx localmcp extract https://example.com/pricing --schema '{"plans":[{"name":"string"}]}' --json
+npx localmcp links https://docs.example.com --same-origin --match /api/
 ```
 
 `--json` prints `structuredContent`; otherwise you get the same fenced markdown the MCP tools return. Exit code 1 means a policy block or a page error.
@@ -129,10 +129,10 @@ Password values are never echoed back. If an action navigates to a host your pol
 **Option A: dedicated profile (recommended)**
 
 ```bash
-npx browsermcpai login https://dashboard.stripe.com
+npx localmcp login https://dashboard.stripe.com
 ```
 
-A browser window opens on `~/.browsermcp/profile`. Sign in to whatever your agent should read, then close the window. With the default `browser.profile: "auto"`, browsermcp uses that profile from then on. Chromium locks a profile to one process. If two clients run browsermcp at once, the second one falls back to an ephemeral session and says so in its output.
+A browser window opens on `~/.localmcp/profile`. Sign in to whatever your agent should read, then close the window. With the default `browser.profile: "auto"`, localmcp uses that profile from then on. Chromium locks a profile to one process. If two clients run localmcp at once, the second one falls back to an ephemeral session and says so in its output.
 
 **Option B: your own Chrome**
 
@@ -142,7 +142,7 @@ Start Chrome with `--remote-debugging-port=9222`, then:
 { "browser": { "cdpEndpoint": "http://localhost:9222" } }
 ```
 
-browsermcp opens its own tabs in your existing session and never closes your browser.
+localmcp opens its own tabs in your existing session and never closes your browser.
 
 > Either way the agent can read anything those sessions can. So while a signed-in session is in use, `interact` is **off by default** (`policy.allowInteract: "auto"`): the agent reads as you but can't click or type as you until you set `allowInteract: true`. Pair this with `policy.allow` (below).
 
@@ -159,11 +159,11 @@ browsermcp opens its own tabs in your existing session and never closes your bro
 | Your running Safari | `safaridriver` | Roadmap |
 | Tabs in your everyday browser, no flags | extension bridge | Roadmap |
 
-Firefox and WebKit need a one-time `npx playwright install firefox webkit`. Sign in per engine with `npx browsermcpai login <url> --browser firefox`.
+Firefox and WebKit need a one-time `npx playwright install firefox webkit`. Sign in per engine with `npx localmcp login <url> --browser firefox`.
 
 ## Configuration
 
-`npx browsermcpai init` writes `.browsermcp.json`. Global defaults can live in `~/.config/browsermcp/config.json`; project config wins.
+`npx localmcp init` writes `.localmcp.json`. Global defaults can live in `~/.config/localmcp/config.json`; project config wins.
 
 ```jsonc
 {
@@ -201,7 +201,7 @@ Host globs: `example.com` (exact host, any port), `*.example.com` (subdomains, n
 - **Nothing is relayed.** Pages are fetched and distilled by a browser on your machine, then go only to the model your agent already uses. No telemetry, no account.
 - **Policy at the boundary.** Every URL is checked before a browser is touched, and again after redirects or actions that change origin. Deny rules also apply to every request a page makes — images, iframes, scripts, fetches — including when attached to your own browser. Only `http(s)` is allowed by default; `file:`, `javascript:`, `chrome:`, `data:` are refused.
 - **Prompt-injection fence.** Page content comes back inside `<untrusted-page-content>` tags, and the server's `instructions` tell the model to treat it as data. Pages that try to close the fence early are neutralised. This *reduces* injection risk; it doesn't eliminate it. Keep `interact` confirmations on in your client.
-- **Circuit breaker.** Daily session and token caps (local SQLite at `~/.browsermcp/usage.db`). `npx browsermcpai usage` shows totals. `BROWSERMCP_NO_LIMIT=1` overrides.
+- **Circuit breaker.** Daily session and token caps (local SQLite at `~/.localmcp/usage.db`). `npx localmcp usage` shows totals. `LOCALMCP_NO_LIMIT=1` overrides.
 
 ## MCP protocol surface
 
@@ -212,24 +212,24 @@ Host globs: `example.com` (exact host, any port), `*.example.com` (subdomains, n
 | Server `instructions` | ✓ |
 | `notifications/progress` (when the client sends a `progressToken`) | ✓ |
 | `sampling/createMessage` (used by `extract` when the client supports it) | ✓ |
-| `resources` — diff snapshots at `browsermcp://snapshot/{url}` | ✓ |
+| `resources` — diff snapshots at `localmcp://snapshot/{url}` | ✓ |
 | Transport | stdio |
 
 ## CLI
 
 ```
-browsermcp                 Start the MCP server on stdio
-browsermcp init            Create .browsermcp.json and print setup for your MCP clients
-browsermcp login [url]     Sign in once on the persistent profile
-browsermcp usage           Today's and this week's usage
-browsermcp --version
+localmcp                 Start the MCP server on stdio
+localmcp init            Create .localmcp.json and print setup for your MCP clients
+localmcp login [url]     Sign in once on the persistent profile
+localmcp usage           Today's and this week's usage
+localmcp --version
 ```
 
 ## Token benchmark
 
 `npm run bench` measures named public pages four ways — rendered HTML, a Playwright MCP `browser_snapshot`, `browse` with no budget, and `browse` with the 4,000-token default — and writes [benchmarks/results.md](benchmarks/results.md). On 2026-10-01:
 
-| Page | Rendered HTML | Playwright MCP snapshot | browsermcp (full) | browsermcp (default) |
+| Page | Rendered HTML | Playwright MCP snapshot | localmcp (full) | localmcp (default) |
 |---|---:|---:|---:|---:|
 | Stripe API reference | 428,457 | 30,724 | 482 | 482 |
 | GitHub REST: Issues | 330,083 | 87,350 | 20,228 | 4,002 |
@@ -238,7 +238,7 @@ browsermcp --version
 | Python: json module | 29,700 | 25,381 | 8,624 | 3,996 |
 | Hacker News front page | 8,539 | 12,207 | 4,023 | 3,945 |
 
-Tokens ≈ characters ÷ 4 in every column. Savings range from 2× (a page that is already mostly text) to hundreds of times (a site serving its own markdown); `focus` and `maxTokens` cap any page at the budget you choose. Tool schemas: browsermcp 1,352 tokens, Playwright MCP 5,072 — Claude Code, Cursor and Codex load schemas on demand, so this mainly matters for clients that don't.
+Tokens ≈ characters ÷ 4 in every column. Savings range from 2× (a page that is already mostly text) to hundreds of times (a site serving its own markdown); `focus` and `maxTokens` cap any page at the budget you choose. Tool schemas: localmcp 1,352 tokens, Playwright MCP 5,072 — Claude Code, Cursor and Codex load schemas on demand, so this mainly matters for clients that don't.
 
 ## Development
 
@@ -251,7 +251,9 @@ npm run build
 
 ## Name
 
-browsermcp (`browsermcpai` on npm) is not affiliated with Browser MCP (browsermcp.io), a separate Chrome-extension project.
+localmcp was previously published as `browsermcpai` (and `headlessdev` before that). The old config files, state directory and env override keep working; see the [changelog](CHANGELOG.md).
+
+It is not affiliated with Browser MCP (browsermcp.io), a Chrome-extension project, nor with the `local-mcp` and `@localmcp/*` packages on npm, which give ChatGPT and Claude shell and file access to your machine. localmcp is the opposite kind of tool: a scoped, read-only browser.
 
 ## License
 

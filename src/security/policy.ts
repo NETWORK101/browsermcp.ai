@@ -1,8 +1,8 @@
 import { existsSync } from 'fs';
-import type { BrowserMcpConfig } from '../config/schema.js';
+import type { LocalMcpConfig } from '../config/schema.js';
 import { profileDirFor } from '../browser/manager.js';
 
-export type Policy = BrowserMcpConfig['policy'];
+export type Policy = LocalMcpConfig['policy'];
 
 export type PolicyDecision = { ok: true; url: URL } | { ok: false; reason: string };
 
@@ -48,7 +48,7 @@ export function checkUrl(raw: string, policy: Policy): PolicyDecision {
   if (url.protocol === 'file:') {
     return policy.allowFileUrls
       ? { ok: true, url }
-      : { ok: false, reason: 'file:// URLs are disabled (set policy.allowFileUrls in .browsermcp.json to enable).' };
+      : { ok: false, reason: 'file:// URLs are disabled (set policy.allowFileUrls in .localmcp.json to enable).' };
   }
   if (!WEB_SCHEMES.has(url.protocol)) {
     return { ok: false, reason: `Scheme "${url.protocol}" is not allowed — only http(s) URLs can be opened.` };
@@ -76,8 +76,8 @@ export function fenceUntrusted(content: string, source: string): string {
   return `<${FENCE_TAG} source="${source.replaceAll('"', '%22')}">\n${safe}\n</${FENCE_TAG}>`;
 }
 
-/** True when browsermcp will read as the user: a saved login profile or an attached browser. */
-export function usesSignedInSession(browser: BrowserMcpConfig['browser']): boolean {
+/** True when localmcp will read as the user: a saved login profile or an attached browser. */
+export function usesSignedInSession(browser: LocalMcpConfig['browser']): boolean {
   if (browser.cdpEndpoint) return true;
   if (browser.profile === 'persistent') return true;
   if (browser.profile === 'auto') return existsSync(profileDirFor(browser.engine, browser.profileDir));
@@ -90,7 +90,7 @@ export type InteractDecision = { allowed: true } | { allowed: false; reason: str
  * Resolve policy.allowInteract. "auto" keeps clicks and typing off whenever the agent would act
  * with the user's credentials — the combination vendors warn about (signed-in browser + injection).
  */
-export function interactDecision(config: BrowserMcpConfig): InteractDecision {
+export function interactDecision(config: LocalMcpConfig): InteractDecision {
   const v = config.policy.allowInteract;
   if (v === true) return { allowed: true };
   if (v === false) {
@@ -100,8 +100,8 @@ export function interactDecision(config: BrowserMcpConfig): InteractDecision {
   return {
     allowed: false,
     reason:
-      'interact is off while browsermcp uses your signed-in session (policy.allowInteract: "auto"). ' +
-      'To let the agent click and type as you, set "allowInteract": true in .browsermcp.json.',
+      'interact is off while localmcp uses your signed-in session (policy.allowInteract: "auto"). ' +
+      'To let the agent click and type as you, set "allowInteract": true in .localmcp.json.',
   };
 }
 

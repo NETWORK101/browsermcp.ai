@@ -2,20 +2,20 @@
 
 const command = process.argv[2];
 
-const HELP = `browsermcp — a local, read-optimized browser for AI agents (MCP)
+const HELP = `localmcp — a local, read-optimized browser for AI agents (MCP)
 
 Usage:
-  browsermcp                 Start the MCP server on stdio (what your MCP client runs)
-  browsermcp init            Create .browsermcp.json and print setup for your MCP clients
-  browsermcp login [url] [--browser chromium|firefox|webkit]
+  localmcp                 Start the MCP server on stdio (what your MCP client runs)
+  localmcp init            Create .localmcp.json and print setup for your MCP clients
+  localmcp login [url] [--browser chromium|firefox|webkit]
                              Open a visible browser to sign in; the agent reuses the session
-  browsermcp usage           Show today's and this week's usage
-  browsermcp --version       Print the version
+  localmcp usage           Show today's and this week's usage
+  localmcp --version       Print the version
 
 Read pages from a shell (same tools and policy, no tool schema in your agent's context):
-  browsermcp read <url> [--focus <text>] [--max-tokens <n>] [--diff] [--elements] [--json]
-  browsermcp extract <url> [--schema '<json>'] [--json]
-  browsermcp links <url> [--same-origin] [--match <text>] [--json]
+  localmcp read <url> [--focus <text>] [--max-tokens <n>] [--diff] [--elements] [--json]
+  localmcp extract <url> [--schema '<json>'] [--json]
+  localmcp links <url> [--same-origin] [--match <text>] [--json]
 `;
 
 if (command === 'init') {

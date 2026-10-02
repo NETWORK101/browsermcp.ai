@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 
 const ThemeContext = createContext()
-const KEY = 'browsermcp-theme'
+const KEY = 'localmcp-theme'
 
 function initialTheme() {
   if (typeof document === 'undefined') return 'dark'

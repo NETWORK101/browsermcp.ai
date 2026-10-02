@@ -8,7 +8,7 @@ function readVersion(): string {
   for (let i = 0; i < 4; i++) {
     try {
       const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf-8'));
-      if (pkg.name === 'browsermcpai') return pkg.version;
+      if (pkg.name === 'localmcp') return pkg.version;
     } catch {
       /* keep walking up */
     }
