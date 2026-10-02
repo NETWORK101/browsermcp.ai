@@ -1,3 +1,5 @@
+> **This project has moved and been renamed: it is now [localmcp](https://github.com/NETWORK101/localmcp)** — `npx localmcp init` · site: https://localmcp.pages.dev. This repository is archived and no longer updated; `browsermcpai` and `headlessdev` on npm are superseded by `localmcp`.
+
 # browsermcp
 
 **A local, read-optimized browser for AI agents.** Your agent reads any page — including the ones you're signed in to — as focused, token-budgeted markdown. Runs a real Chromium on your machine. No cloud relay, no API key, no account.
